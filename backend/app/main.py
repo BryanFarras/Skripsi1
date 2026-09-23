@@ -4,7 +4,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from pathlib import Path
 
-from .config import STATIC_DIR, EXPORTS_DIR
+from .config import FRONTEND_DIR, EXPORTS_DIR
 from .api.routes import router as api_router
 
 app = FastAPI(
@@ -22,19 +22,24 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Include API endpoints
+# Include API endpoints first so they take precedence
 app.include_router(api_router)
 
-# Mount static files and exports
-if STATIC_DIR.exists():
-    app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
-
+# Mount exports directory
 if EXPORTS_DIR.exists():
     app.mount("/exports", StaticFiles(directory=str(EXPORTS_DIR)), name="exports")
 
+# Mount frontend static directories
+if FRONTEND_DIR.exists():
+    app.mount("/static", StaticFiles(directory=str(FRONTEND_DIR)), name="static")
+    if (FRONTEND_DIR / "css").exists():
+        app.mount("/css", StaticFiles(directory=str(FRONTEND_DIR / "css")), name="css")
+    if (FRONTEND_DIR / "js").exists():
+        app.mount("/js", StaticFiles(directory=str(FRONTEND_DIR / "js")), name="js")
+
 @app.get("/")
 async def root():
-    index_file = STATIC_DIR / "index.html"
+    index_file = FRONTEND_DIR / "index.html"
     if index_file.exists():
         return FileResponse(index_file)
     return {

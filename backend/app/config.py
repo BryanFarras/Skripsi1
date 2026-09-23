@@ -1,11 +1,16 @@
 from pathlib import Path
 
 # Paths
-BASE_DIR = Path(__file__).resolve().parent.parent
-APP_DIR = BASE_DIR / "app"
-STATIC_DIR = APP_DIR / "static"
-UPLOADS_DIR = BASE_DIR / "uploads"
-EXPORTS_DIR = BASE_DIR / "exports"
+BACKEND_DIR = Path(__file__).resolve().parent.parent
+ROOT_DIR = BACKEND_DIR.parent
+APP_DIR = BACKEND_DIR / "app"
+
+# Frontend directory (separated at root level)
+FRONTEND_DIR = ROOT_DIR / "frontend"
+
+# Runtime directories inside backend
+UPLOADS_DIR = BACKEND_DIR / "uploads"
+EXPORTS_DIR = BACKEND_DIR / "exports"
 
 # Ensure runtime directories exist
 UPLOADS_DIR.mkdir(parents=True, exist_ok=True)

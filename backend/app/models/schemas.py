@@ -37,6 +37,20 @@ class SpectrogramData(BaseModel):
     max_db: float
     detected_cutoff_hz: Optional[float] = None
 
+class WaterfallSlice(BaseModel):
+    timestamp_sec: float
+    formatted_time: str            # e.g. "00:04.50"
+    magnitudes_db: List[float]     # dB levels for this slice
+    peak_db: float
+    color_hex: str                 # Color along gradient (green -> yellow -> red -> purple)
+
+class Waterfall3DData(BaseModel):
+    frequencies: List[float]       # Shared frequency bins (Hz)
+    slices: List[WaterfallSlice]   # Time slices receding into z-depth
+    min_db: float
+    max_db: float
+    total_slices: int
+
 class AIForensicMetrics(BaseModel):
     estimated_cutoff_hz: Optional[float] = None
     cutoff_detected: bool = False
@@ -53,4 +67,5 @@ class AnalysisResponse(BaseModel):
     fft_spectrum: FFTSpectrumData
     tonal_balance: TonalBalanceData
     spectrogram: SpectrogramData
+    waterfall_3d: Optional[Waterfall3DData] = None
     forensics: AIForensicMetrics

@@ -57,13 +57,13 @@
 
   <!-- Main Container -->
   <div class="page-container">
-    <!-- Top Feature / Notification Banner (Inspired by FreeConvert Header Banner) -->
+    <!-- Top Feature / Notification Banner -->
     <section class="feature-banner">
       <div class="banner-content">
         <div class="banner-badge">AI FORENSICS</div>
         <div class="banner-text">
-          <h3>Spectral Forensics for AI Music Detection</h3>
-          <p>Inspect brickwall cutoffs, diffusion artifacts, and tonal energy distribution in any song.</p>
+          <h3>Spectral Forensics & 3D Waterfall for AI Music Detection</h3>
+          <p>Inspect temporal spectral variations across 30s clips, brickwall cutoffs, and multi-band balance.</p>
         </div>
       </div>
       <div class="banner-action">
@@ -80,7 +80,7 @@
 
     <!-- 2-Column Split Workspace -->
     <main class="split-layout">
-      <!-- LEFT COLUMN: Media Viewport & Visualizer (Drag & Drop + Player) -->
+      <!-- LEFT COLUMN: Media Viewport & Visualizer (Drag & Drop + Player + 3D Waterfall) -->
       <section class="media-column">
         <!-- Main Media Player & Canvas Display Screen -->
         <div class="media-viewport-card">
@@ -102,19 +102,21 @@
               <button type="button" class="btn btn-browse" id="browseBtn">Choose Audio File</button>
             </div>
 
-            <!-- Active Visualizer Screen (Wave Candy / Player style) -->
+            <!-- Active Visualizer Screen (Wave Candy / 3D Waterfall style) -->
             <div class="media-screen" id="mediaScreen" style="display: none;">
               <!-- View Switcher Tabs inside Player -->
               <div class="screen-tabs">
                 <button class="screen-tab active" data-view="spectrogram">Spectrogram (STFT)</button>
-                <button class="screen-tab" data-view="equalizer">Equalizer (FFT)</button>
-                <button class="screen-tab" data-view="tonal">Tonal Balance</button>
+                <button class="screen-tab" data-view="waterfall">3D Waterfall</button>
+                <button class="screen-tab" data-view="equalizer">Equalizer (Real-Time FFT)</button>
+                <button class="screen-tab" data-view="tonal">Tonal Balance (Real-Time)</button>
                 <button class="screen-tab" data-view="stacked">All Stacked</button>
               </div>
 
               <!-- Canvas Container -->
               <div class="screen-canvas-container" id="screenCanvasContainer">
                 <canvas id="mainSpecCanvas"></canvas>
+                <canvas id="mainWaterfallCanvas" style="display: none;"></canvas>
                 <canvas id="mainEqCanvas" style="display: none;"></canvas>
                 <canvas id="mainTonalCanvas" style="display: none;"></canvas>
 
@@ -127,12 +129,17 @@
                   </button>
                 </div>
 
-                <!-- Playhead Cursor Line -->
+                <!-- Playhead Cursor Line for 2D Spectrogram -->
                 <div id="playheadCursor" class="playhead-line"></div>
 
                 <!-- AI Cutoff Floating Tag on Canvas -->
                 <div id="canvasCutoffBadge" class="canvas-cutoff-tag" style="display: none;">
                   <span class="cutoff-led"></span> AI Cutoff: <span id="cutoffValText">--</span>
+                </div>
+
+                <!-- 3D Waterfall Interaction Hint -->
+                <div id="waterfallHintTag" class="waterfall-hint-tag" style="display: none;">
+                  <span>🖱️ Drag to rotate 3D • Scroll to zoom • Click slice to seek</span>
                 </div>
               </div>
 
@@ -154,7 +161,7 @@
             </div>
           </div>
 
-          <!-- Bottom Position Buttons (Replicating "Use current position as: Trim Start | Trim End") -->
+          <!-- Bottom Position Buttons -->
           <div class="position-actions-bar">
             <span class="pos-label">Use current position as:</span>
             <div class="pos-buttons">
@@ -180,13 +187,13 @@
         <!-- Secondary Visualizers (When in Stacked Mode) -->
         <div class="stacked-visualizers-card" id="stackedVisualizersCard" style="display: none;">
           <div class="sub-card">
-            <h4>Equalizer (FFT Frequency Spectrum & Peak Hold)</h4>
+            <h4>Equalizer (Live Real-Time FFT & Peak Hold)</h4>
             <div class="sub-canvas-wrap">
               <canvas id="stackedEqCanvas"></canvas>
             </div>
           </div>
           <div class="sub-card">
-            <h4>Tonal Balance (Multi-Band Spectral Energy)</h4>
+            <h4>Tonal Balance (Live Multi-Band Spectral Energy)</h4>
             <div class="sub-canvas-wrap">
               <canvas id="stackedTonalCanvas"></canvas>
             </div>
@@ -194,7 +201,7 @@
         </div>
       </section>
 
-      <!-- RIGHT COLUMN: Options & Analysis Settings Panel (Inspired by GIF Options) -->
+      <!-- RIGHT COLUMN: Options & Analysis Settings Panel -->
       <aside class="options-column">
         <div class="options-card">
           <!-- Card Header with Gear Icon -->
@@ -210,6 +217,20 @@
           </div>
 
           <div class="options-body">
+            <!-- 3D Waterfall Camera Presets (Visible when in 3D Waterfall tab) -->
+            <div class="option-group" id="waterfallControlsGroup" style="display: none;">
+              <div class="option-label-row">
+                <label>3D Waterfall View Angle</label>
+                <span class="help-circle" title="Change 3D camera angle to inspect the waterfall from different perspectives">?</span>
+              </div>
+              <div class="camera-btn-row">
+                <button class="btn btn-sm btn-camera active" id="btnPresetSketch" data-preset="sketch">Sketch Angle</button>
+                <button class="btn btn-sm btn-camera" id="btnPresetIso" data-preset="iso">Isometric</button>
+                <button class="btn btn-sm btn-camera" id="btnPresetFront" data-preset="front">Front (EQ)</button>
+              </div>
+              <p class="option-desc">Matching your sketch (X: freq, Y: vol, Z: time). Drag on screen to orbit.</p>
+            </div>
+
             <!-- 1. Trim Start -->
             <div class="option-group">
               <div class="option-label-row">
@@ -244,6 +265,25 @@
                 <option value="4096">4096 samples (High frequency resolution)</option>
               </select>
               <p class="option-desc">Select STFT window size for frequency decomposition.</p>
+            </div>
+
+            <!-- 4. Real-Time Averaging Window (3ms - 400ms) -->
+            <div class="option-group" id="averagingControlGroup">
+              <div class="option-label-row">
+                <label for="averagingSlider">Live Averaging Window</label>
+                <span class="help-circle" title="Controls temporal smoothing: 3ms captures instantaneous transient spikes; 400ms provides smooth rolling tonal balance (standard Ozone Tonal Balance style).">?</span>
+              </div>
+              <div class="slider-control-row">
+                <input type="range" id="averagingSlider" min="3" max="400" step="1" value="400" class="form-range" />
+                <span class="slider-val-badge" id="averagingValBadge">400 ms</span>
+              </div>
+              <div class="preset-chips-row">
+                <button type="button" class="preset-chip" data-avg="3">3ms (Fast)</button>
+                <button type="button" class="preset-chip" data-avg="50">50ms</button>
+                <button type="button" class="preset-chip" data-avg="150">150ms</button>
+                <button type="button" class="preset-chip active" data-avg="400">400ms (Ozone)</button>
+              </div>
+              <p class="option-desc">Temporal smoothing for real-time Equalizer and Tonal Balance visualizers (3ms – 400ms).</p>
             </div>
 
             <!-- 4. Colormap Palette -->
@@ -288,14 +328,14 @@
               <div class="s-notes" id="forensicNotes"></div>
             </div>
 
-            <!-- 6. Preserve Transparency Checkbox (inspired by inspo) -->
+            <!-- 6. AI Cutoff Checkbox -->
             <div class="option-checkbox-row">
               <input type="checkbox" id="aiCutoffCheck" checked />
               <label for="aiCutoffCheck">Enable automated AI brickwall cutoff detection</label>
             </div>
           </div>
 
-          <!-- Bottom Full-Width Action Button (Replicating "Convert to GIF ->") -->
+          <!-- Bottom Full-Width Action Button -->
           <div class="options-footer">
             <button id="primaryActionBtn" class="btn btn-convert-full" disabled>
               Export Skripsi Publication Plot (PNG)
@@ -309,7 +349,7 @@
       </aside>
     </main>
 
-    <!-- Floating Action Button for Quick Upload (Replicating circular + button) -->
+    <!-- Floating Action Button for Quick Upload -->
     <button class="fab-btn" id="fabBtn" title="Upload Audio File">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
         <line x1="12" y1="5" x2="12" y2="19"></line>
@@ -317,8 +357,8 @@
       </svg>
     </button>
 
-    <!-- Hidden Audio Element for playback -->
-    <audio id="audioElement" preload="metadata"></audio>
+    <!-- Audio Element for playback (preload auto enables instant seeking) -->
+    <audio id="audioElement" preload="auto" crossorigin="anonymous"></audio>
 
     <!-- Loading Overlay -->
     <div id="loadingOverlay" class="loading-overlay" style="display: none;">

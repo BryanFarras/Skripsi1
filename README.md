@@ -1,50 +1,40 @@
-# AI Music Detector - Backend & Audio Forensic Visualizer
+# AI Music Detector - Audio Forensic Visualizer
 
-A modular audio forensics backend and interactive visualizer designed for AI music detection research and thesis (Skripsi) analysis.
-
----
-
-## 🎧 Features
-
-1. **Tri-Panel Visual Analysis (Matching Research Standard)**:
-   - **Equalizer**: Logarithmic FFT frequency curve with peak-hold tracking (20 Hz - 20,000 Hz).
-   - **Tonal Balance**: Multi-band spectral energy distribution (*Sub, Bass, Low-Mid, High-Mid, Treble/Air*) with color gradient fill.
-   - **Spectrogram**: High-resolution STFT time-frequency heatmap with real-time playback synchronization.
-2. **AI Forensic Indicators**:
-   - Automated brickwall cutoff detection (identifies sharp cutoffs at 16 kHz, 18 kHz, or 20 kHz common in AI generative audio models like Suno, Udio, and MusicLM).
-   - Spectral rolloff (85% & 95%), spectral centroid (brightness), and high-frequency power ratios.
-3. **One-Click Skripsi Publication Figure Export**:
-   - Exports 200 DPI PNG figures directly formatted for thesis documents.
-4. **Local Path Analysis**:
-   - Analyze files directly from local dataset folders on disk without manual re-uploading.
+A modular audio forensics system and interactive visualizer designed for AI music detection research and thesis (Skripsi) analysis.
 
 ---
 
-## 📁 Project Structure
+## 📁 Project Structure (Separated Frontend & Backend)
 
 ```
 MY-AIDETECTOR/
 ├── backend/
 │   ├── app/
-│   │   ├── main.py                     # FastAPI application entry point
-│   │   ├── config.py                   # Configuration and path settings
+│   │   ├── main.py                     # FastAPI application & route mounting
+│   │   ├── config.py                   # Configuration, paths, & audio processing constants
 │   │   ├── api/
-│   │   │   └── routes.py               # REST API endpoints (/upload, /analyze, /export)
+│   │   │   └── routes.py               # REST API (/api/upload, /api/analyze-local-path, /api/export-plot)
 │   │   ├── services/
-│   │   │   ├── audio_loader.py         # Multi-format decoder (WAV, MP3, FLAC, M4A)
+│   │   │   ├── audio_loader.py         # Multi-format decoder (WAV, MP3, FLAC, M4A via bundled ffmpeg)
 │   │   │   ├── visualizer_service.py   # Computes FFT spectrum, Tonal Balance, & STFT
 │   │   │   └── detector_service.py     # AI cutoff and acoustic forensic metrics
-│   │   ├── models/
-│   │   │   └── schemas.py              # Pydantic data schemas
-│   │   └── static/                     # Built-in local web dashboard
-│   │       ├── index.html              # Modern dark-mode UI
-│   │       ├── css/style.css           # Styling
-│   │       └── js/app.js               # Canvas visualizer & player sync
+│   │   └── models/
+│   │       └── schemas.py              # Pydantic data schemas
 │   ├── uploads/                        # Temporary cached audio files
-│   ├── exports/                        # High-resolution exported figures
+│   ├── exports/                        # High-resolution exported figures (200 DPI PNG)
 │   └── requirements.txt                # Python dependencies
-├── run_server.py                       # Python launch script
+├── frontend/
+│   ├── index.html                      # 2-column split UI (inspired by FreeConvert)
+│   ├── css/
+│   │   └── style.css                   # Polished styling and responsive layout
+│   └── js/
+│       └── app.js                      # Canvas visualizers, playback synchronization, & controls
+├── run_server.py                       # Python launch script with automatic browser opening
 ├── run_visualizer.bat                  # One-click Windows batch launcher
+├── start_app.bat                       # Convenient quick launcher
+├── start_app.ps1                       # PowerShell launcher
+├── create_desktop_shortcut.bat         # Windows Desktop shortcut creator
+├── test_backend.py                     # Automated pipeline verification script
 └── README.md
 ```
 
@@ -52,13 +42,19 @@ MY-AIDETECTOR/
 
 ## 🚀 How to Run
 
-### Method 1: Double Click
-Simply double-click **`run_visualizer.bat`**.
+### Method 1: Double-Click (Recommended)
+Double-click **`start_app.bat`** (or **`run_visualizer.bat`**).
 
-### Method 2: Command Line
+### Method 2: PowerShell
+Right-click **`start_app.ps1`** and choose *"Run with PowerShell"*, or run:
+```powershell
+.\start_app.ps1
+```
+
+### Method 3: Command Line
 ```powershell
 python run_server.py
 ```
 
-The app will start on `http://localhost:8000` and automatically open in your default browser.
+The app will start on `http://localhost:8000` (or the next available port) and automatically open in your default browser.
 Interactive API documentation is accessible at `http://localhost:8000/docs`.
