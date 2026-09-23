@@ -1,76 +1,139 @@
 let currentFileId = null;
 let currentDuration = 0;
 let analysisData = null;
+let currentView = 'spectrogram';
+let trimStartSec = 0;
+let trimEndSec = 0;
 
 // DOM Elements
-const dropZone = document.getElementById('dropZone');
+const mediaDropZone = document.getElementById('mediaDropZone');
+const dropPrompt = document.getElementById('dropPrompt');
+const mediaScreen = document.getElementById('mediaScreen');
 const audioFileInput = document.getElementById('audioFileInput');
+const browseBtn = document.getElementById('browseBtn');
+const fabBtn = document.getElementById('fabBtn');
+const loadDemoBtn = document.getElementById('loadDemoBtn');
+
 const localPathInput = document.getElementById('localPathInput');
 const analyzePathBtn = document.getElementById('analyzePathBtn');
-const exportPlotBtn = document.getElementById('exportPlotBtn');
-const loadingOverlay = document.getElementById('loadingOverlay');
+const exportTopBtn = document.getElementById('exportTopBtn');
+const primaryActionBtn = document.getElementById('primaryActionBtn');
 
-const playerCard = document.getElementById('playerCard');
-const trackTitle = document.getElementById('trackTitle');
-const trackDetails = document.getElementById('trackDetails');
+// Player Controls
 const audioElement = document.getElementById('audioElement');
-const playBtn = document.getElementById('playBtn');
-const playIcon = document.getElementById('playIcon');
-const timeDisplay = document.getElementById('timeDisplay');
+const bigPlayBtn = document.getElementById('bigPlayBtn');
+const bigPlayIcon = document.getElementById('bigPlayIcon');
+const playOverlay = document.getElementById('playOverlay');
+const miniPlayBtn = document.getElementById('miniPlayBtn');
+const miniPlayIcon = document.getElementById('miniPlayIcon');
+const progressBarBg = document.getElementById('progressBarBg');
+const progressBarFill = document.getElementById('progressBarFill');
+const trimRangeHighlight = document.getElementById('trimRangeHighlight');
+const timecodeDisplay = document.getElementById('timecodeDisplay');
 const playheadCursor = document.getElementById('playheadCursor');
+const canvasCutoffBadge = document.getElementById('canvasCutoffBadge');
+const cutoffValText = document.getElementById('cutoffValText');
 
-const forensicsCard = document.getElementById('forensicsCard');
+// Position Buttons
+const useTrimStartBtn = document.getElementById('useTrimStartBtn');
+const useTrimEndBtn = document.getElementById('useTrimEndBtn');
+const resetTrimBtn = document.getElementById('resetTrimBtn');
+const trackStats = document.getElementById('trackStats');
+const statRate = document.getElementById('statRate');
+const statChannels = document.getElementById('statChannels');
+const statDuration = document.getElementById('statDuration');
+
+// Sidebar Options
+const trimStartInput = document.getElementById('trimStartInput');
+const trimEndInput = document.getElementById('trimEndInput');
+const copyStartBtn = document.getElementById('copyStartBtn');
+const copyEndBtn = document.getElementById('copyEndBtn');
+const fftSizeSelect = document.getElementById('fftSizeSelect');
+const colorPaletteSelect = document.getElementById('colorPaletteSelect');
+const aiCutoffCheck = document.getElementById('aiCutoffCheck');
+
+// Forensics Summary
+const forensicsSummaryBox = document.getElementById('forensicsSummaryBox');
 const cutoffBadge = document.getElementById('cutoffBadge');
 const valCutoff = document.getElementById('valCutoff');
 const valRolloff = document.getElementById('valRolloff');
 const valCentroid = document.getElementById('valCentroid');
-const valHighFreq = document.getElementById('valHighFreq');
+const valAirPower = document.getElementById('valAirPower');
 const forensicNotes = document.getElementById('forensicNotes');
-const cutoffIndicator = document.getElementById('cutoffIndicator');
-const bandPills = document.getElementById('bandPills');
 
 // Canvases
-const eqCanvas = document.getElementById('eqCanvas');
-const tonalCanvas = document.getElementById('tonalCanvas');
-const specCanvas = document.getElementById('specCanvas');
+const mainSpecCanvas = document.getElementById('mainSpecCanvas');
+const mainEqCanvas = document.getElementById('mainEqCanvas');
+const mainTonalCanvas = document.getElementById('mainTonalCanvas');
+const stackedVisualizersCard = document.getElementById('stackedVisualizersCard');
+const stackedEqCanvas = document.getElementById('stackedEqCanvas');
+const stackedTonalCanvas = document.getElementById('stackedTonalCanvas');
 
-// Initialize event listeners
+const loadingOverlay = document.getElementById('loadingOverlay');
+
 function init() {
-  dropZone.addEventListener('click', () => audioFileInput.click());
-  audioFileInput.addEventListener('change', handleFileSelect);
-
-  // Drag and Drop
-  dropZone.addEventListener('dragover', (e) => {
-    e.preventDefault();
-    dropZone.classList.add('dragover');
+  // File Upload Handlers
+  browseBtn.addEventListener('click', () => audioFileInput.click());
+  fabBtn.addEventListener('click', () => audioFileInput.click());
+  audioFileInput.addEventListener('change', (e) => {
+    if (e.target.files.length > 0) uploadAudio(e.target.files[0]);
   });
 
-  dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
-  dropZone.addEventListener('drop', (e) => {
+  // Drag & Drop
+  mediaDropZone.addEventListener('dragover', (e) => {
     e.preventDefault();
-    dropZone.classList.remove('dragover');
+    mediaDropZone.classList.add('dragover');
+  });
+  mediaDropZone.addEventListener('dragleave', () => mediaDropZone.classList.remove('dragover'));
+  mediaDropZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    mediaDropZone.classList.remove('dragover');
     if (e.dataTransfer.files.length > 0) {
-      uploadFile(e.dataTransfer.files[0]);
+      uploadAudio(e.dataTransfer.files[0]);
     }
   });
 
+  // Local Path Analyze
   analyzePathBtn.addEventListener('click', analyzeLocalPath);
   localPathInput.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') analyzeLocalPath();
   });
 
-  exportPlotBtn.addEventListener('click', exportPlot);
+  // Demo Audio Button
+  loadDemoBtn.addEventListener('click', loadDemoAudio);
 
-  // Audio Playback
-  playBtn.addEventListener('click', togglePlay);
-  audioElement.addEventListener('timeupdate', updatePlaybackCursor);
-  audioElement.addEventListener('ended', onPlaybackEnded);
+  // Playback Handlers
+  bigPlayBtn.addEventListener('click', togglePlayback);
+  miniPlayBtn.addEventListener('click', togglePlayback);
+  audioElement.addEventListener('timeupdate', onTimeUpdate);
+  audioElement.addEventListener('ended', onEnded);
+  audioElement.addEventListener('play', () => updatePlayIcons(true));
+  audioElement.addEventListener('pause', () => updatePlayIcons(false));
 
-  // Canvas click to seek
-  specCanvas.addEventListener('click', handleSpecClick);
+  progressBarBg.addEventListener('click', seekAudio);
+  mainSpecCanvas.addEventListener('click', handleCanvasClick);
 
-  // Resize listener
-  window.addEventListener('resize', redrawAll);
+  // View Switcher Tabs
+  document.querySelectorAll('.screen-tab').forEach(tab => {
+    tab.addEventListener('click', (e) => switchView(e.target.dataset.view));
+  });
+
+  // Position Buttons & Sidebar Buttons
+  useTrimStartBtn.addEventListener('click', setTrimStartFromCurrent);
+  useTrimEndBtn.addEventListener('click', setTrimEndFromCurrent);
+  copyStartBtn.addEventListener('click', setTrimStartFromCurrent);
+  copyEndBtn.addEventListener('click', setTrimEndFromCurrent);
+  resetTrimBtn.addEventListener('click', resetTrim);
+
+  // Colormap & AI Cutoff Select
+  colorPaletteSelect.addEventListener('change', () => redrawCurrentView());
+  aiCutoffCheck.addEventListener('change', () => redrawCurrentView());
+
+  // Export Buttons
+  exportTopBtn.addEventListener('click', exportPlot);
+  primaryActionBtn.addEventListener('click', exportPlot);
+
+  window.addEventListener('resize', () => redrawCurrentView());
 }
 
 function showLoading(text) {
@@ -82,30 +145,25 @@ function hideLoading() {
   loadingOverlay.style.display = 'none';
 }
 
-// Upload via Drag / Browse
-async function handleFileSelect(e) {
-  const file = e.target.files[0];
-  if (file) uploadFile(file);
-}
-
-async function uploadFile(file) {
-  showLoading(`Analyzing "${file.name}"... Computing FFT & Spectrogram...`);
+// Upload Audio File
+async function uploadAudio(file) {
+  showLoading(`Analyzing "${file.name}"... Computing STFT & AI Forensics...`);
   try {
     const formData = new FormData();
     formData.append('file', file);
 
-    const response = await fetch('/api/upload', {
+    const res = await fetch('/api/upload', {
       method: 'POST',
       body: formData
     });
 
-    if (!response.ok) {
-      const err = await response.json();
-      throw new Error(err.detail || 'Analysis failed.');
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.detail || 'Upload failed');
     }
 
-    const data = await response.json();
-    handleAnalysisSuccess(data);
+    const data = await res.json();
+    handleAnalysisLoaded(data);
   } catch (err) {
     alert('Error analyzing audio: ' + err.message);
   } finally {
@@ -113,282 +171,140 @@ async function uploadFile(file) {
   }
 }
 
-// Analyze via local disk path
+// Analyze Local Path
 async function analyzeLocalPath() {
-  const path = localPathInput.value.trim();
-  if (!path) {
-    alert('Please enter a valid file path.');
+  const p = localPathInput.value.trim();
+  if (!p) {
+    alert('Please enter a valid local audio path.');
     return;
   }
-
-  showLoading(`Analyzing local audio file from disk...`);
+  showLoading('Loading local file from disk...');
   try {
-    const response = await fetch('/api/analyze-local-path', {
+    const res = await fetch('/api/analyze-local-path', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ file_path: path })
+      body: JSON.stringify({ file_path: p })
     });
-
-    if (!response.ok) {
-      const err = await response.json();
-      throw new Error(err.detail || 'Failed to analyze path.');
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.detail || 'Failed to analyze path');
     }
-
-    const data = await response.json();
-    handleAnalysisSuccess(data);
+    const data = await res.json();
+    handleAnalysisLoaded(data);
   } catch (err) {
-    alert('Error analyzing file: ' + err.message);
+    alert('Error: ' + err.message);
   } finally {
     hideLoading();
   }
 }
 
-function handleAnalysisSuccess(data) {
+// Load Bundled Sample
+async function loadDemoAudio() {
+  localPathInput.value = 'backend/uploads/sample_ai_test.wav';
+  analyzeLocalPath();
+}
+
+// Handler when analysis is loaded
+function handleAnalysisLoaded(data) {
   analysisData = data;
   currentFileId = data.metadata.file_id;
   currentDuration = data.metadata.duration_seconds;
+  trimStartSec = 0;
+  trimEndSec = currentDuration;
 
-  // Update Track Info
-  trackTitle.innerText = data.metadata.original_filename;
-  trackDetails.innerText = `${(data.metadata.sample_rate / 1000).toFixed(1)} kHz • Mono • ${formatTime(currentDuration)}`;
-  timeDisplay.innerText = `0:00 / ${formatTime(currentDuration)}`;
-  
-  // Set Audio Source
+  // Toggle Viewport Screen
+  dropPrompt.style.display = 'none';
+  mediaScreen.style.display = 'flex';
+  trackStats.style.display = 'block';
+  forensicsSummaryBox.style.display = 'block';
+  playheadCursor.style.display = 'block';
+  exportTopBtn.disabled = false;
+  primaryActionBtn.disabled = false;
+
+  // Update Stats
+  statRate.innerText = `${(data.metadata.sample_rate / 1000).toFixed(1)} kHz`;
+  statChannels.innerText = data.metadata.channels === 1 ? 'Mono' : 'Stereo';
+  statDuration.innerText = `${currentDuration.toFixed(2)}s`;
+
+  // Timecodes
+  trimStartInput.value = formatTimecode(0);
+  trimEndInput.value = formatTimecode(currentDuration);
+  timecodeDisplay.innerText = `${formatTimecode(0)} / ${formatTimecode(currentDuration)}`;
+
+  // Set audio source
   audioElement.src = `/api/audio/${currentFileId}`;
   audioElement.load();
 
-  playerCard.style.display = 'block';
-  forensicsCard.style.display = 'block';
-  exportPlotBtn.disabled = false;
-  playheadCursor.style.display = 'block';
+  // Populate Diagnostics
+  updateDiagnostics(data.forensics);
 
-  // Populate Forensic Badge & Metrics
-  updateForensicsUI(data.forensics);
-
-  // Render Visualizers
-  redrawAll();
+  // Redraw
+  redrawCurrentView();
 }
 
-function updateForensicsUI(forensics) {
+function updateDiagnostics(forensics) {
   if (forensics.cutoff_detected) {
     cutoffBadge.innerText = forensics.cutoff_severity;
-    if (forensics.estimated_cutoff_hz <= 16500) {
-      cutoffBadge.className = 'badge badge-danger';
-    } else {
-      cutoffBadge.className = 'badge badge-warning';
-    }
+    cutoffBadge.className = forensics.estimated_cutoff_hz <= 16500 ? 'badge badge-danger' : 'badge badge-warning';
     valCutoff.innerText = `${forensics.estimated_cutoff_hz.toFixed(0)} Hz`;
-    cutoffIndicator.style.display = 'flex';
+    canvasCutoffBadge.style.display = 'flex';
+    cutoffValText.innerText = `${forensics.estimated_cutoff_hz.toFixed(0)} Hz`;
   } else {
     cutoffBadge.innerText = 'Natural Spectrum';
     cutoffBadge.className = 'badge badge-normal';
-    valCutoff.innerText = 'Full Range (20k+)';
-    cutoffIndicator.style.display = 'none';
+    valCutoff.innerText = 'None (>20kHz)';
+    canvasCutoffBadge.style.display = 'none';
   }
 
   valRolloff.innerText = `${forensics.spectral_rolloff_95.toFixed(0)} Hz`;
   valCentroid.innerText = `${forensics.spectral_centroid_hz.toFixed(0)} Hz`;
-  valHighFreq.innerText = `${(forensics.high_freq_energy_ratio * 100).toFixed(2)}%`;
-
+  valAirPower.innerText = `${(forensics.high_freq_energy_ratio * 100).toFixed(2)}%`;
   forensicNotes.innerHTML = forensics.forensic_notes.map(n => `<p>• ${n}</p>`).join('');
-
-  // Tonal Pills
-  if (analysisData && analysisData.tonal_balance) {
-    bandPills.innerHTML = analysisData.tonal_balance.bands.map(b => `
-      <span class="band-pill" style="border-color: ${b.color_hex}; color: ${b.color_hex};">
-        ${b.name}: ${b.energy_percent.toFixed(1)}%
-      </span>
-    `).join('');
-  }
 }
 
-// Redraw all 3 canvases
-function redrawAll() {
+// View Switcher (Spectrogram, Equalizer, Tonal, Stacked)
+function switchView(view) {
+  currentView = view;
+  document.querySelectorAll('.screen-tab').forEach(t => {
+    t.classList.toggle('active', t.dataset.view === view);
+  });
+
+  mainSpecCanvas.style.display = (view === 'spectrogram' || view === 'stacked') ? 'block' : 'none';
+  mainEqCanvas.style.display = view === 'equalizer' ? 'block' : 'none';
+  mainTonalCanvas.style.display = view === 'tonal' ? 'block' : 'none';
+  stackedVisualizersCard.style.display = view === 'stacked' ? 'flex' : 'none';
+
+  redrawCurrentView();
+}
+
+function redrawCurrentView() {
   if (!analysisData) return;
-  renderEqualizer(analysisData.fft_spectrum);
-  renderTonalBalance(analysisData.tonal_balance);
-  renderSpectrogram(analysisData.spectrogram, analysisData.forensics);
+  const palette = colorPaletteSelect.value;
+  const showCutoff = aiCutoffCheck.checked;
+
+  if (currentView === 'spectrogram' || currentView === 'stacked') {
+    renderSpectrogramCanvas(mainSpecCanvas, analysisData.spectrogram, analysisData.forensics, palette, showCutoff);
+  }
+  if (currentView === 'equalizer') {
+    renderEqualizerCanvas(mainEqCanvas, analysisData.fft_spectrum);
+  }
+  if (currentView === 'tonal') {
+    renderTonalCanvas(mainTonalCanvas, analysisData.tonal_balance);
+  }
+  if (currentView === 'stacked') {
+    renderEqualizerCanvas(stackedEqCanvas, analysisData.fft_spectrum);
+    renderTonalCanvas(stackedTonalCanvas, analysisData.tonal_balance);
+  }
 }
 
-// 1. Equalizer Curve
-function renderEqualizer(eqData) {
+// 1. Render Spectrogram Canvas (Wave Candy style)
+function renderSpectrogramCanvas(canvas, specData, forensics, palette, showCutoff) {
   const dpr = window.devicePixelRatio || 1;
-  const rect = eqCanvas.getBoundingClientRect();
-  eqCanvas.width = rect.width * dpr;
-  eqCanvas.height = rect.height * dpr;
+  const rect = canvas.getBoundingClientRect();
+  canvas.width = rect.width * dpr;
+  canvas.height = rect.height * dpr;
 
-  const ctx = eqCanvas.getContext('2d');
-  ctx.scale(dpr, dpr);
-  const w = rect.width;
-  const h = rect.height;
-
-  ctx.fillStyle = '#12141a';
-  ctx.fillRect(0, 0, w, h);
-
-  // Draw Grid Lines (100Hz, 1kHz, 10kHz)
-  const gridFreqs = [100, 1000, 10000];
-  ctx.strokeStyle = '#1e2430';
-  ctx.lineWidth = 1;
-  ctx.fillStyle = '#64748b';
-  ctx.font = '10px JetBrains Mono';
-
-  gridFreqs.forEach(f => {
-    const x = freqToX(f, w);
-    ctx.beginPath();
-    ctx.moveTo(x, 0);
-    ctx.lineTo(x, h);
-    ctx.stroke();
-    ctx.fillText(`${f >= 1000 ? f/1000 + 'k' : f}Hz`, x + 4, h - 6);
-  });
-
-  // dB Grid Lines (-60, -40, -20, 0)
-  const dBLines = [-60, -40, -20, 0];
-  dBLines.forEach(db => {
-    const y = dbToY(db, h);
-    ctx.beginPath();
-    ctx.moveTo(0, y);
-    ctx.lineTo(w, y);
-    ctx.stroke();
-    ctx.fillText(`${db}dB`, 6, y - 4);
-  });
-
-  const freqs = eqData.frequencies;
-  const peaks = eqData.peaks_db;
-  const avgs = eqData.magnitudes_db;
-
-  // Draw Peak Hold Line
-  ctx.strokeStyle = '#475569';
-  ctx.lineWidth = 1.2;
-  ctx.beginPath();
-  for (let i = 0; i < freqs.length; i++) {
-    const x = freqToX(freqs[i], w);
-    const y = dbToY(peaks[i], h);
-    if (i === 0) ctx.moveTo(x, y);
-    else ctx.lineTo(x, y);
-  }
-  ctx.stroke();
-
-  // Draw Average Spectrum Curve with Cyan Glow Fill
-  const gradient = ctx.createLinearGradient(0, 0, 0, h);
-  gradient.addColorStop(0, 'rgba(0, 229, 255, 0.35)');
-  gradient.addColorStop(1, 'rgba(0, 229, 255, 0.0)');
-
-  ctx.beginPath();
-  for (let i = 0; i < freqs.length; i++) {
-    const x = freqToX(freqs[i], w);
-    const y = dbToY(avgs[i], h);
-    if (i === 0) ctx.moveTo(x, y);
-    else ctx.lineTo(x, y);
-  }
-
-  // Close path for fill
-  ctx.lineTo(w, h);
-  ctx.lineTo(0, h);
-  ctx.closePath();
-  ctx.fillStyle = gradient;
-  ctx.fill();
-
-  // Stroke line on top
-  ctx.strokeStyle = '#00e5ff';
-  ctx.lineWidth = 1.8;
-  ctx.beginPath();
-  for (let i = 0; i < freqs.length; i++) {
-    const x = freqToX(freqs[i], w);
-    const y = dbToY(avgs[i], h);
-    if (i === 0) ctx.moveTo(x, y);
-    else ctx.lineTo(x, y);
-  }
-  ctx.stroke();
-}
-
-// 2. Tonal Balance Curve
-function renderTonalBalance(tbData) {
-  const dpr = window.devicePixelRatio || 1;
-  const rect = tonalCanvas.getBoundingClientRect();
-  tonalCanvas.width = rect.width * dpr;
-  tonalCanvas.height = rect.height * dpr;
-
-  const ctx = tonalCanvas.getContext('2d');
-  ctx.scale(dpr, dpr);
-  const w = rect.width;
-  const h = rect.height;
-
-  ctx.fillStyle = '#12141a';
-  ctx.fillRect(0, 0, w, h);
-
-  // Background bands fill
-  tbData.bands.forEach(b => {
-    const x1 = freqToX(b.freq_range[0], w);
-    const x2 = freqToX(b.freq_range[1], w);
-    ctx.fillStyle = b.color_hex + '22'; // 13% opacity
-    ctx.fillRect(x1, 0, x2 - x1, h);
-
-    // Separator line
-    ctx.strokeStyle = '#272d3b';
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(x2, 0);
-    ctx.lineTo(x2, h);
-    ctx.stroke();
-  });
-
-  // Draw continuous spectrum fill under curve
-  const curveF = tbData.curve_freqs;
-  const curveL = tbData.curve_levels;
-
-  tbData.bands.forEach(b => {
-    const fMin = b.freq_range[0];
-    const fMax = b.freq_range[1];
-
-    ctx.beginPath();
-    let started = false;
-    let firstX = 0, lastX = 0;
-
-    for (let i = 0; i < curveF.length; i++) {
-      if (curveF[i] >= fMin && curveF[i] <= fMax) {
-        const x = freqToX(curveF[i], w);
-        const y = dbToY(curveL[i], h);
-        if (!started) {
-          ctx.moveTo(x, y);
-          firstX = x;
-          started = true;
-        } else {
-          ctx.lineTo(x, y);
-        }
-        lastX = x;
-      }
-    }
-
-    if (started) {
-      ctx.lineTo(lastX, h);
-      ctx.lineTo(firstX, h);
-      ctx.closePath();
-      ctx.fillStyle = b.color_hex + '66'; // 40% opacity
-      ctx.fill();
-    }
-  });
-
-  // Top white smooth curve
-  ctx.strokeStyle = '#ffffff';
-  ctx.lineWidth = 2.0;
-  ctx.beginPath();
-  for (let i = 0; i < curveF.length; i++) {
-    const x = freqToX(curveF[i], w);
-    const y = dbToY(curveL[i], h);
-    if (i === 0) ctx.moveTo(x, y);
-    else ctx.lineTo(x, y);
-  }
-  ctx.stroke();
-}
-
-// 3. Spectrogram Heatmap
-function renderSpectrogram(specData, forensics) {
-  const dpr = window.devicePixelRatio || 1;
-  const rect = specCanvas.getBoundingClientRect();
-  specCanvas.width = rect.width * dpr;
-  specCanvas.height = rect.height * dpr;
-
-  const ctx = specCanvas.getContext('2d');
+  const ctx = canvas.getContext('2d');
   ctx.scale(dpr, dpr);
   const w = rect.width;
   const h = rect.height;
@@ -397,39 +313,33 @@ function renderSpectrogram(specData, forensics) {
   const numFreqs = matrix.length;
   const numTimes = matrix[0].length;
 
-  // Off-screen canvas for pixel drawing
-  const offCanvas = document.createElement('canvas');
-  offCanvas.width = numTimes;
-  offCanvas.height = numFreqs;
-  const offCtx = offCanvas.getContext('2d');
+  const off = document.createElement('canvas');
+  off.width = numTimes;
+  off.height = numFreqs;
+  const offCtx = off.getContext('2d');
   const imgData = offCtx.createImageData(numTimes, numFreqs);
   const data = imgData.data;
 
-  // Map dB to Inferno colormap
   for (let f = 0; f < numFreqs; f++) {
-    const row = matrix[numFreqs - 1 - f]; // invert y so 0Hz is at bottom
+    const row = matrix[numFreqs - 1 - f];
     for (let t = 0; t < numTimes; t++) {
       const db = row[t];
-      // Normalize -80 dB to 0 dB -> [0.0, 1.0]
       const norm = Math.max(0, Math.min(1, (db + 80) / 80));
-      const [r, g, b] = getInfernoColor(norm);
-
-      const pIdx = (f * numTimes + t) * 4;
-      data[pIdx] = r;
-      data[pIdx + 1] = g;
-      data[pIdx + 2] = b;
-      data[pIdx + 3] = 255;
+      const [r, g, b] = getColorForPalette(norm, palette);
+      const p = (f * numTimes + t) * 4;
+      data[p] = r;
+      data[p + 1] = g;
+      data[p + 2] = b;
+      data[p + 3] = 255;
     }
   }
 
   offCtx.putImageData(imgData, 0, 0);
-
-  // Draw stretched to canvas with smooth filtering
   ctx.imageSmoothingEnabled = true;
-  ctx.drawImage(offCanvas, 0, 0, w, h);
+  ctx.drawImage(off, 0, 0, w, h);
 
-  // Overlay AI Cutoff Line if detected
-  if (forensics && forensics.cutoff_detected && forensics.estimated_cutoff_hz) {
+  // AI Cutoff line
+  if (showCutoff && forensics && forensics.cutoff_detected && forensics.estimated_cutoff_hz) {
     const maxHz = specData.frequencies[specData.frequencies.length - 1];
     const cutoffY = h - (forensics.estimated_cutoff_hz / maxHz) * h;
 
@@ -441,67 +351,188 @@ function renderSpectrogram(specData, forensics) {
     ctx.lineTo(w, cutoffY);
     ctx.stroke();
     ctx.setLineDash([]);
-
-    // Cutoff Label
-    ctx.fillStyle = '#00ffcc';
-    ctx.font = 'bold 11px JetBrains Mono';
-    ctx.fillText(`AI Brickwall Cutoff: ${forensics.estimated_cutoff_hz.toFixed(0)} Hz`, 12, cutoffY - 6);
   }
 
-  // Draw Frequency Guides (5k, 10k, 15k, 20k)
+  // Frequency tick labels on left side (Wave Candy style)
   const maxHz = specData.frequencies[specData.frequencies.length - 1];
-  [5000, 10000, 15000, 20000].forEach(hz => {
+  [20000, 15000, 10000, 5000, 1000].forEach(hz => {
     if (hz < maxHz) {
       const y = h - (hz / maxHz) * h;
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.45)';
-      ctx.font = '10px JetBrains Mono';
-      ctx.fillText(`${hz/1000}kHz`, w - 44, y - 4);
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+      ctx.font = '9px JetBrains Mono';
+      ctx.fillText(`${hz >= 1000 ? hz / 1000 + 'kHz' : hz + 'Hz'}`, 6, y - 3);
       ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
       ctx.lineWidth = 1;
       ctx.beginPath();
-      ctx.moveTo(0, y);
-      ctx.lineTo(w - 50, y);
+      ctx.moveTo(42, y);
+      ctx.lineTo(w, y);
       ctx.stroke();
     }
   });
 }
 
-// Helpers for Coordinates
-function freqToX(freq, width) {
+// 2. Render Equalizer Canvas
+function renderEqualizerCanvas(canvas, eqData) {
+  const dpr = window.devicePixelRatio || 1;
+  const rect = canvas.getBoundingClientRect();
+  canvas.width = rect.width * dpr;
+  canvas.height = rect.height * dpr;
+
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+  const w = rect.width;
+  const h = rect.height;
+
+  ctx.fillStyle = '#080a0f';
+  ctx.fillRect(0, 0, w, h);
+
+  // Freq grid
+  [100, 1000, 10000].forEach(f => {
+    const x = freqToX(f, w);
+    ctx.strokeStyle = '#1a2233';
+    ctx.beginPath();
+    ctx.moveTo(x, 0);
+    ctx.lineTo(x, h);
+    ctx.stroke();
+    ctx.fillStyle = '#64748b';
+    ctx.font = '10px JetBrains Mono';
+    ctx.fillText(`${f >= 1000 ? f/1000 + 'k' : f}Hz`, x + 4, h - 6);
+  });
+
+  const freqs = eqData.frequencies;
+  const peaks = eqData.peaks_db;
+  const avgs = eqData.magnitudes_db;
+
+  // Peak hold line
+  ctx.strokeStyle = '#475569';
+  ctx.lineWidth = 1.2;
+  ctx.beginPath();
+  for (let i = 0; i < freqs.length; i++) {
+    const x = freqToX(freqs[i], w);
+    const y = dbToY(peaks[i], h);
+    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  }
+  ctx.stroke();
+
+  // Cyan gradient fill
+  const grad = ctx.createLinearGradient(0, 0, 0, h);
+  grad.addColorStop(0, 'rgba(0, 229, 255, 0.35)');
+  grad.addColorStop(1, 'rgba(0, 229, 255, 0.0)');
+
+  ctx.beginPath();
+  for (let i = 0; i < freqs.length; i++) {
+    const x = freqToX(freqs[i], w);
+    const y = dbToY(avgs[i], h);
+    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  }
+  ctx.lineTo(w, h);
+  ctx.lineTo(0, h);
+  ctx.closePath();
+  ctx.fillStyle = grad;
+  ctx.fill();
+
+  // Stroke on top
+  ctx.strokeStyle = '#00e5ff';
+  ctx.lineWidth = 2.0;
+  ctx.beginPath();
+  for (let i = 0; i < freqs.length; i++) {
+    const x = freqToX(freqs[i], w);
+    const y = dbToY(avgs[i], h);
+    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  }
+  ctx.stroke();
+}
+
+// 3. Render Tonal Balance Canvas
+function renderTonalCanvas(canvas, tbData) {
+  const dpr = window.devicePixelRatio || 1;
+  const rect = canvas.getBoundingClientRect();
+  canvas.width = rect.width * dpr;
+  canvas.height = rect.height * dpr;
+
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+  const w = rect.width;
+  const h = rect.height;
+
+  ctx.fillStyle = '#080a0f';
+  ctx.fillRect(0, 0, w, h);
+
+  const curveF = tbData.curve_freqs;
+  const curveL = tbData.curve_levels;
+
+  tbData.bands.forEach(b => {
+    const fMin = b.freq_range[0];
+    const fMax = b.freq_range[1];
+    ctx.beginPath();
+    let started = false, firstX = 0, lastX = 0;
+
+    for (let i = 0; i < curveF.length; i++) {
+      if (curveF[i] >= fMin && curveF[i] <= fMax) {
+        const x = freqToX(curveF[i], w);
+        const y = dbToY(curveL[i], h);
+        if (!started) { ctx.moveTo(x, y); firstX = x; started = true; }
+        else { ctx.lineTo(x, y); }
+        lastX = x;
+      }
+    }
+    if (started) {
+      ctx.lineTo(lastX, h);
+      ctx.lineTo(firstX, h);
+      ctx.closePath();
+      ctx.fillStyle = b.color_hex + '66';
+      ctx.fill();
+    }
+  });
+
+  // White smooth curve
+  ctx.strokeStyle = '#ffffff';
+  ctx.lineWidth = 2.2;
+  ctx.beginPath();
+  for (let i = 0; i < curveF.length; i++) {
+    const x = freqToX(curveF[i], w);
+    const y = dbToY(curveL[i], h);
+    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  }
+  ctx.stroke();
+}
+
+// Helpers
+function freqToX(freq, w) {
   const minF = Math.log10(20);
   const maxF = Math.log10(20000);
   const clamped = Math.max(20, Math.min(20000, freq));
-  return ((Math.log10(clamped) - minF) / (maxF - minF)) * width;
+  return ((Math.log10(clamped) - minF) / (maxF - minF)) * w;
 }
 
-function dbToY(db, height) {
+function dbToY(db, h) {
   const minDb = -80.0;
   const maxDb = 0.0;
   const clamped = Math.max(minDb, Math.min(maxDb, db));
-  return height - ((clamped - minDb) / (maxDb - minDb)) * height;
+  return h - ((clamped - minDb) / (maxDb - minDb)) * h;
 }
 
-// High Quality Inferno Colormap
-function getInfernoColor(t) {
-  // t is 0.0 to 1.0
-  const c0 = [0, 0, 4];
-  const c1 = [40, 11, 84];
-  const c2 = [101, 21, 110];
-  const c3 = [159, 42, 99];
-  const c4 = [212, 72, 66];
-  const c5 = [245, 125, 21];
-  const c6 = [250, 193, 39];
-  const c7 = [252, 255, 164];
-
-  const palette = [c0, c1, c2, c3, c4, c5, c6, c7];
-  const idx = t * (palette.length - 1);
+function getColorForPalette(t, palette) {
+  if (palette === 'cyan') {
+    return [Math.round(0 * t), Math.round(229 * t), Math.round(255 * t)];
+  }
+  if (palette === 'plasma') {
+    // Plasma: dark blue -> violet -> pink -> yellow
+    return [Math.round(255 * Math.pow(t, 0.7)), Math.round(180 * Math.pow(t, 1.5)), Math.round(255 * (1 - t * 0.5))];
+  }
+  if (palette === 'magma') {
+    return [Math.round(255 * t), Math.round(120 * Math.pow(t, 2)), Math.round(200 * Math.pow(1-t, 2))];
+  }
+  // Default Inferno / Wave Candy
+  const colors = [
+    [0, 0, 4], [40, 11, 84], [101, 21, 110], [159, 42, 99],
+    [212, 72, 66], [245, 125, 21], [250, 193, 39], [252, 255, 164]
+  ];
+  const idx = t * (colors.length - 1);
   const i = Math.floor(idx);
   const f = idx - i;
-
-  if (i >= palette.length - 1) return palette[palette.length - 1];
-  const p1 = palette[i];
-  const p2 = palette[i + 1];
-
+  if (i >= colors.length - 1) return colors[colors.length - 1];
+  const p1 = colors[i], p2 = colors[i + 1];
   return [
     Math.round(p1[0] + (p2[0] - p1[0]) * f),
     Math.round(p1[1] + (p2[1] - p1[1]) * f),
@@ -510,66 +541,119 @@ function getInfernoColor(t) {
 }
 
 // Playback Logic
-function togglePlay() {
+function togglePlayback() {
   if (audioElement.paused) {
     audioElement.play();
-    playIcon.innerHTML = '<rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect>';
   } else {
     audioElement.pause();
-    playIcon.innerHTML = '<polygon points="5 3 19 12 5 21 5 3"></polygon>';
   }
 }
 
-function onPlaybackEnded() {
-  playIcon.innerHTML = '<polygon points="5 3 19 12 5 21 5 3"></polygon>';
+function updatePlayIcons(isPlaying) {
+  if (isPlaying) {
+    bigPlayIcon.innerHTML = '<rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect>';
+    miniPlayIcon.innerHTML = '<rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect>';
+    playOverlay.classList.add('hidden');
+  } else {
+    bigPlayIcon.innerHTML = '<polygon points="6 3 20 12 6 21 6 3"></polygon>';
+    miniPlayIcon.innerHTML = '<polygon points="5 3 19 12 5 21 5 3"></polygon>';
+    playOverlay.classList.remove('hidden');
+  }
+}
+
+function onTimeUpdate() {
+  if (!currentDuration) return;
+  const cur = audioElement.currentTime;
+  const pct = (cur / currentDuration) * 100;
+  progressBarFill.style.width = `${pct}%`;
+  playheadCursor.style.left = `${pct}%`;
+  timecodeDisplay.innerText = `${formatTimecode(cur)} / ${formatTimecode(currentDuration)}`;
+}
+
+function onEnded() {
+  updatePlayIcons(false);
+  progressBarFill.style.width = '0%';
   playheadCursor.style.left = '0%';
 }
 
-function updatePlaybackCursor() {
+function seekAudio(e) {
   if (!currentDuration) return;
-  const cur = audioElement.currentTime;
-  timeDisplay.innerText = `${formatTime(cur)} / ${formatTime(currentDuration)}`;
-  const pct = (cur / currentDuration) * 100;
-  playheadCursor.style.left = `${pct}%`;
-}
-
-function handleSpecClick(e) {
-  if (!currentDuration) return;
-  const rect = specCanvas.getBoundingClientRect();
-  const clickX = e.clientX - rect.left;
-  const pct = clickX / rect.width;
+  const rect = progressBarBg.getBoundingClientRect();
+  const pct = (e.clientX - rect.left) / rect.width;
   audioElement.currentTime = pct * currentDuration;
 }
 
-function formatTime(secs) {
-  const m = Math.floor(secs / 60);
-  const s = Math.floor(secs % 60);
-  return `${m}:${s < 10 ? '0' : ''}${s}`;
+function handleCanvasClick(e) {
+  if (!currentDuration) return;
+  const rect = mainSpecCanvas.getBoundingClientRect();
+  const pct = (e.clientX - rect.left) / rect.width;
+  audioElement.currentTime = pct * currentDuration;
 }
 
-// Export high-res PNG for Thesis / Skripsi
+// Timecode Formatting (hh:mm:ss.ms)
+function formatTimecode(totalSec) {
+  const h = Math.floor(totalSec / 3600);
+  const m = Math.floor((totalSec % 3600) / 60);
+  const s = Math.floor(totalSec % 60);
+  const ms = Math.floor((totalSec - Math.floor(totalSec)) * 100);
+
+  const pad = (n) => String(n).padStart(2, '0');
+  return `${pad(h)} : ${pad(m)} : ${pad(s)} . ${pad(ms)}`;
+}
+
+// Trim Positions
+function setTrimStartFromCurrent() {
+  if (!audioElement) return;
+  trimStartSec = audioElement.currentTime;
+  trimStartInput.value = formatTimecode(trimStartSec);
+  updateTrimHighlight();
+}
+
+function setTrimEndFromCurrent() {
+  if (!audioElement) return;
+  trimEndSec = audioElement.currentTime;
+  trimEndInput.value = formatTimecode(trimEndSec);
+  updateTrimHighlight();
+}
+
+function resetTrim() {
+  trimStartSec = 0;
+  trimEndSec = currentDuration;
+  trimStartInput.value = formatTimecode(0);
+  trimEndInput.value = formatTimecode(currentDuration);
+  updateTrimHighlight();
+}
+
+function updateTrimHighlight() {
+  if (!currentDuration) return;
+  const sPct = (trimStartSec / currentDuration) * 100;
+  const ePct = (trimEndSec / currentDuration) * 100;
+  trimRangeHighlight.style.display = 'block';
+  trimRangeHighlight.style.left = `${sPct}%`;
+  trimRangeHighlight.style.width = `${Math.max(0, ePct - sPct)}%`;
+}
+
+// Export Publication Plot
 async function exportPlot() {
   if (!currentFileId) return;
-  showLoading('Rendering high-resolution 200 DPI publication figure...');
+  showLoading('Rendering 200 DPI Skripsi publication figure...');
   try {
     const res = await fetch(`/api/export-plot/${currentFileId}`, { method: 'POST' });
-    if (!res.ok) throw new Error('Export failed.');
-    
+    if (!res.ok) throw new Error('Export failed');
     const blob = await res.blob();
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `forensic_visualizer_${trackTitle.innerText}.png`;
+    a.download = `skripsi_visualizer_${analysisData.metadata.original_filename}.png`;
     document.body.appendChild(a);
     a.click();
     a.remove();
     window.URL.revokeObjectURL(url);
   } catch (err) {
-    alert('Error exporting figure: ' + err.message);
+    alert('Error exporting plot: ' + err.message);
   } finally {
     hideLoading();
   }
 }
 
-// Auto init on load
 window.addEventListener('DOMContentLoaded', init);
