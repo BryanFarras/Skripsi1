@@ -17,7 +17,8 @@ MY-AIDETECTOR/
 │   │   ├── services/
 │   │   │   ├── audio_loader.py         # Multi-format decoder (WAV, MP3, FLAC, M4A via bundled ffmpeg)
 │   │   │   ├── visualizer_service.py   # Computes FFT spectrum, Tonal Balance, & STFT
-│   │   │   └── detector_service.py     # AI cutoff and acoustic forensic metrics
+│   │   │   ├── detector_service.py     # AI cutoff and acoustic forensic metrics
+│   │   │   └── stem_service.py         # 5-stem neural separation (Demucs / MUSDB)
 │   │   └── models/
 │   │       └── schemas.py              # Pydantic data schemas
 │   ├── uploads/                        # Temporary cached audio files
@@ -31,14 +32,8 @@ MY-AIDETECTOR/
 │       ├── main.js                     # Modular application entry point & bootstrap
 │       ├── state.js                    # Central state registry & cached DOM elements
 │       ├── audioPlayer.js              # Web Audio API AnalyserNode & 60 FPS render loop
-│       ├── uploader.js                 # Drag & drop, local path analyzer & demo loader
 │       └── components/
-│           ├── spectrogram.js          # 2D Spectrogram (Wave Candy scroll & Edison full)
-│           ├── waterfall3d.js          # 3D Waterfall, painter's depth sort & 360° orbit
-│           ├── equalizer.js            # Fruity Parametric EQ 2 flame FFT & 7 bands
-│           ├── tonalBalance.js         # Tonal Balance curve, corridor & live HUD
-│           ├── controls.js             # View tabs, trim controls, averaging slider
-│           └── forensics.js            # AI metrics summary badges & Skripsi figure export
+├── split_stems.py                      # Multi-stem separation CLI (Full Mix, Vocals, Drums, Bass, Other)
 ├── run_server.py                       # Python launch script with automatic browser opening
 ├── run_visualizer.bat                  # One-click Windows batch launcher
 ├── start_app.bat                       # Convenient quick launcher
@@ -46,6 +41,23 @@ MY-AIDETECTOR/
 ├── create_desktop_shortcut.bat         # Windows Desktop shortcut creator
 ├── test_backend.py                     # Automated pipeline verification script
 └── README.md
+```
+
+---
+
+## 🎛️ Stem Separation Tool (`split_stems.py`)
+
+Split any audio track into **5 individual forensic components** (`mixture`, `vocals`, `drums`, `bass`, `other`):
+
+```bash
+# 1. Single audio file (automatically creates 'song1_stems/' next to the file)
+python split_stems.py path/to/song1.wav
+
+# 2. Specify custom parent directory (creates 'my_stems/song1_stems/')
+python split_stems.py path/to/song1.mp3 --output-dir my_stems/
+
+# 3. Batch processing an entire folder of songs (creates '<song>_stems/' for each track)
+python split_stems.py --batch-dir Datasets/raw/ai_suno --output-dir Datasets/stems/ai_suno
 ```
 
 ---

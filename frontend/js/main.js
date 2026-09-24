@@ -6,6 +6,7 @@ import { setupControls, redrawCurrentView } from './components/controls.js';
 import { setupSpectrogramControls } from './components/spectrogram.js';
 import { setupWaterfallOrbitControls } from './components/waterfall3d.js';
 import { exportPlot } from './components/forensics.js';
+import { initStemSplitter } from './components/stems.js';
 
 export function init() {
   // Ensure all DOM elements are indexed
@@ -17,6 +18,7 @@ export function init() {
   setupControls();
   setupSpectrogramControls(redrawCurrentView);
   setupWaterfallOrbitControls(elements.mainWaterfallCanvas, redrawCurrentView);
+  initStemSplitter();
 
   // Bind Export Skripsi Plot buttons
   if (elements.exportTopBtn) {

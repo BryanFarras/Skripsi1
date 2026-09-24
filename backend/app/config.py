@@ -11,10 +11,13 @@ FRONTEND_DIR = ROOT_DIR / "frontend"
 # Runtime directories inside backend
 UPLOADS_DIR = BACKEND_DIR / "uploads"
 EXPORTS_DIR = BACKEND_DIR / "exports"
+STEMS_TEMP_DIR = BACKEND_DIR / "stems_temp"
+STEMS_EXPIRE_SECONDS = 3600  # Stems automatically expire and delete after 1 hour
 
 # Ensure runtime directories exist
 UPLOADS_DIR.mkdir(parents=True, exist_ok=True)
 EXPORTS_DIR.mkdir(parents=True, exist_ok=True)
+STEMS_TEMP_DIR.mkdir(parents=True, exist_ok=True)
 
 # Audio Processing Defaults
 TARGET_SAMPLE_RATE = 44100

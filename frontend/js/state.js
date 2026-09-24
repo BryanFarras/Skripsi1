@@ -51,7 +51,11 @@ export const state = {
   lastFrameTime: performance.now(),
   averagingMs: 400,       // Default 400ms (Ozone standard)
   isLiveRendering: false,
-  animFrameId: null
+  animFrameId: null,
+
+  // Stem Splitting State
+  currentStemsData: null,
+  isSplittingStems: false
 };
 
 // Cached DOM Elements
@@ -70,6 +74,17 @@ export function initDOMElements() {
   elements.analyzePathBtn = document.getElementById('analyzePathBtn');
   elements.exportTopBtn = document.getElementById('exportTopBtn');
   elements.primaryActionBtn = document.getElementById('primaryActionBtn');
+
+  // Stem Splitter Elements
+  elements.stemSplitterCard = document.getElementById('stemSplitterCard');
+  elements.splitStemsBtn = document.getElementById('splitStemsBtn');
+  elements.sideSplitStemsBtn = document.getElementById('sideSplitStemsBtn');
+  elements.quickStemGroup = document.getElementById('quickStemGroup');
+  elements.stemProcessStatus = document.getElementById('stemProcessStatus');
+  elements.stemResultsContainer = document.getElementById('stemResultsContainer');
+  elements.stemList = document.getElementById('stemList');
+  elements.stemStatusTitle = document.getElementById('stemStatusTitle');
+  elements.stemStatusSub = document.getElementById('stemStatusSub');
 
   // Averaging Controls
   elements.averagingSlider = document.getElementById('averagingSlider');

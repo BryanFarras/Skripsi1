@@ -3,6 +3,7 @@ import { state, elements, showLoading, hideLoading, formatTimecode } from './sta
 import { updateDiagnostics } from './components/forensics.js';
 import { switchView } from './components/controls.js';
 import { stopLiveRenderLoop } from './audioPlayer.js';
+import { onAudioLoadedForStems } from './components/stems.js';
 
 // Upload Audio File
 export async function uploadAudio(file) {
@@ -117,6 +118,9 @@ export function handleAnalysisLoaded(data) {
 
   // Populate Diagnostics
   updateDiagnostics(data.forensics);
+
+  // Notify stem separator component
+  onAudioLoadedForStems();
 
   // Reset spectrogram offscreen cache for new audio file
   state.specOffscreenCanvas = null;
