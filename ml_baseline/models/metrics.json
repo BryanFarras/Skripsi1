@@ -1,0 +1,172 @@
+{
+  "best_model_name": "Random Forest",
+  "results": {
+    "Random Forest": {
+      "accuracy": 0.9666666666666667,
+      "precision": 1.0,
+      "recall": 0.9555555555555556,
+      "f1_score": 0.9772727272727273,
+      "roc_auc": 1.0,
+      "eer": 0.0,
+      "eer_threshold": 0.2888888888888889,
+      "confusion_matrix": [
+        [
+          30,
+          0
+        ],
+        [
+          4,
+          86
+        ]
+      ],
+      "train_time_sec": 0.176
+    },
+    "Support Vector Machine (RBF)": {
+      "accuracy": 0.9583333333333334,
+      "precision": 1.0,
+      "recall": 0.9444444444444444,
+      "f1_score": 0.9714285714285714,
+      "roc_auc": 0.997037037037037,
+      "eer": 0.05555555555555553,
+      "eer_threshold": 0.17405678604906394,
+      "confusion_matrix": [
+        [
+          30,
+          0
+        ],
+        [
+          5,
+          85
+        ]
+      ],
+      "train_time_sec": 0.018
+    },
+    "Logistic Regression": {
+      "accuracy": 0.9666666666666667,
+      "precision": 1.0,
+      "recall": 0.9555555555555556,
+      "f1_score": 0.9772727272727273,
+      "roc_auc": 0.9907407407407407,
+      "eer": 0.03888888888888886,
+      "eer_threshold": 0.16576968133449554,
+      "confusion_matrix": [
+        [
+          30,
+          0
+        ],
+        [
+          4,
+          86
+        ]
+      ],
+      "train_time_sec": 0.005
+    },
+    "Multi-Layer Perceptron (MLP)": {
+      "accuracy": 0.8583333333333333,
+      "precision": 0.9866666666666667,
+      "recall": 0.8222222222222222,
+      "f1_score": 0.896969696969697,
+      "roc_auc": 0.9151851851851852,
+      "eer": 0.12777777777777777,
+      "eer_threshold": 0.29877302050590515,
+      "confusion_matrix": [
+        [
+          29,
+          1
+        ],
+        [
+          16,
+          74
+        ]
+      ],
+      "train_time_sec": 0.07
+    }
+  },
+  "top_features": [
+    {
+      "feature": "spec_contrast_b6_mean",
+      "importance": 0.16928010281208086
+    },
+    {
+      "feature": "mfcc_17_mean",
+      "importance": 0.10614610118683529
+    },
+    {
+      "feature": "spec_rolloff85_mean",
+      "importance": 0.057584868016357996
+    },
+    {
+      "feature": "mfcc_16_mean",
+      "importance": 0.046790015871518216
+    },
+    {
+      "feature": "mfcc_2_mean",
+      "importance": 0.043449690619136616
+    },
+    {
+      "feature": "spec_bandwidth_mean",
+      "importance": 0.0413617785089306
+    },
+    {
+      "feature": "spec_contrast_b6_std",
+      "importance": 0.034320638356512195
+    },
+    {
+      "feature": "spec_centroid_mean",
+      "importance": 0.026843201345714048
+    },
+    {
+      "feature": "mfcc_12_mean",
+      "importance": 0.02610656525154275
+    },
+    {
+      "feature": "spec_rolloff95_mean",
+      "importance": 0.02314572683321094
+    },
+    {
+      "feature": "mfcc_15_mean",
+      "importance": 0.020284033372353766
+    },
+    {
+      "feature": "spec_rolloff95_std",
+      "importance": 0.019103658548816873
+    },
+    {
+      "feature": "mfcc_7_mean",
+      "importance": 0.01768202668073284
+    },
+    {
+      "feature": "spec_contrast_b2_mean",
+      "importance": 0.01751914342671727
+    },
+    {
+      "feature": "mfcc_20_mean",
+      "importance": 0.016621337899029656
+    }
+  ],
+  "dataset_summary": {
+    "total_samples": 420,
+    "train_samples": 300,
+    "test_samples": 120,
+    "num_features": 110,
+    "train_tracks": [
+      "bonafide_8",
+      "bonafide_7",
+      "spoof_6",
+      "bonafide_13",
+      "bonafide_11",
+      "spoof_1",
+      "bonafide_9",
+      "bonafide_12",
+      "bonafide_14",
+      "spoof_3"
+    ],
+    "test_tracks": [
+      "bonafide_10",
+      "spoof_2",
+      "spoof_4",
+      "spoof_5"
+    ]
+  },
+  "timestamp": "2026-09-25 00:21:26"
+}

@@ -539,21 +539,29 @@ class MultiStemDetectorService:
 
 ## 9. Checklist Roadmap Bertahap (Action Plan)
 
-- [ ] **Fase 1: Uji Skrip Pemisah Stem (Stem Separator)**
-  - [ ] Jalankan skrip pemisah stem pada satu trek lagu uji di terminal untuk memverifikasi output 5 file WAV (`mixture`, `vocals`, `drums`, `bass`, `other`).
-  - [ ] Pastikan dependensi pemisah (`demucs` atau script ekstraktor) berjalan mulus di mesin lokal.
+- [x] **Fase 1: Uji Skrip Pemisah Stem (Stem Separator)**
+  - [x] Jalankan skrip pemisah stem pada satu trek lagu uji di terminal untuk memverifikasi output 5 file WAV stereo (`mixture`, `vocals`, `drums`, `bass`, `other`).
+  - [x] Pastikan dependensi pemisah (`demucs` dan `ffmpeg`) berjalan mulus di `.venv` dengan preservasi kanal stereo.
+  - [x] Integrasikan pemisahan stem langsung ke Web App dengan pembersihan otomatis 1 jam.
 
-- [ ] **Fase 2: Ekstraksi Dataset Multi-Komponen**
+- [x] **Fase 1.5: Baseline Machine Learning Classifier (`ml_baseline/`)** *(BARU SELESAI)*
+  - [x] Ekstraksi 110 fitur akustik/forensik (MFCC 1-20, Deltas, Rolloff 85/95%, Centroid, Bandwidth, Contrast 7 bands, ZCR, RMS, Rasio HF).
+  - [x] Pembuatan dataset seimbang dari Suno (AI Spoof) dan MUSDB18 (Human Bona-fide) dengan *Track-Level Grouping* untuk mencegah kebocoran data (*zero data leakage*).
+  - [x] Pelatihan & perbandingan 4 arsitektur baseline: Random Forest (Akurasi 96.7%, F1 97.7%, ROC-AUC 100%, EER 0.00%), SVM, Logistic Regression, dan MLP.
+  - [x] Serialisasi model juara ke `ml_baseline/models/baseline_classifier.joblib` dan `feature_scaler.joblib`.
+  - [x] Script inferensi visual per-segmen 5 detik (`ml_baseline.predict`) untuk analisis file penuh atau komponen stem.
+
+- [ ] **Fase 2: Ekstraksi Dataset Multi-Komponen Skala Besar**
+  - [x] Ekstrak trek AI (Suno) menjadi folder stem 5-komponen di `Datasets/suno/splits/`.
   - [ ] Ekstrak trek human dari `Datasets/musdb18_wav/` menggunakan [extract_musdb_stems.py](file:///c:/Users/asus/Documents/SKRIPSI/Datasets/extract_musdb_stems.py).
-  - [ ] Ekstrak trek AI (Suno, Udio) menjadi folder stem 5-komponen.
   - [ ] Potong seluruh stem menjadi klip sinkron 5 detik (`build_multistem_dataset.py`).
 
-- [ ] **Fase 3: Pelatihan & Eksperimen Skripsi**
+- [ ] **Fase 3: Pelatihan Deep Learning & Eksperimen Skripsi**
   - [ ] Latih model pada masing-masing stem secara terpisah (untuk mengisi tabel perbandingan Bab 4).
   - [ ] Latih model `MultiStemAudioClassifier` dengan fusi fitur gabungan.
   - [ ] Simpan bobot terbaik (`best_multistem_detector.pt`) dan catat metrik EER.
 
-- [ ] **Fase 4: Integrasi ke Web App [MY-AIDETECTOR](file:///c:/Users/asus/Documents/SKRIPSI/APPS/MY-AIDETECTOR)**
-  - [ ] Tambahkan tombol toggle *"Analyze Stems & Full Mix"* pada UI frontend.
+- [ ] **Fase 4: Integrasi Lanjutan ke Web App [MY-AIDETECTOR](file:///c:/Users/asus/Documents/SKRIPSI/APPS/MY-AIDETECTOR)**
+  - [ ] Tampilkan skor prediksi baseline AI model di dashboard di samping skor heuristik DSP.
   - [ ] Pasang radar chart / 5-bar visualizer pada tab Forensik (`forensics.js`) untuk menampilkan skor risiko per instrumen.
   - [ ] Hubungkan API route `/api/analyze-multistem` ke FastAPI backend.
