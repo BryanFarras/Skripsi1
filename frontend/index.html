@@ -132,6 +132,20 @@
                 <!-- Playhead Cursor Line for 2D Spectrogram -->
                 <div id="playheadCursor" class="playhead-line"></div>
 
+                <!-- Spectrogram Controls Toolbar (Moving / Wave Candy vs Full Track) -->
+                <div id="specToolbarTag" class="spec-toolbar-tag">
+                  <div class="spec-mode-switch">
+                    <button type="button" class="spec-mode-btn active" id="btnSpecScroll" data-mode="scroll" title="Smooth scrolling view like Wave Candy & Edison follow mode">Moving (Wave Candy)</button>
+                    <button type="button" class="spec-mode-btn" id="btnSpecFull" data-mode="full" title="Full clip overview with moving playback line like Edison">↔ Full Track (Edison)</button>
+                  </div>
+                  <div class="spec-zoom-group" id="specZoomGroup">
+                    <span class="zoom-label">Window:</span>
+                    <button type="button" class="btn-zoom-chip" data-win="3">3s</button>
+                    <button type="button" class="btn-zoom-chip active" data-win="6">6s</button>
+                    <button type="button" class="btn-zoom-chip" data-win="12">12s</button>
+                  </div>
+                </div>
+
                 <!-- AI Cutoff Floating Tag on Canvas -->
                 <div id="canvasCutoffBadge" class="canvas-cutoff-tag" style="display: none;">
                   <span class="cutoff-led"></span> AI Cutoff: <span id="cutoffValText">--</span>
@@ -228,7 +242,12 @@
                 <button class="btn btn-sm btn-camera" id="btnPresetIso" data-preset="iso">Isometric</button>
                 <button class="btn btn-sm btn-camera" id="btnPresetFront" data-preset="front">Front (EQ)</button>
               </div>
-              <p class="option-desc">Matching your sketch (X: freq, Y: vol, Z: time). Drag on screen to orbit.</p>
+              <div class="option-label-row" style="margin-top: 12px;">
+                <label for="wfOpacitySlider">Inactive Frames Transparency</label>
+                <span class="slider-val-badge" id="wfOpacityBadge">Transparent (15%)</span>
+              </div>
+              <input type="range" id="wfOpacitySlider" min="0" max="80" step="5" value="15" class="form-range" />
+              <p class="option-desc">Keeps background frames transparent so the active wave cuts through clearly.</p>
             </div>
 
             <!-- 1. Trim Start -->
@@ -367,6 +386,6 @@
     </div>
   </div>
 
-  <script src="/static/js/app.js"></script>
+  <script type="module" src="/js/main.js"></script>
 </body>
 </html>

@@ -16,12 +16,12 @@ from ..models.schemas import (
 )
 from .detector_service import detect_brickwall_cutoff
 
-def compute_fft_spectrum(audio: np.ndarray, sample_rate: int, num_log_bins: int = 256) -> FFTSpectrumData:
+def compute_fft_spectrum(audio: np.ndarray, sample_rate: int, num_log_bins: int = 512) -> FFTSpectrumData:
     """
     Computes an Equalizer-style frequency response curve across log-spaced frequencies (20Hz - 20kHz).
-    Returns averaged magnitude dB and peak hold dB representing the whole audio clip.
+    Returns averaged magnitude dB and peak hold dB representing the whole audio clip with high resolution (512 bins).
     """
-    n_fft = 4096
+    n_fft = 8192
     hop = 1024
     window = np.hanning(n_fft)
     
@@ -72,7 +72,7 @@ def compute_fft_spectrum(audio: np.ndarray, sample_rate: int, num_log_bins: int 
 def compute_tonal_balance(audio: np.ndarray, sample_rate: int) -> TonalBalanceData:
     """
     Computes Tonal Balance curve and 5 standard frequency bands (Sub, Bass, Low-Mid, High-Mid, Treble/Air)
-    representing the average balance across the entire clip.
+    representing the average balance across the entire clip with 256 curve frequency points.
     """
     band_defs = [
         {"name": "Sub", "range": [20.0, 60.0], "color": "#E53935"},
@@ -124,7 +124,7 @@ def compute_tonal_balance(audio: np.ndarray, sample_rate: int) -> TonalBalanceDa
             color_hex=b["color"]
         ))
 
-    curve_freqs = np.geomspace(20.0, min(20000.0, sample_rate / 2.0 - 50), 128)
+    curve_freqs = np.geomspace(20.0, min(20000.0, sample_rate / 2.0 - 50), 256)
     ref = np.max(avg_mag) + 1e-12
     raw_levels = 20 * np.log10(np.clip(np.interp(curve_freqs, freqs, avg_mag) / ref, 1e-4, 1.0))
     smooth_levels = np.convolve(raw_levels, np.ones(7)/7, mode='same')
@@ -135,12 +135,18 @@ def compute_tonal_balance(audio: np.ndarray, sample_rate: int) -> TonalBalanceDa
         bands=bands
     )
 
-def compute_spectrogram(audio: np.ndarray, sample_rate: int, max_time_bins: int = 400, max_freq_bins: int = 128) -> SpectrogramData:
+def compute_spectrogram(
+    audio: np.ndarray,
+    sample_rate: int,
+    n_fft: int = 4096,
+    hop: int = 512,
+    max_time_bins: int = 800,
+    max_freq_bins: int = 512
+) -> SpectrogramData:
     """
-    Computes downsampled 2D STFT Spectrogram matrix in dB for web rendering.
+    Computes high-resolution 2D STFT Spectrogram matrix in dB for web rendering.
+    Increased to 512 frequency bins and 4096 n_fft for ultra-fine frequency resolution.
     """
-    n_fft = 2048
-    hop = 512
     window = np.hanning(n_fft)
 
     num_frames = (len(audio) - n_fft) // hop
@@ -175,9 +181,10 @@ def compute_spectrogram(audio: np.ndarray, sample_rate: int, max_time_bins: int 
     ref = np.max(downsampled_matrix) + 1e-12
     db_matrix = 20 * np.log10(np.clip(downsampled_matrix / ref, 1e-4, 1.0))
 
-    avg_spectrum = np.mean(downsampled_matrix, axis=1)
-    avg_db = 20 * np.log10(np.clip(avg_spectrum / (np.max(avg_spectrum) + 1e-12), 1e-4, 1.0))
-    detected_cutoff = detect_brickwall_cutoff(target_freqs, avg_db, sample_rate)
+    avg_spectrum_full = np.mean(stft_matrix, axis=1)
+    ref_full = np.max(avg_spectrum_full) + 1e-12
+    avg_db_full = 20 * np.log10(np.clip(avg_spectrum_full / ref_full, 1e-4, 1.0))
+    detected_cutoff = detect_brickwall_cutoff(full_freqs, avg_db_full, sample_rate)
 
     matrix_list = [[round(float(val), 1) for val in row] for row in db_matrix]
 
@@ -194,15 +201,15 @@ def compute_waterfall_3d(
     audio: np.ndarray,
     sample_rate: int,
     num_slices: int = 576,
-    bins_per_slice: int = 70
+    bins_per_slice: int = 256
 ) -> Waterfall3DData:
     """
     Computes a sequence of discrete time-slice FFT spectra receding into depth (z-axis),
     matching the 3D waterfall sketch in 3d visual.png.
-    Increased 16x (up to 576 frames) for high-density 3D spectral terrain.
+    Enhanced with 256 frequency bins per slice (almost 4x resolution) and up to 576 frames for high-density 3D terrain.
     """
     duration = len(audio) / sample_rate
-    n_fft = 2048
+    n_fft = 4096
     window = np.hanning(n_fft)
 
     max_hz = min(20000.0, sample_rate / 2.0 - 50)
@@ -249,7 +256,7 @@ def compute_waterfall_3d(
         slices_raw.append((t_sec, spec))
 
     slices = []
-    kernel = np.ones(3) / 3.0
+    kernel = np.ones(5) / 5.0
 
     for idx, (t_sec, spec) in enumerate(slices_raw):
         log_mag = np.interp(target_freqs, full_freqs, spec)
