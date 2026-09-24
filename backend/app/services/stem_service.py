@@ -215,10 +215,16 @@ class StemService:
                     try:
                         with wave.open(str(f), "rb") as wf:
                             sr = wf.getframerate()
+                            n_channels = wf.getnchannels()
                             n_frames = wf.getnframes()
                             raw_bytes = wf.readframes(n_frames)
                             data = np.frombuffer(raw_bytes, dtype=np.int16).astype(np.float32) / 32768.0
-                            stems_numpy[name] = data
+                            if n_channels > 1:
+                                data = data.reshape(-1, n_channels)
+                                mono = np.mean(data, axis=1)
+                            else:
+                                mono = data
+                            stems_numpy[name] = mono
                     except Exception as err:
                         print(f"[StemService] Note: wave read error on {f}: {err}")
 
@@ -285,29 +291,40 @@ class StemService:
         for idx, stem_name in enumerate(model.sources):
             stems_dict[stem_name] = sources[idx].cpu()
 
-        # Convert to float32 mono numpy arrays and optionally save WAVs
+        # Convert and save stems preserving full stereo channels
         stems_numpy = {}
         saved_paths = {}
         base_name = audio_path.stem
 
         for name in self.STEM_NAMES:
-            stem_tensor = stems_dict[name]
-            # Downmix to mono float32 for forensic ML feature analysis
-            mono = torch.mean(stem_tensor, dim=0).numpy().astype(np.float32)
-            
-            # Normalize peak to 0.95 to prevent clipping
-            peak = np.max(np.abs(mono))
+            stem_tensor = stems_dict[name]  # Shape: [Channels, Samples]
+            stereo_audio = stem_tensor.numpy().astype(np.float32)
+
+            # Normalize peak to 0.95 to prevent clipping while preserving channel balance
+            peak = np.max(np.abs(stereo_audio))
             if peak > 0.95:
-                mono = mono / peak * 0.95
+                stereo_audio = stereo_audio / peak * 0.95
+
+            # Mono projection for internal 1D acoustic feature routines
+            if stereo_audio.ndim > 1 and stereo_audio.shape[0] > 1:
+                mono = np.mean(stereo_audio, axis=0)
+            else:
+                mono = stereo_audio.squeeze(0) if stereo_audio.ndim > 1 else stereo_audio
 
             stems_numpy[name] = mono
 
             if save_wavs:
                 stem_file = output_dir / f"{base_name}_{name}.wav"
-                sf.write(str(stem_file), mono, target_sr, subtype="PCM_16")
+                # soundfile expects [Samples, Channels] for multi-channel stereo audio
+                if stereo_audio.ndim > 1 and stereo_audio.shape[0] > 1:
+                    save_data = stereo_audio.T  # Transpose [2, N] -> [N, 2]
+                else:
+                    save_data = mono
+
+                sf.write(str(stem_file), save_data, target_sr, subtype="PCM_16")
                 saved_paths[name] = stem_file
 
-        print(f"[StemService] Successfully split 5 stems into: {output_dir}")
+        print(f"[StemService] Successfully split 5 stereo stems into: {output_dir}")
         return {
             "stems": stems_numpy,
             "file_paths": saved_paths if save_wavs else {},
