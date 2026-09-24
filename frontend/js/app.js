@@ -12,6 +12,15 @@ let camZoom = 1.0;
 let isDragging3D = false;
 let dragStartX = 0, dragStartY = 0;
 
+// 360° Drag Inertia State
+let dragVelX = 0, dragVelY = 0;      // velocity (rad/frame) for momentum
+let lastDragDx = 0, lastDragDy = 0;  // last frame delta for velocity capture
+let inertiaRafId = null;             // requestAnimationFrame id for inertia loop
+
+// Touch State (pinch-to-zoom)
+let touch1 = null, touch2 = null;
+let pinchStartDist = 0, pinchStartZoom = 1.0;
+
 // DOM Elements
 const mediaDropZone = document.getElementById('mediaDropZone');
 const dropPrompt = document.getElementById('dropPrompt');
@@ -140,6 +149,10 @@ function init() {
   audioElement.addEventListener('timeupdate', onTimeUpdate);
   audioElement.addEventListener('ended', onEnded);
   audioElement.addEventListener('play', () => {
+    initWebAudio();
+    if (audioCtx && audioCtx.state === 'suspended') {
+      audioCtx.resume();
+    }
     updatePlayIcons(true);
     startLiveRenderLoop();
   });
@@ -174,30 +187,164 @@ function init() {
     });
   });
 
-  // 3D Waterfall Canvas Mouse Interactions
+  // ── 3D Waterfall: Full 360° Drag with Inertia ──────────────────────────────
+
+  /** Stop any ongoing inertia animation */
+  function stopInertia() {
+    if (inertiaRafId !== null) {
+      cancelAnimationFrame(inertiaRafId);
+      inertiaRafId = null;
+    }
+  }
+
+  /** Kick off momentum after drag-release */
+  function startInertia() {
+    stopInertia();
+    const FRICTION = 0.88;       // decay per frame (lower = stops faster)
+    const MIN_VEL = 0.0002;      // stop threshold
+
+    function step() {
+      dragVelX *= FRICTION;
+      dragVelY *= FRICTION;
+
+      if (Math.abs(dragVelX) < MIN_VEL && Math.abs(dragVelY) < MIN_VEL) {
+        inertiaRafId = null;
+        return;
+      }
+
+      // Full 360° — yaw wraps freely, pitch wraps full circle
+      camYaw  += dragVelX;
+      camPitch += dragVelY;
+      // Keep pitch in (-PI, PI) so it never accumulates to infinity
+      camPitch = ((camPitch + Math.PI) % (2 * Math.PI)) - Math.PI;
+
+      if (currentView === 'waterfall') redrawCurrentView();
+      inertiaRafId = requestAnimationFrame(step);
+    }
+
+    inertiaRafId = requestAnimationFrame(step);
+  }
+
+  // Mouse Down — begin drag, stop any ongoing inertia
   mainWaterfallCanvas.addEventListener('mousedown', (e) => {
+    if (e.button !== 0) return;          // left button only
+    stopInertia();
     isDragging3D = true;
     dragStartX = e.clientX;
     dragStartY = e.clientY;
+    dragVelX = 0; dragVelY = 0;
+    lastDragDx = 0; lastDragDy = 0;
+    mainWaterfallCanvas.style.cursor = 'grabbing';
   });
 
+  // Mouse Move — rotate on every pixel moved
   window.addEventListener('mousemove', (e) => {
     if (!isDragging3D) return;
     const dx = e.clientX - dragStartX;
     const dy = e.clientY - dragStartY;
     dragStartX = e.clientX;
     dragStartY = e.clientY;
-    camYaw += dx * 0.008;
-    camPitch = Math.max(0.05, Math.min(1.4, camPitch + dy * 0.008));
+
+    // Full 360° — no clamping
+    camYaw   += dx * 0.008;
+    camPitch += dy * 0.008;
+    camPitch  = ((camPitch + Math.PI) % (2 * Math.PI)) - Math.PI;
+
+    // Capture velocity for inertia
+    lastDragDx = dx * 0.008;
+    lastDragDy = dy * 0.008;
+
     if (currentView === 'waterfall') redrawCurrentView();
   });
 
-  window.addEventListener('mouseup', () => { isDragging3D = false; });
+  // Mouse Up — release and launch inertia
+  window.addEventListener('mouseup', (e) => {
+    if (!isDragging3D) return;
+    isDragging3D = false;
+    mainWaterfallCanvas.style.cursor = 'grab';
+    // Seed velocity from last frame's delta
+    dragVelX = lastDragDx;
+    dragVelY = lastDragDy;
+    if (currentView === 'waterfall') startInertia();
+  });
 
+  // Restore cursor when mouse leaves the canvas during non-drag
+  mainWaterfallCanvas.addEventListener('mouseenter', () => {
+    if (!isDragging3D) mainWaterfallCanvas.style.cursor = 'grab';
+  });
+  mainWaterfallCanvas.addEventListener('mouseleave', () => {
+    if (!isDragging3D) mainWaterfallCanvas.style.cursor = '';
+  });
+
+  // Scroll to Zoom
   mainWaterfallCanvas.addEventListener('wheel', (e) => {
     e.preventDefault();
     camZoom = Math.max(0.5, Math.min(2.5, camZoom - e.deltaY * 0.0012));
     if (currentView === 'waterfall') redrawCurrentView();
+  }, { passive: false });
+
+  // ── Touch Support: drag-to-rotate + pinch-to-zoom ──────────────────────────
+  mainWaterfallCanvas.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    stopInertia();
+    isDragging3D = false;
+    dragVelX = 0; dragVelY = 0;
+
+    if (e.touches.length === 1) {
+      isDragging3D = true;
+      dragStartX = e.touches[0].clientX;
+      dragStartY = e.touches[0].clientY;
+      lastDragDx = 0; lastDragDy = 0;
+      touch1 = e.touches[0];
+      touch2 = null;
+    } else if (e.touches.length === 2) {
+      isDragging3D = false;
+      touch1 = e.touches[0];
+      touch2 = e.touches[1];
+      pinchStartDist = Math.hypot(
+        touch2.clientX - touch1.clientX,
+        touch2.clientY - touch1.clientY
+      );
+      pinchStartZoom = camZoom;
+    }
+  }, { passive: false });
+
+  mainWaterfallCanvas.addEventListener('touchmove', (e) => {
+    e.preventDefault();
+    if (e.touches.length === 1 && isDragging3D) {
+      const dx = e.touches[0].clientX - dragStartX;
+      const dy = e.touches[0].clientY - dragStartY;
+      dragStartX = e.touches[0].clientX;
+      dragStartY = e.touches[0].clientY;
+
+      camYaw   += dx * 0.008;
+      camPitch += dy * 0.008;
+      camPitch  = ((camPitch + Math.PI) % (2 * Math.PI)) - Math.PI;
+      lastDragDx = dx * 0.008;
+      lastDragDy = dy * 0.008;
+
+      if (currentView === 'waterfall') redrawCurrentView();
+    } else if (e.touches.length === 2) {
+      const dist = Math.hypot(
+        e.touches[1].clientX - e.touches[0].clientX,
+        e.touches[1].clientY - e.touches[0].clientY
+      );
+      if (pinchStartDist > 0) {
+        camZoom = Math.max(0.5, Math.min(2.5, pinchStartZoom * (dist / pinchStartDist)));
+        if (currentView === 'waterfall') redrawCurrentView();
+      }
+    }
+  }, { passive: false });
+
+  mainWaterfallCanvas.addEventListener('touchend', (e) => {
+    e.preventDefault();
+    if (isDragging3D) {
+      isDragging3D = false;
+      dragVelX = lastDragDx;
+      dragVelY = lastDragDy;
+      if (currentView === 'waterfall') startInertia();
+    }
+    touch1 = null; touch2 = null;
   }, { passive: false });
 
   mainWaterfallCanvas.addEventListener('click', handleWaterfallCanvasClick);
@@ -362,6 +509,7 @@ function handleAnalysisLoaded(data) {
   if (isLiveRendering) stopLiveRenderLoop();
 
   // Set audio source
+  audioElement.crossOrigin = 'anonymous';
   audioElement.src = `/api/audio/${currentFileId}`;
   audioElement.load();
 
@@ -425,6 +573,7 @@ function redrawCurrentView() {
   const showCutoff = aiCutoffCheck.checked;
 
   const isPlaying = audioElement && !audioElement.paused;
+  updateLiveAudioData(16.6);
 
   if (currentView === 'spectrogram') {
     renderSpectrogramCanvas(mainSpecCanvas, analysisData.spectrogram, analysisData.forensics, palette, showCutoff);
@@ -547,6 +696,40 @@ function renderWaterfall3DCanvas(canvas, waterfallData) {
   ctx.fillText('freq (x)', axX.sx + 8, axX.sy + 14);
   ctx.fillText('t (z)', axZ.sx + 8, axZ.sy - 4);
 
+  const isPlaying = audioElement && !audioElement.paused;
+
+  // Ground plane outline (Time x Frequency plane)
+  const floorO = project(0, 0, 0);
+  const floorX = project(1, 0, 0);
+  const floorXZ = project(1, 0, 1);
+  const floorZ = project(0, 0, 1);
+
+  ctx.strokeStyle = isPlaying ? 'rgba(255, 255, 255, 0.08)' : 'rgba(255, 255, 255, 0.04)';
+  ctx.lineWidth = 1.0;
+  ctx.beginPath();
+  ctx.moveTo(floorO.sx, floorO.sy);
+  ctx.lineTo(floorX.sx, floorX.sy);
+  ctx.lineTo(floorXZ.sx, floorXZ.sy);
+  ctx.lineTo(floorZ.sx, floorZ.sy);
+  ctx.closePath();
+  ctx.stroke();
+
+  // If playing, draw a travel guide line on the ground plane along the current slice's baseline
+  if (isPlaying) {
+    const curZ = activeSliceIdx / Math.max(1, numSlices - 1);
+    const lineStart = project(0, 0, curZ);
+    const lineEnd = project(1, 0, curZ);
+
+    ctx.strokeStyle = 'rgba(0, 229, 255, 0.35)';
+    ctx.lineWidth = 1.2;
+    ctx.setLineDash([4, 4]);
+    ctx.beginPath();
+    ctx.moveTo(lineStart.sx, lineStart.sy);
+    ctx.lineTo(lineEnd.sx, lineEnd.sy);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+
   // Depth-sort slices (back to front painter's algorithm)
   const sortedIndices = Array.from({ length: numSlices }, (_, i) => i);
   sortedIndices.sort((a, b) => {
@@ -555,8 +738,12 @@ function renderWaterfall3DCanvas(canvas, waterfallData) {
     return zb - za; // Furthest first
   });
 
+  // When playing: show ONLY the frame that is currently playing.
+  // When viewing without playing: keep the original view with all slices visible.
+  const indicesToRender = isPlaying ? [activeSliceIdx] : sortedIndices;
+
   // Render Slices
-  sortedIndices.forEach(sIdx => {
+  indicesToRender.forEach(sIdx => {
     const slice = slices[sIdx];
     const zNorm = sIdx / Math.max(1, numSlices - 1);
     const mags = slice.magnitudes_db;
@@ -595,18 +782,18 @@ function renderWaterfall3DCanvas(canvas, waterfallData) {
     ctx.closePath();
 
     const isDense = numSlices > 100;
-    const fillAlpha = numSlices > 300 ? '12' : (numSlices > 100 ? '1c' : '28');
+    const fillAlpha = isPlaying ? '55' : (numSlices > 300 ? '12' : (numSlices > 100 ? '1c' : '28'));
 
-    if (isActive) {
-      ctx.fillStyle = 'rgba(0, 229, 255, 0.45)';
+    if (isActive || isPlaying) {
+      ctx.fillStyle = slice.color_hex + '55';
     } else {
       ctx.fillStyle = slice.color_hex + fillAlpha;
     }
     ctx.fill();
 
     // Baseline separator line
-    ctx.strokeStyle = isActive ? 'rgba(0, 229, 255, 0.8)' : (isDense ? 'rgba(255, 255, 255, 0.03)' : 'rgba(255, 255, 255, 0.08)');
-    ctx.lineWidth = isActive ? 1.5 : (isDense ? 0.8 : 1);
+    ctx.strokeStyle = (isActive || isPlaying) ? 'rgba(0, 229, 255, 0.9)' : (isDense ? 'rgba(255, 255, 255, 0.03)' : 'rgba(255, 255, 255, 0.08)');
+    ctx.lineWidth = (isActive || isPlaying) ? 1.8 : (isDense ? 0.8 : 1);
     ctx.beginPath();
     ctx.moveTo(baselineStart.sx, baselineStart.sy);
     ctx.lineTo(baselineEnd.sx, baselineEnd.sy);
@@ -619,10 +806,10 @@ function renderWaterfall3DCanvas(canvas, waterfallData) {
       else ctx.lineTo(pts[i].sx, pts[i].sy);
     }
 
-    if (isActive) {
+    if (isActive || isPlaying) {
       // Glowing highlight for currently playing/scrubbed slice
       ctx.save();
-      ctx.shadowColor = '#00e5ff';
+      ctx.shadowColor = slice.color_hex || '#00e5ff';
       ctx.shadowBlur = 14;
       ctx.strokeStyle = '#ffffff';
       ctx.lineWidth = 3.4;
@@ -631,7 +818,7 @@ function renderWaterfall3DCanvas(canvas, waterfallData) {
 
       // Draw active time marker
       if (peakPt) {
-        ctx.fillStyle = '#00e5ff';
+        ctx.fillStyle = slice.color_hex || '#00e5ff';
         ctx.beginPath();
         ctx.arc(peakPt.sx, peakPt.sy, 5.0, 0, Math.PI * 2);
         ctx.fill();
@@ -646,6 +833,16 @@ function renderWaterfall3DCanvas(canvas, waterfallData) {
       ctx.stroke();
     }
   });
+
+  // Status HUD indicator
+  ctx.font = '10px JetBrains Mono, monospace';
+  if (isPlaying) {
+    ctx.fillStyle = '#00ffcc';
+    ctx.fillText(`● LIVE 3D FRAME: ${slices[activeSliceIdx].formatted_time} (Slice ${activeSliceIdx + 1}/${numSlices})`, w - 320, 24);
+  } else {
+    ctx.fillStyle = '#94a3b8';
+    ctx.fillText(`● 3D WATERFALL (${numSlices} Slices - All Visible)`, w - 240, 24);
+  }
 }
 
 // 3D Waterfall Click-To-Seek
@@ -770,7 +967,26 @@ function renderSpectrogramCanvas(canvas, specData, forensics, palette, showCutof
   });
 }
 
-// 3. Render Equalizer Canvas (Live Real-Time FFT or Global Average)
+// 7 Parametric EQ 2 Bands (Matching FL Studio Fruity Parametric EQ 2 visualizer)
+const PEQ2_BANDS = [
+  { id: 1, name: 'SUB', freq: 35, range: [20, 60], color: '#ef4444' },
+  { id: 2, name: 'BASS', freq: 110, range: [60, 250], color: '#f97316' },
+  { id: 3, name: 'LOW MID', freq: 380, range: [250, 600], color: '#eab308' },
+  { id: 4, name: 'MID', freq: 1100, range: [600, 2400], color: '#22c55e' },
+  { id: 5, name: 'HIGH MID', freq: 3400, range: [2400, 6000], color: '#06b6d4' },
+  { id: 6, name: 'HIGH', freq: 7600, range: [6000, 11000], color: '#3b82f6' },
+  { id: 7, name: 'TREBLE', freq: 14500, range: [11000, 20000], color: '#a855f7' }
+];
+
+const BAND_DEFINITIONS = [
+  { name: 'Sub', range: [20, 60], color: '#ef4444' },
+  { name: 'Bass', range: [60, 250], color: '#f97316' },
+  { name: 'Low Mid', range: [250, 2000], color: '#22c55e' },
+  { name: 'High Mid', range: [2000, 8000], color: '#06b6d4' },
+  { name: 'Treble / Air', range: [8000, 20000], color: '#a855f7' }
+];
+
+// 3. Render Equalizer Canvas (FL Studio Fruity Parametric EQ 2 Real-Time Visualizer)
 function renderEqualizerCanvas(canvas, eqData, isLive = false) {
   if (!canvas || !eqData) return;
   const dpr = window.devicePixelRatio || 1;
@@ -783,126 +999,241 @@ function renderEqualizerCanvas(canvas, eqData, isLive = false) {
   const w = rect.width;
   const h = rect.height;
 
-  // Background
-  ctx.fillStyle = '#080a0f';
+  // Background - Sleek Studio Console
+  ctx.fillStyle = '#080b11';
   ctx.fillRect(0, 0, w, h);
 
-  // Vertical Frequency grid lines
-  [30, 60, 100, 250, 500, 1000, 2000, 4000, 8000, 16000].forEach(f => {
-    const x = freqToX(f, w);
-    ctx.strokeStyle = '#151c28';
+  const topHeaderH = 30;
+  const bottomAxisH = 22;
+  const rightAxisW = 44;
+  const contentW = Math.max(100, w - rightAxisW);
+  const contentH = Math.max(50, h - topHeaderH - bottomAxisH);
+  const topY = topHeaderH;
+  const bottomY = topY + contentH;
+
+  // dB to Y mapping tailored for Parametric EQ 2 (+12dB down to -80dB)
+  function peqDbToY(db) {
+    const minDb = -80.0;
+    const maxDb = 12.0;
+    const clamped = Math.max(minDb, Math.min(maxDb, db));
+    return topY + (1.0 - (clamped - minDb) / (maxDb - minDb)) * contentH;
+  }
+
+  // 1. Top 7 Band Header Buttons / Pills
+  const pillW = contentW / 7;
+  PEQ2_BANDS.forEach((b, idx) => {
+    const px = idx * pillW;
+    const pw = pillW - 2;
+
+    ctx.fillStyle = 'rgba(18, 24, 38, 0.9)';
+    ctx.fillRect(px, 3, pw, topHeaderH - 6);
+
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(px, 3, pw, topHeaderH - 6);
+
+    // Colored top accent
+    ctx.fillStyle = b.color;
+    ctx.fillRect(px, 3, pw, 3);
+
+    // Pill badge & name
+    ctx.beginPath();
+    ctx.arc(px + 10, 15, 6, 0, Math.PI * 2);
+    ctx.fillStyle = b.color;
+    ctx.fill();
+
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 8px JetBrains Mono, monospace';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(`${b.id}`, px + 10, 15);
+
+    ctx.textAlign = 'left';
+    ctx.font = 'bold 9px JetBrains Mono, monospace';
+    ctx.fillStyle = '#cbd5e1';
+    ctx.fillText(b.name, px + 20, 16);
+  });
+  ctx.textAlign = 'start';
+  ctx.textBaseline = 'alphabetic';
+
+  // 2. Frequency Grid Lines & Labels
+  const gridFreqs = [20, 30, 40, 50, 100, 200, 300, 400, 500, 1000, 2000, 3000, 4000, 5000, 10000, 20000];
+  const majorFreqs = [20, 50, 100, 250, 500, 1000, 2000, 4000, 8000, 16000];
+
+  gridFreqs.forEach(f => {
+    const x = freqToX(f, contentW);
+    const isMajor = [100, 1000, 10000].includes(f);
+    ctx.strokeStyle = isMajor ? 'rgba(255, 255, 255, 0.12)' : 'rgba(255, 255, 255, 0.04)';
     ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.moveTo(x, 0);
-    ctx.lineTo(x, h);
+    ctx.moveTo(x, topY);
+    ctx.lineTo(x, bottomY);
     ctx.stroke();
-
-    if ([100, 1000, 10000].includes(f)) {
-      ctx.fillStyle = '#64748b';
-      ctx.font = '10px JetBrains Mono';
-      ctx.fillText(`${f >= 1000 ? f / 1000 + 'k' : f}Hz`, x + 4, h - 8);
-    }
   });
 
-  // Horizontal dB grid lines
-  [-12, -24, -36, -48, -60, -72].forEach(db => {
-    const y = dbToY(db, h);
-    ctx.strokeStyle = '#151c28';
-    ctx.lineWidth = 1;
+  majorFreqs.forEach(f => {
+    const x = freqToX(f, contentW);
+    ctx.fillStyle = '#64748b';
+    ctx.font = '9px JetBrains Mono, monospace';
+    const txt = f >= 1000 ? `${f / 1000}k` : `${f}`;
+    ctx.fillText(txt, x - 6, h - 6);
+  });
+
+  // 3. dB Grid Lines & Scale Labels
+  const dbLines = [12, 6, 0, -6, -12, -18, -36, -60];
+  dbLines.forEach(db => {
+    const y = peqDbToY(db);
+    ctx.strokeStyle = (db === 0) ? 'rgba(255, 255, 255, 0.22)' : 'rgba(255, 255, 255, 0.05)';
+    ctx.lineWidth = (db === 0) ? 1.2 : 1;
+    if (db !== 0) ctx.setLineDash([4, 4]); else ctx.setLineDash([]);
     ctx.beginPath();
     ctx.moveTo(0, y);
-    ctx.lineTo(w, y);
+    ctx.lineTo(contentW, y);
     ctx.stroke();
+    ctx.setLineDash([]);
 
-    ctx.fillStyle = '#475569';
-    ctx.font = '9px JetBrains Mono';
-    ctx.fillText(`${db}dB`, w - 38, y - 3);
+    ctx.fillStyle = (db === 0) ? '#cbd5e1' : '#64748b';
+    ctx.font = '9px JetBrains Mono, monospace';
+    ctx.fillText(`${db > 0 ? '+' : ''}${db}dB`, contentW + 6, y + 3);
   });
 
   const freqs = eqData.frequencies;
   const globalAvgs = eqData.magnitudes_db;
 
-  // If live, render faint global average curve as reference benchmark
-  if (isLive) {
-    ctx.strokeStyle = 'rgba(99, 102, 241, 0.35)';
-    ctx.lineWidth = 1.5;
-    ctx.setLineDash([4, 4]);
-    ctx.beginPath();
-    for (let i = 0; i < freqs.length; i++) {
-      const x = freqToX(freqs[i], w);
-      const y = dbToY(globalAvgs[i], h);
-      if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  const avgs = (liveMagnitudesDb && liveMagnitudesDb.length === freqs.length) ? liveMagnitudesDb : globalAvgs;
+  const peaks = (livePeakHoldDb && livePeakHoldDb.length === freqs.length) ? livePeakHoldDb : eqData.peaks_db;
+
+  function getDbAtFreq(targetHz, arr) {
+    if (targetHz <= freqs[0]) return arr[0];
+    if (targetHz >= freqs[freqs.length - 1]) return arr[freqs.length - 1];
+    const logMin = Math.log10(freqs[0]);
+    const logMax = Math.log10(freqs[freqs.length - 1]);
+    const logT = Math.log10(targetHz);
+    const pos = ((logT - logMin) / (logMax - logMin)) * (freqs.length - 1);
+    const i0 = Math.floor(pos);
+    const i1 = Math.min(freqs.length - 1, i0 + 1);
+    const frac = pos - i0;
+    return arr[i0] * (1 - frac) + arr[i1] * frac;
+  }
+
+  // 4. REAL-TIME VERTICAL SPECTRUM BARS (FL Studio Parametric EQ 2 Style)
+  const barSpacing = 3;
+  const numBars = Math.floor(contentW / barSpacing);
+  const barW = Math.max(1.5, barSpacing - 1);
+
+  for (let i = 0; i < numBars; i++) {
+    const x = i * barSpacing;
+    const norm = i / (numBars - 1);
+    const logF = Math.log10(20) + norm * (Math.log10(20000) - Math.log10(20));
+    const f = Math.pow(10, logF);
+
+    const db = getDbAtFreq(f, avgs);
+    const peakDb = getDbAtFreq(f, peaks);
+
+    const barY = peqDbToY(db);
+    const peakY = peqDbToY(peakDb);
+    const barHeight = bottomY - barY;
+
+    if (barHeight > 1) {
+      // Flame Gradient (Crimson -> Red -> Orange -> Amber -> Yellow)
+      const grad = ctx.createLinearGradient(0, bottomY, 0, barY);
+      grad.addColorStop(0.0, '#5a0204');
+      grad.addColorStop(0.35, '#dc2626');
+      grad.addColorStop(0.70, '#ea580c');
+      grad.addColorStop(0.92, '#f59e0b');
+      grad.addColorStop(1.0, '#fef08a');
+
+      ctx.fillStyle = grad;
+      ctx.fillRect(x, barY, barW, barHeight);
+
+      // Peak Hold Cap
+      if (peakY < barY - 1) {
+        ctx.fillStyle = 'rgba(254, 240, 138, 0.75)';
+        ctx.fillRect(x, peakY, barW, 1.5);
+      }
     }
-    ctx.stroke();
-    ctx.setLineDash([]);
   }
 
-  // Choose active levels: live smoothed or global average
-  const avgs = (isLive && liveMagnitudesDb) ? liveMagnitudesDb : globalAvgs;
-  const peaks = (isLive && livePeakHoldDb) ? livePeakHoldDb : eqData.peaks_db;
-
-  // Peak hold line
-  ctx.strokeStyle = isLive ? 'rgba(0, 255, 204, 0.45)' : '#475569';
-  ctx.lineWidth = 1.2;
+  // 5. Smooth Spectrum Envelope Curve & Translucent Fill
   ctx.beginPath();
+  let firstPt = true;
   for (let i = 0; i < freqs.length; i++) {
-    const x = freqToX(freqs[i], w);
-    const y = dbToY(peaks[i], h);
-    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    const x = freqToX(freqs[i], contentW);
+    const y = peqDbToY(avgs[i]);
+    if (firstPt) { ctx.moveTo(x, y); firstPt = false; }
+    else { ctx.lineTo(x, y); }
   }
-  ctx.stroke();
-
-  // Gradient fill
-  const grad = ctx.createLinearGradient(0, 0, 0, h);
-  if (isLive) {
-    grad.addColorStop(0, 'rgba(0, 255, 204, 0.38)');
-    grad.addColorStop(0.5, 'rgba(99, 102, 241, 0.16)');
-    grad.addColorStop(1, 'rgba(0, 0, 0, 0.0)');
-  } else {
-    grad.addColorStop(0, 'rgba(0, 229, 255, 0.35)');
-    grad.addColorStop(1, 'rgba(0, 229, 255, 0.0)');
-  }
-
-  ctx.beginPath();
-  for (let i = 0; i < freqs.length; i++) {
-    const x = freqToX(freqs[i], w);
-    const y = dbToY(avgs[i], h);
-    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
-  }
-  ctx.lineTo(w, h);
-  ctx.lineTo(0, h);
+  ctx.lineTo(contentW, bottomY);
+  ctx.lineTo(0, bottomY);
   ctx.closePath();
-  ctx.fillStyle = grad;
+
+  const curveGrad = ctx.createLinearGradient(0, topY, 0, bottomY);
+  curveGrad.addColorStop(0.0, 'rgba(249, 115, 22, 0.22)');
+  curveGrad.addColorStop(0.5, 'rgba(220, 38, 38, 0.08)');
+  curveGrad.addColorStop(1.0, 'rgba(0, 0, 0, 0.0)');
+  ctx.fillStyle = curveGrad;
   ctx.fill();
 
-  // Vibrant foreground stroke
-  ctx.strokeStyle = isLive ? '#00ffcc' : '#00e5ff';
-  ctx.lineWidth = 2.2;
-  ctx.shadowColor = isLive ? 'rgba(0, 255, 204, 0.5)' : 'rgba(0, 229, 255, 0.4)';
-  ctx.shadowBlur = 8;
+  // Glow line
   ctx.beginPath();
   for (let i = 0; i < freqs.length; i++) {
-    const x = freqToX(freqs[i], w);
-    const y = dbToY(avgs[i], h);
+    const x = freqToX(freqs[i], contentW);
+    const y = peqDbToY(avgs[i]);
     if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
   }
+  ctx.strokeStyle = '#ffffff';
+  ctx.lineWidth = 1.8;
+  ctx.shadowColor = 'rgba(254, 240, 138, 0.6)';
+  ctx.shadowBlur = 8;
   ctx.stroke();
   ctx.shadowBlur = 0;
 
-  // Status badges
-  ctx.font = '10px JetBrains Mono';
+  // 6. Numbered Band Tokens (Circles 1 to 7 riding dynamically along the curve)
+  PEQ2_BANDS.forEach(b => {
+    const bx = freqToX(b.freq, contentW);
+    const bDb = getDbAtFreq(b.freq, avgs);
+    const by = peqDbToY(bDb);
+
+    ctx.save();
+    ctx.shadowColor = b.color;
+    ctx.shadowBlur = 12;
+
+    ctx.beginPath();
+    ctx.arc(bx, by, 9, 0, Math.PI * 2);
+    ctx.fillStyle = '#0c111a';
+    ctx.fill();
+
+    ctx.lineWidth = 2.0;
+    ctx.strokeStyle = b.color;
+    ctx.stroke();
+    ctx.restore();
+
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 9px JetBrains Mono, monospace';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(`${b.id}`, bx, by);
+
+    ctx.font = '8px JetBrains Mono, monospace';
+    ctx.fillStyle = b.color;
+    const fLabel = b.freq >= 1000 ? `${(b.freq / 1000).toFixed(1)}k` : `${b.freq}Hz`;
+    ctx.fillText(fLabel, bx, by + 14);
+  });
+  ctx.textAlign = 'start';
+  ctx.textBaseline = 'alphabetic';
+
+  // 7. Status Badge
+  ctx.font = '10px JetBrains Mono, monospace';
   if (isLive) {
     ctx.fillStyle = '#00ffcc';
-    ctx.fillText(`● LIVE FFT (${averagingMs}ms avg)`, w - 170, 22);
-    ctx.fillStyle = 'rgba(99, 102, 241, 0.7)';
-    ctx.fillText(`-- Clip Avg Ref`, w - 170, 36);
+    ctx.fillText(`● LIVE PARAMETRIC EQ 2 (${averagingMs}ms avg)`, contentW - 225, topY + 18);
   } else {
     ctx.fillStyle = '#94a3b8';
-    ctx.fillText(`● CLIP GLOBAL AVERAGE`, w - 150, 22);
+    ctx.fillText(`● PLAYHEAD REAL-TIME SPECTRUM`, contentW - 200, topY + 18);
   }
 }
 
-// 4. Render Tonal Balance Canvas (Live Real-Time or Global Average)
+// 4. Render Tonal Balance Canvas (Live Real-Time or Playhead Slice)
 function renderTonalCanvas(canvas, tbData, isLive = false) {
   if (!canvas || !tbData) return;
   const dpr = window.devicePixelRatio || 1;
@@ -919,13 +1250,72 @@ function renderTonalCanvas(canvas, tbData, isLive = false) {
   ctx.fillStyle = '#080a0f';
   ctx.fillRect(0, 0, w, h);
 
-  const curveF = (isLive && analysisData && analysisData.fft_spectrum)
+  const curveF = (analysisData && analysisData.fft_spectrum)
     ? analysisData.fft_spectrum.frequencies
     : tbData.curve_freqs;
 
-  const curveL = (isLive && liveMagnitudesDb)
+  const curveL = (liveMagnitudesDb && liveMagnitudesDb.length === curveF.length)
     ? liveMagnitudesDb
     : tbData.curve_levels;
+
+  const topY = 32;
+  const bottomY = h - 22;
+  const contentH = bottomY - topY;
+
+  function tonalDbToY(db) {
+    const minDb = -80.0;
+    const maxDb = 0.0;
+    const clamped = Math.max(minDb, Math.min(maxDb, db));
+    return topY + (1.0 - (clamped - minDb) / (maxDb - minDb)) * contentH;
+  }
+
+  // Frequency grid
+  [60, 250, 1000, 2000, 8000].forEach(f => {
+    const x = freqToX(f, w);
+    ctx.strokeStyle = '#151c28';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(x, topY);
+    ctx.lineTo(x, bottomY);
+    ctx.stroke();
+
+    ctx.fillStyle = '#64748b';
+    ctx.font = '10px JetBrains Mono';
+    ctx.fillText(`${f >= 1000 ? f / 1000 + 'k' : f}Hz`, x + 4, h - 6);
+  });
+
+  // dB grid
+  [-12, -24, -36, -48, -60].forEach(db => {
+    const y = tonalDbToY(db);
+    ctx.strokeStyle = '#151c28';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(0, y);
+    ctx.lineTo(w, y);
+    ctx.stroke();
+
+    ctx.fillStyle = '#475569';
+    ctx.font = '9px JetBrains Mono';
+    ctx.fillText(`${db}dB`, w - 38, y - 3);
+  });
+
+  // Target Reference Corridor (Mastering target zone)
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.035)';
+  ctx.beginPath();
+  for (let i = 0; i < curveF.length; i++) {
+    const x = freqToX(curveF[i], w);
+    const targetDb = -18 - Math.log10(curveF[i] / 20) * 8;
+    const yTop = tonalDbToY(targetDb + 4);
+    if (i === 0) ctx.moveTo(x, yTop); else ctx.lineTo(x, yTop);
+  }
+  for (let i = curveF.length - 1; i >= 0; i--) {
+    const x = freqToX(curveF[i], w);
+    const targetDb = -18 - Math.log10(curveF[i] / 20) * 8;
+    const yBot = tonalDbToY(targetDb - 6);
+    ctx.lineTo(x, yBot);
+  }
+  ctx.closePath();
+  ctx.fill();
 
   // Draw 5 multi-band fills
   BAND_DEFINITIONS.forEach(b => {
@@ -937,17 +1327,17 @@ function renderTonalCanvas(canvas, tbData, isLive = false) {
     for (let i = 0; i < curveF.length; i++) {
       if (curveF[i] >= fMin && curveF[i] <= fMax) {
         const x = freqToX(curveF[i], w);
-        const y = dbToY(curveL[i], h);
+        const y = tonalDbToY(curveL[i]);
         if (!started) { ctx.moveTo(x, y); firstX = x; started = true; }
         else { ctx.lineTo(x, y); }
         lastX = x;
       }
     }
     if (started) {
-      ctx.lineTo(lastX, h);
-      ctx.lineTo(firstX, h);
+      ctx.lineTo(lastX, bottomY);
+      ctx.lineTo(firstX, bottomY);
       ctx.closePath();
-      ctx.fillStyle = b.color + '55';
+      ctx.fillStyle = b.color + '44';
       ctx.fill();
     }
   });
@@ -960,26 +1350,30 @@ function renderTonalCanvas(canvas, tbData, isLive = false) {
   ctx.beginPath();
   for (let i = 0; i < curveF.length; i++) {
     const x = freqToX(curveF[i], w);
-    const y = dbToY(curveL[i], h);
+    const y = tonalDbToY(curveL[i]);
     if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
   }
   ctx.stroke();
   ctx.shadowBlur = 0;
 
   // Live HUD: Multi-band energy percentage badges
-  const hudY = 22;
+  const hudY = 18;
   let hudX = 14;
   ctx.font = '10px JetBrains Mono';
 
   BAND_DEFINITIONS.forEach((b, idx) => {
     const pct = isLive
       ? (liveBandPercentages[idx] || 0)
-      : (tbData.bands[idx] ? tbData.bands[idx].energy_pct : 0);
+      : (tbData.bands && tbData.bands[idx] && tbData.bands[idx].energy_percent !== undefined
+          ? tbData.bands[idx].energy_percent
+          : (tbData.bands && tbData.bands[idx] && tbData.bands[idx].energy_pct !== undefined
+              ? tbData.bands[idx].energy_pct
+              : 0));
 
     ctx.fillStyle = b.color;
     ctx.fillRect(hudX, hudY - 9, 8, 8);
     ctx.fillStyle = '#e2e8f0';
-    const text = `${b.name}: ${pct.toFixed(1)}%`;
+    const text = `${b.name}: ${Number(pct).toFixed(1)}%`;
     ctx.fillText(text, hudX + 12, hudY - 2);
     hudX += ctx.measureText(text).width + 20;
   });
@@ -990,18 +1384,9 @@ function renderTonalCanvas(canvas, tbData, isLive = false) {
     ctx.fillText(`● LIVE TONAL (${averagingMs}ms avg)`, w - 180, hudY - 2);
   } else {
     ctx.fillStyle = '#94a3b8';
-    ctx.fillText(`● CLIP GLOBAL BALANCE`, w - 160, hudY - 2);
+    ctx.fillText(`● PLAYHEAD TONAL BALANCE`, w - 170, hudY - 2);
   }
 }
-
-// Helpers
-const BAND_DEFINITIONS = [
-  { name: 'Sub', range: [20, 60], color: '#E53935' },
-  { name: 'Bass', range: [60, 250], color: '#FB8C00' },
-  { name: 'Low Mid', range: [250, 2000], color: '#43A047' },
-  { name: 'High Mid', range: [2000, 8000], color: '#00ACC1' },
-  { name: 'Treble / Air', range: [8000, 20000], color: '#8E24AA' }
-];
 
 function freqToX(freq, w) {
   const minF = Math.log10(20);
@@ -1061,9 +1446,11 @@ function initWebAudio() {
     analyserNode.fftSize = 2048; // 1024 frequency bins
     analyserNode.smoothingTimeConstant = 0.0; // Temporal smoothing handled dynamically via averagingMs!
 
-    mediaSourceNode = audioCtx.createMediaElementSource(audioElement);
-    mediaSourceNode.connect(analyserNode);
-    analyserNode.connect(audioCtx.destination);
+    if (!mediaSourceNode) {
+      mediaSourceNode = audioCtx.createMediaElementSource(audioElement);
+      mediaSourceNode.connect(analyserNode);
+      analyserNode.connect(audioCtx.destination);
+    }
 
     liveRawFreqData = new Float32Array(analyserNode.frequencyBinCount);
   } catch (err) {
@@ -1085,7 +1472,8 @@ function updateLiveAudioData(dtMs) {
   const rawDbs = new Float32Array(numBins);
   let hasRealTimeSignal = false;
 
-  if (analyserNode && liveRawFreqData) {
+  // 1. Try real-time hardware signal from AnalyserNode
+  if (analyserNode && liveRawFreqData && audioElement && !audioElement.paused) {
     analyserNode.getFloatFrequencyData(liveRawFreqData);
 
     let maxAmp = -150;
@@ -1093,7 +1481,7 @@ function updateLiveAudioData(dtMs) {
       if (liveRawFreqData[i] > maxAmp) maxAmp = liveRawFreqData[i];
     }
 
-    if (maxAmp > -85) {
+    if (maxAmp > -120) {
       hasRealTimeSignal = true;
       const sr = (audioCtx && audioCtx.sampleRate) || 44100;
       const binWidth = (sr / 2) / liveRawFreqData.length;
@@ -1105,48 +1493,74 @@ function updateLiveAudioData(dtMs) {
         const b1 = Math.min(liveRawFreqData.length - 1, b0 + 1);
         const frac = binIdx - b0;
         const dbVal = liveRawFreqData[b0] * (1 - frac) + liveRawFreqData[b1] * frac;
-        rawDbs[i] = Math.max(-90, Math.min(0, dbVal));
+        rawDbs[i] = Math.max(-90, Math.min(6, dbVal));
       }
     }
   }
 
-  // Fallback: If Web Audio is silent or suspended, interpolate precalculated spectrogram slice
-  if (!hasRealTimeSignal && analysisData.spectrogram) {
+  // 2. High-accuracy fallback: Interpolate precalculated Waterfall or Spectrogram slice at playhead
+  if (!hasRealTimeSignal) {
     const curTime = audioElement ? audioElement.currentTime : 0;
-    const spec = analysisData.spectrogram;
-    const times = spec.times;
-    const matrix = spec.matrix_db;
-
-    let tIdx = 0;
-    let minDiff = 999999;
-    for (let t = 0; t < times.length; t++) {
-      const diff = Math.abs(times[t] - curTime);
-      if (diff < minDiff) {
-        minDiff = diff;
-        tIdx = t;
+    
+    if (analysisData.waterfall_3d && analysisData.waterfall_3d.slices && analysisData.waterfall_3d.slices.length > 0) {
+      const slices = analysisData.waterfall_3d.slices;
+      let sIdx = 0;
+      let minDiff = 999999;
+      for (let s = 0; s < slices.length; s++) {
+        const diff = Math.abs(slices[s].timestamp_sec - curTime);
+        if (diff < minDiff) {
+          minDiff = diff;
+          sIdx = s;
+        }
       }
-    }
+      const sliceMags = slices[sIdx].magnitudes_db;
+      for (let i = 0; i < numBins; i++) {
+        const ratio = i / Math.max(1, numBins - 1);
+        const wfIdx = ratio * (sliceMags.length - 1);
+        const w0 = Math.floor(wfIdx);
+        const w1 = Math.min(sliceMags.length - 1, w0 + 1);
+        const frac = wfIdx - w0;
+        rawDbs[i] = sliceMags[w0] * (1 - frac) + sliceMags[w1] * frac;
+      }
+    } else if (analysisData.spectrogram) {
+      const spec = analysisData.spectrogram;
+      const times = spec.time_points || [];
+      const matrix = spec.matrix_db;
 
-    const specFreqs = spec.frequencies;
-    for (let i = 0; i < numBins; i++) {
-      const targetF = freqs[i];
-      let fIdx = (targetF / specFreqs[specFreqs.length - 1]) * (specFreqs.length - 1);
-      fIdx = Math.max(0, Math.min(specFreqs.length - 1, fIdx));
-      const f0 = Math.floor(fIdx);
-      const f1 = Math.min(specFreqs.length - 1, f0 + 1);
-      const frac = fIdx - f0;
-      const v0 = matrix[f0] ? matrix[f0][tIdx] : -80;
-      const v1 = matrix[f1] ? matrix[f1][tIdx] : -80;
-      rawDbs[i] = Math.max(-90, Math.min(0, v0 * (1 - frac) + v1 * frac));
+      let tIdx = 0;
+      let minDiff = 999999;
+      for (let t = 0; t < times.length; t++) {
+        const diff = Math.abs(times[t] - curTime);
+        if (diff < minDiff) {
+          minDiff = diff;
+          tIdx = t;
+        }
+      }
+
+      const specFreqs = spec.frequencies;
+      for (let i = 0; i < numBins; i++) {
+        const targetF = freqs[i];
+        let fIdx = (targetF / specFreqs[specFreqs.length - 1]) * (specFreqs.length - 1);
+        fIdx = Math.max(0, Math.min(specFreqs.length - 1, fIdx));
+        const f0 = Math.floor(fIdx);
+        const f1 = Math.min(specFreqs.length - 1, f0 + 1);
+        const frac = fIdx - f0;
+        const v0 = matrix[f0] ? matrix[f0][tIdx] : -80;
+        const v1 = matrix[f1] ? matrix[f1][tIdx] : -80;
+        rawDbs[i] = Math.max(-90, Math.min(6, v0 * (1 - frac) + v1 * frac));
+      }
+    } else {
+      for (let i = 0; i < numBins; i++) {
+        rawDbs[i] = analysisData.fft_spectrum.magnitudes_db[i];
+      }
     }
   }
 
   // Temporal Smoothing with user configurable averagingMs (3ms - 400ms)
-  // Time constant tau in ms = averagingMs; alpha = exp(-dtMs / tau)
   const tau = Math.max(3, averagingMs);
   const alpha = Math.exp(-dtMs / tau);
   const oneMinusAlpha = 1.0 - alpha;
-  const peakDecay = 0.04 * (dtMs / 16.6);
+  const peakDecay = 0.05 * (dtMs / 16.6);
 
   for (let i = 0; i < numBins; i++) {
     liveMagnitudesDb[i] = alpha * liveMagnitudesDb[i] + oneMinusAlpha * rawDbs[i];
@@ -1265,8 +1679,18 @@ function onTimeUpdate() {
   playheadCursor.style.left = `${pct}%`;
   timecodeDisplay.innerText = `${formatTimecode(cur)} / ${formatTimecode(currentDuration)}`;
 
-  if (currentView === 'waterfall' && analysisData && analysisData.waterfall_3d) {
-    renderWaterfall3DCanvas(mainWaterfallCanvas, analysisData.waterfall_3d);
+  if (audioElement.paused && analysisData) {
+    updateLiveAudioData(16.6);
+    if (currentView === 'waterfall' && analysisData.waterfall_3d) {
+      renderWaterfall3DCanvas(mainWaterfallCanvas, analysisData.waterfall_3d);
+    } else if (currentView === 'equalizer') {
+      renderEqualizerCanvas(mainEqCanvas, analysisData.fft_spectrum, false);
+    } else if (currentView === 'tonal') {
+      renderTonalCanvas(mainTonalCanvas, analysisData.tonal_balance, false);
+    } else if (currentView === 'stacked') {
+      renderEqualizerCanvas(stackedEqCanvas, analysisData.fft_spectrum, false);
+      renderTonalCanvas(stackedTonalCanvas, analysisData.tonal_balance, false);
+    }
   }
 }
 
