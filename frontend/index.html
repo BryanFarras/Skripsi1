@@ -6,7 +6,7 @@
   <title>AI Music Forensic Visualizer</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
@@ -15,12 +15,7 @@
     <div class="nav-container">
       <div class="nav-left">
         <a href="/" class="brand-logo">
-          <div class="logo-icon">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-              <path d="M12 2v20M17 5v14M7 9v6M22 10v4M2 11v2"></path>
-            </svg>
-          </div>
-          <span class="brand-name">AI Forensics</span>
+          <span class="brand-name">AI FORENSIC</span>
         </a>
         <nav class="nav-links">
           <div class="nav-dropdown">
@@ -37,10 +32,6 @@
       </div>
 
       <div class="nav-right">
-        <div class="status-indicator">
-          <span class="status-dot"></span>
-          <span class="status-text">Backend Ready</span>
-        </div>
         <button id="loadDemoBtn" class="btn btn-nav">Load Sample Audio</button>
       </div>
     </div>
@@ -57,27 +48,6 @@
 
   <!-- Main Container -->
   <div class="page-container">
-    <!-- Top Feature / Notification Banner -->
-    <section class="feature-banner">
-      <div class="banner-content">
-        <div class="banner-badge">AI FORENSICS</div>
-        <div class="banner-text">
-          <h3>Spectral Forensics & 3D Waterfall for AI Music Detection</h3>
-          <p>Inspect temporal spectral variations across 30s clips, brickwall cutoffs, and multi-band balance.</p>
-        </div>
-      </div>
-      <div class="banner-action">
-        <button id="exportTopBtn" class="btn banner-btn" disabled>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-            <polyline points="7 10 12 15 17 10"></polyline>
-            <line x1="12" y1="15" x2="12" y2="3"></line>
-          </svg>
-          Export Skripsi Plot
-        </button>
-      </div>
-    </section>
-
     <!-- 2-Column Split Workspace -->
     <main class="split-layout">
       <!-- LEFT COLUMN: Media Viewport & Visualizer (Drag & Drop + Player + 3D Waterfall) -->
@@ -136,7 +106,7 @@
                 <div id="specToolbarTag" class="spec-toolbar-tag">
                   <div class="spec-mode-switch">
                     <button type="button" class="spec-mode-btn active" id="btnSpecScroll" data-mode="scroll" title="Smooth scrolling view like Wave Candy & Edison follow mode">Moving (Wave Candy)</button>
-                    <button type="button" class="spec-mode-btn" id="btnSpecFull" data-mode="full" title="Full clip overview with moving playback line like Edison">↔ Full Track (Edison)</button>
+                    <button type="button" class="spec-mode-btn" id="btnSpecFull" data-mode="full" title="Full clip overview with moving playback line like Edison">Full Track (Edison)</button>
                   </div>
                   <div class="spec-zoom-group" id="specZoomGroup">
                     <span class="zoom-label">Window:</span>
@@ -153,7 +123,7 @@
 
                 <!-- 3D Waterfall Interaction Hint -->
                 <div id="waterfallHintTag" class="waterfall-hint-tag" style="display: none;">
-                  <span>🖱️ Drag to rotate 360° • Scroll / Pinch to zoom • Click slice to seek</span>
+                  <span>Drag to rotate 360° • Scroll / Pinch to zoom • Click slice to seek</span>
                 </div>
               </div>
 
@@ -193,7 +163,6 @@
         <div class="stem-splitter-card" id="stemSplitterCard" style="display: none;">
           <div class="stem-card-header">
             <div class="stem-title-wrap">
-              <div class="stem-icon-badge">🎛️</div>
               <div class="stem-header-text">
                 <h4>Multi-Stem Forensic Separator</h4>
                 <p>Deconstruct track into Vocals, Drums, Bass, & Other. Temporary files are auto-deleted in 1 hour.</p>
@@ -221,7 +190,7 @@
           <!-- Stems Output Results Container -->
           <div id="stemResultsContainer" class="stem-results-container" style="display: none;">
             <div class="stem-results-header">
-              <span class="stem-session-title">✨ Extracted Forensic Components</span>
+              <span class="stem-session-title">Extracted Forensic Components</span>
               <span class="stem-expiry-tag">
                 <span class="expiry-dot"></span> Auto-deletes in 1 hour
               </span>
@@ -397,7 +366,7 @@
                 <span class="help-circle" title="Split into isolated stems to verify vocoder smearing in vocals or transient blur in drums">?</span>
               </div>
               <button id="sideSplitStemsBtn" class="btn btn-outline-cyan btn-full">
-                🎛️ Split Audio Stems (1h Temp)
+                Split Audio Stems (1h Temp)
               </button>
               <p class="option-desc">Decomposes mix into 5 stems with isolated spectral analysis.</p>
             </div>

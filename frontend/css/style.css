@@ -22,7 +22,7 @@
   --accent-orange: #f97316;
   --accent-red: #ef4444;
 
-  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-sans: 'Commissioner', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-mono: 'JetBrains Mono', 'Consolas', monospace;
 
   --radius-sm: 6px;
@@ -146,7 +146,7 @@ body {
   color: var(--text-secondary);
   background: var(--bg-subtle);
   padding: 5px 12px;
-  border-radius: 20px;
+  border-radius: 4px;
   border: 1px solid var(--border-light);
 }
 
@@ -996,7 +996,7 @@ body {
   font-size: 0.68rem;
   font-weight: 700;
   padding: 2px 8px;
-  border-radius: 12px;
+  border-radius: 4px;
   text-transform: uppercase;
 }
 
@@ -1473,28 +1473,13 @@ body {
 .stem-expiry-tag {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
   font-size: 0.74rem;
   font-weight: 600;
   color: #b45309;
   background: rgba(245, 158, 11, 0.12);
   border: 1px solid rgba(245, 158, 11, 0.25);
-  padding: 4px 10px;
-  border-radius: 20px;
-}
-
-.expiry-dot {
-  width: 6px;
-  height: 6px;
-  background-color: #f59e0b;
-  border-radius: 50%;
-  animation: pulseDot 1.8s infinite;
-}
-
-@keyframes pulseDot {
-  0% { transform: scale(0.9); opacity: 0.7; }
-  50% { transform: scale(1.3); opacity: 1; }
-  100% { transform: scale(0.9); opacity: 0.7; }
+  padding: 3px 8px;
+  border-radius: 4px;
 }
 
 .stem-list {
@@ -1505,46 +1490,43 @@ body {
 
 .stem-item-card {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: var(--bg-subtle);
+  flex-direction: column;
+  background: var(--bg-card);
   border: 1px solid var(--border-light);
   border-radius: var(--radius-md);
   padding: 12px 16px;
-  gap: 16px;
-  transition: all 0.15s ease;
+  gap: 10px;
+  transition: all 0.2s ease;
 }
 
 .stem-item-card:hover {
   background: #ffffff;
-  border-color: rgba(99, 102, 241, 0.35);
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.03);
+  border-color: rgba(99, 102, 241, 0.4);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
+}
+
+.stem-item-card.is-active-stem {
+  border-color: var(--primary-purple);
+  box-shadow: 0 4px 18px rgba(99, 102, 241, 0.12);
+}
+
+.stem-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
 }
 
 .stem-item-left {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   min-width: 0;
   flex: 1;
 }
 
-.stem-badge-icon {
-  width: 38px;
-  height: 38px;
-  border-radius: var(--radius-sm);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.15rem;
-  flex-shrink: 0;
-}
 
-.badge-mix { background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.3); }
-.badge-voc { background: rgba(168, 85, 247, 0.14); border: 1px solid rgba(168, 85, 247, 0.3); }
-.badge-drm { background: rgba(249, 115, 22, 0.12); border: 1px solid rgba(249, 115, 22, 0.3); }
-.badge-bass { background: rgba(6, 182, 212, 0.12); border: 1px solid rgba(6, 182, 212, 0.3); }
-.badge-oth { background: rgba(59, 130, 246, 0.12); border: 1px solid rgba(59, 130, 246, 0.3); }
 
 .stem-info {
   min-width: 0;
@@ -1579,6 +1561,88 @@ body {
   overflow: hidden;
   text-overflow: ellipsis;
   margin-top: 1px;
+}
+
+/* Interactive Wave Visualizer Bar */
+.stem-wave-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #090c13;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-sm);
+  padding: 6px 12px;
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.35);
+}
+
+.stem-wave-canvas-box {
+  position: relative;
+  flex: 1;
+  height: 38px;
+  cursor: pointer;
+  user-select: none;
+  overflow: hidden;
+  border-radius: 3px;
+}
+
+.stem-wave-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.stem-wave-playhead {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: #ffffff;
+  box-shadow: 0 0 6px rgba(255, 255, 255, 0.9), 0 0 2px #ffffff;
+  pointer-events: none;
+  border-radius: 1px;
+  z-index: 2;
+}
+
+.stem-wave-hover-line {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: rgba(255, 255, 255, 0.6);
+  pointer-events: none;
+  z-index: 3;
+}
+
+.stem-wave-hover-time {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(15, 23, 42, 0.95);
+  color: #f8fafc;
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  padding: 1px 5px;
+  border-radius: 3px;
+  white-space: nowrap;
+  margin-bottom: 2px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.4);
+}
+
+.stem-wave-time-readout {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: #94a3b8;
+  white-space: nowrap;
+  min-width: 95px;
+  text-align: right;
+  letter-spacing: -0.2px;
+}
+
+.stem-current-time {
+  font-weight: 600;
+  color: #f1f5f9;
 }
 
 .stem-item-actions {

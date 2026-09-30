@@ -232,7 +232,7 @@ export function renderWaterfall3DCanvas(canvas, waterfallData) {
       ctx.arc(peakX, peakY, 4.5, 0, Math.PI * 2);
       ctx.fill();
 
-      const badgeText = `▶ ${slice.formatted_time}`;
+      const badgeText = `${slice.formatted_time}`;
       ctx.font = 'bold 10px JetBrains Mono';
       const badgeW = ctx.measureText(badgeText).width + 10;
       ctx.fillStyle = 'rgba(15, 23, 42, 0.92)';

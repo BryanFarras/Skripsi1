@@ -2,6 +2,7 @@ import time
 import uuid
 import shutil
 import urllib.parse
+import numpy as np
 from pathlib import Path
 from typing import Optional
 from fastapi import APIRouter, HTTPException, UploadFile, File, Request, Query
@@ -320,15 +321,33 @@ async def split_audio_stems(payload: dict):
     output_dir = result["output_dir"]
     stems_meta = {}
 
+    dur_sec = float(result.get("duration", 0))
     for stem_name, file_path in result["file_paths"].items():
         size_bytes = file_path.stat().st_size if file_path.exists() else 0
+        mono_audio = result.get("stems", {}).get(stem_name)
+        peaks = []
+        if mono_audio is not None and len(mono_audio) > 0:
+            num_peaks = 160
+            chunk_size = max(1, len(mono_audio) // num_peaks)
+            peaks_raw = [
+                float(np.max(np.abs(mono_audio[i * chunk_size : (i + 1) * chunk_size])))
+                for i in range(min(num_peaks, len(mono_audio) // chunk_size))
+            ]
+            max_val = max(peaks_raw) if peaks_raw else 1.0
+            if max_val > 0:
+                peaks = [round(float(p / max_val), 3) for p in peaks_raw]
+            else:
+                peaks = [0.0] * len(peaks_raw)
+
         stems_meta[stem_name] = {
             "name": stem_name,
             "filename": file_path.name,
             "size_bytes": size_bytes,
             "size_formatted": f"{size_bytes / (1024 * 1024):.2f} MB",
             "stream_url": f"/api/stems/{stem_token}/{stem_name}",
-            "file_path": str(file_path)
+            "file_path": str(file_path),
+            "peaks": peaks,
+            "duration": round(dur_sec, 2)
         }
 
     return {
