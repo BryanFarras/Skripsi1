@@ -363,9 +363,10 @@ With the server running, navigate to:
 This research repository forms the core experimental software and methodology for the Undergraduate Thesis (_Skripsi_):
 
 - **Author**: Muhammad Bryan Farras (NPM: 2306230975)
+- **Advisor**: Muhammad Firdaus Syawaludin Lubis
 - **Institution**: Program Studi Teknik Komputer, Departemen Teknik Elektro, Fakultas Teknik, Universitas Indonesia (FTUI)
 - **Topic**: _Rancang Bangun Sistem Deteksi Musik Berbasis Kecerdasan Artifisial Menggunakan Ekstraksi Fitur Akustik dan Explainable AI (TreeSHAP)_
-- **Advisors & Department**: Departemen Teknik Elektro FTUI
+- **Contact**: muhammad.bryan31@ui.ac.id | m.firdaus04@ui.ac.id
 
 ---
 
