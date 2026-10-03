@@ -10,7 +10,11 @@ Write-Host ""
 
 # Find Python
 $PythonCmd = $null
-if (Get-Command "python" -ErrorAction SilentlyContinue) {
+if (Test-Path "$PSScriptRoot\..\..\.venv\Scripts\python.exe") {
+    $PythonCmd = "$PSScriptRoot\..\..\.venv\Scripts\python.exe"
+} elseif (Test-Path "..\..\.venv\Scripts\python.exe") {
+    $PythonCmd = "..\..\.venv\Scripts\python.exe"
+} elseif (Get-Command "python" -ErrorAction SilentlyContinue) {
     $PythonCmd = "python"
 } elseif (Get-Command "py" -ErrorAction SilentlyContinue) {
     $PythonCmd = "py -3"

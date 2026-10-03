@@ -21,6 +21,24 @@ from ..services.detector_service import extract_forensic_metrics
 from ..services.stem_service import StemService
 from ..models.schemas import AnalysisResponse, AudioMetadata
 
+# Baseline ML and Explainable AI (XAI) engine
+try:
+    from ml_baseline.baseline_adapter import get_baseline_adapter
+except Exception as e:
+    print(f"[ML Baseline Adapter Note] {e}")
+    get_baseline_adapter = None
+
+def run_ml_inference(audio: np.ndarray, sample_rate: int):
+    """Runs trained baseline model and TreeSHAP attribution."""
+    if get_baseline_adapter is None:
+        return None
+    try:
+        adapter = get_baseline_adapter()
+        return adapter.predict_audio(audio, sample_rate)
+    except Exception as e:
+        print(f"[ML Inference Error] {e}")
+        return None
+
 router = APIRouter(prefix="/api", tags=["Audio Visualizer & Forensics"])
 
 # In-memory registry of processed files
@@ -93,18 +111,20 @@ async def upload_audio_file(request: Request):
         total_samples=len(audio)
     )
 
-    _AUDIO_CACHE[file_id] = {
-        "audio": audio,
-        "sample_rate": sr,
-        "metadata": metadata,
-        "file_path": save_path
-    }
-
     fft_spec = compute_fft_spectrum(audio, sr)
     tonal_bal = compute_tonal_balance(audio, sr)
     spectro = compute_spectrogram(audio, sr)
     waterfall_3d = compute_waterfall_3d(audio, sr)
     forensics = extract_forensic_metrics(audio, sr)
+    ml_result = run_ml_inference(audio, sr)
+
+    _AUDIO_CACHE[file_id] = {
+        "audio": audio,
+        "sample_rate": sr,
+        "metadata": metadata,
+        "file_path": save_path,
+        "ml_result": ml_result
+    }
 
     return AnalysisResponse(
         metadata=metadata,
@@ -112,7 +132,8 @@ async def upload_audio_file(request: Request):
         tonal_balance=tonal_bal,
         spectrogram=spectro,
         waterfall_3d=waterfall_3d,
-        forensics=forensics
+        forensics=forensics,
+        ml_detector=ml_result
     )
 
 @router.post("/analyze-local-path")
@@ -143,18 +164,20 @@ async def analyze_local_path(payload: dict):
         total_samples=len(audio)
     )
 
-    _AUDIO_CACHE[file_id] = {
-        "audio": audio,
-        "sample_rate": sr,
-        "metadata": metadata,
-        "file_path": file_path
-    }
-
     fft_spec = compute_fft_spectrum(audio, sr)
     tonal_bal = compute_tonal_balance(audio, sr)
     spectro = compute_spectrogram(audio, sr)
     waterfall_3d = compute_waterfall_3d(audio, sr)
     forensics = extract_forensic_metrics(audio, sr)
+    ml_result = run_ml_inference(audio, sr)
+
+    _AUDIO_CACHE[file_id] = {
+        "audio": audio,
+        "sample_rate": sr,
+        "metadata": metadata,
+        "file_path": file_path,
+        "ml_result": ml_result
+    }
 
     return AnalysisResponse(
         metadata=metadata,
@@ -162,7 +185,8 @@ async def analyze_local_path(payload: dict):
         tonal_balance=tonal_bal,
         spectrogram=spectro,
         waterfall_3d=waterfall_3d,
-        forensics=forensics
+        forensics=forensics,
+        ml_detector=ml_result
     )
 
 @router.get("/audio/{file_id}")
@@ -247,7 +271,8 @@ async def export_figure(file_id: str):
         sample_rate=sr,
         filename=meta.original_filename,
         output_path=export_path,
-        forensics=forensics
+        forensics=forensics,
+        ml_result=cached.get("ml_result")
     )
 
     return FileResponse(
@@ -339,6 +364,14 @@ async def split_audio_stems(payload: dict):
             else:
                 peaks = [0.0] * len(peaks_raw)
 
+        # Run isolated XAI inference on this stem component
+        stem_ml = None
+        if mono_audio is not None and len(mono_audio) > 0:
+            try:
+                stem_ml = run_ml_inference(mono_audio, 44100)
+            except Exception as e:
+                print(f"[Stem XAI Warning] Could not analyze {stem_name}: {e}")
+
         stems_meta[stem_name] = {
             "name": stem_name,
             "filename": file_path.name,
@@ -347,8 +380,13 @@ async def split_audio_stems(payload: dict):
             "stream_url": f"/api/stems/{stem_token}/{stem_name}",
             "file_path": str(file_path),
             "peaks": peaks,
-            "duration": round(dur_sec, 2)
+            "duration": round(dur_sec, 2),
+            "ai_detection": stem_ml
         }
+
+    # Summary of stem-level AI risks
+    stem_scores = {s: (stems_meta[s]["ai_detection"]["overall_ai_probability"] if stems_meta[s].get("ai_detection") else 0.0) for s in stems_meta}
+    sorted_stems = sorted(stem_scores.items(), key=lambda x: x[1], reverse=True)
 
     return {
         "status": "success",
@@ -357,6 +395,11 @@ async def split_audio_stems(payload: dict):
         "duration_seconds": round(result["duration"], 2),
         "expires_in_seconds": STEMS_EXPIRE_SECONDS,
         "expires_in_text": "1 hour",
+        "stem_attribution_summary": {
+            "highest_ai_risk_stem": sorted_stems[0][0] if sorted_stems else None,
+            "highest_ai_risk_prob": sorted_stems[0][1] if sorted_stems else 0.0,
+            "stem_probabilities": stem_scores
+        },
         "stems": stems_meta
     }
 
@@ -468,18 +511,20 @@ async def load_stem_to_visualizer(payload: dict):
         total_samples=len(audio)
     )
 
-    _AUDIO_CACHE[file_id] = {
-        "audio": audio,
-        "sample_rate": sr,
-        "metadata": metadata,
-        "file_path": stem_path
-    }
-
     fft_spec = compute_fft_spectrum(audio, sr)
     tonal_bal = compute_tonal_balance(audio, sr)
     spectro = compute_spectrogram(audio, sr)
     waterfall_3d = compute_waterfall_3d(audio, sr)
     forensics = extract_forensic_metrics(audio, sr)
+    ml_result = run_ml_inference(audio, sr)
+
+    _AUDIO_CACHE[file_id] = {
+        "audio": audio,
+        "sample_rate": sr,
+        "metadata": metadata,
+        "file_path": stem_path,
+        "ml_result": ml_result
+    }
 
     return AnalysisResponse(
         metadata=metadata,
@@ -487,6 +532,31 @@ async def load_stem_to_visualizer(payload: dict):
         tonal_balance=tonal_bal,
         spectrogram=spectro,
         waterfall_3d=waterfall_3d,
-        forensics=forensics
+        forensics=forensics,
+        ml_detector=ml_result
     )
+
+@router.get("/explain/{file_id}")
+async def get_audio_explanation(file_id: str):
+    """
+    Returns full Explainable AI (XAI) report with SHAP attributions,
+    time-slice anomalies, and academic forensic arguments.
+    """
+    cached = _AUDIO_CACHE.get(file_id)
+    if not cached:
+        raise HTTPException(status_code=404, detail="Audio file not found in active session.")
+    
+    audio = cached["audio"]
+    sr = cached["sample_rate"]
+    ml_res = run_ml_inference(audio, sr)
+    if not ml_res:
+        raise HTTPException(status_code=503, detail="XAI model is not loaded or available.")
+    
+    return {
+        "file_id": file_id,
+        "filename": cached["metadata"].original_filename,
+        "duration_seconds": cached["metadata"].duration_seconds,
+        "ml_detector": ml_res
+    }
+
 

@@ -11,6 +11,12 @@ echo.
 :: Detect Python executable
 set "PYTHON_EXE="
 
+:: 0. Try Skripsi virtual environment (Recommended)
+if exist "%~dp0..\..\.venv\Scripts\python.exe" (
+    set "PYTHON_EXE=%~dp0..\..\.venv\Scripts\python.exe"
+    goto :FOUND_PYTHON
+)
+
 :: 1. Try standard python in PATH
 python --version >nul 2>&1
 if %ERRORLEVEL% equ 0 (

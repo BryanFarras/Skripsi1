@@ -291,13 +291,27 @@ def render_publication_plot(
     sample_rate: int,
     filename: str,
     output_path: Path,
-    forensics: AIForensicMetrics
+    forensics: AIForensicMetrics,
+    ml_result: Optional[dict] = None
 ) -> Path:
     """
     Renders publication figure replicating visual analyzer layout and saves to output_path.
+    Enhanced with Explainable AI (XAI) TreeSHAP banner for Skripsi thesis chapters.
     """
-    fig, (ax_eq, ax_tonal, ax_spec) = plt.subplots(3, 1, figsize=(12, 10), facecolor="#12141a")
+    fig, (ax_eq, ax_tonal, ax_spec) = plt.subplots(3, 1, figsize=(12, 10.5), facecolor="#12141a")
     
+    # Suptitle with XAI Verdict & SHAP Driver
+    if ml_result and "prediction" in ml_result:
+        verdict = ml_result.get("prediction", "")
+        prob = ml_result.get("overall_ai_probability", 0) * 100
+        conf = ml_result.get("confidence_percent", 0)
+        xai_banner = f"  •  XAI Model: {verdict} ({prob:.1f}% AI | Conf: {conf:.0f}%)"
+        if ml_result.get("xai") and ml_result["xai"].get("top_positive_features"):
+            top_f = ml_result["xai"]["top_positive_features"][0]
+            xai_banner += f"  •  Top SHAP Driver: {top_f['title']} (+{top_f['shap_value']:.2f})"
+        fig.suptitle(f"Audio Forensics & Explainable AI (XAI) Report: {filename}\n{xai_banner}", 
+                     color="#a5b4fc", fontsize=11, fontweight="bold", y=0.995)
+
     # 1. Equalizer Panel (Global Average)
     fft_data = compute_fft_spectrum(audio, sample_rate)
     ax_eq.set_facecolor("#181b22")

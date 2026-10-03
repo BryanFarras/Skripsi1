@@ -62,6 +62,38 @@ class AIForensicMetrics(BaseModel):
     high_freq_energy_ratio: float           # Energy > 16kHz / Total Energy
     forensic_notes: List[str]
 
+class XAIFeatureContribution(BaseModel):
+    feature: str
+    title: str
+    shap_value: float
+    raw_value: float
+    unit: str
+    direction: str
+    forensic_cue: str
+    explanation: str
+
+class XAIEngineResult(BaseModel):
+    prediction: str
+    ai_probability: float
+    human_probability: float
+    base_value: float
+    top_positive_features: List[XAIFeatureContribution]
+    top_negative_features: List[XAIFeatureContribution]
+    forensic_synthesis_id: str
+    forensic_synthesis_en: str
+    all_shap_values: Optional[Dict[str, float]] = None
+
+class MLDetectorResult(BaseModel):
+    prediction: str
+    overall_ai_probability: float
+    overall_human_probability: float
+    peak_ai_probability: float
+    flagged_slices_ratio: float
+    confidence_percent: float
+    total_slices_analyzed: int
+    timeline: List[Dict[str, Any]]
+    xai: Optional[XAIEngineResult] = None
+
 class AnalysisResponse(BaseModel):
     metadata: AudioMetadata
     fft_spectrum: FFTSpectrumData
@@ -69,3 +101,5 @@ class AnalysisResponse(BaseModel):
     spectrogram: SpectrogramData
     waterfall_3d: Optional[Waterfall3DData] = None
     forensics: AIForensicMetrics
+    ml_detector: Optional[MLDetectorResult] = None
+

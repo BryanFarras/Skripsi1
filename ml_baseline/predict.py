@@ -53,6 +53,17 @@ class BaselineDetectorPredictor:
         self.extractor = AudioFeatureExtractor()
         self.feature_names = self.extractor.get_feature_names()
 
+        # Initialize XAI Explainer
+        try:
+            if __package__ is None or __package__ == "":
+                from ml_baseline.explainability import AudioForensicExplainer
+            else:
+                from .explainability import AudioForensicExplainer
+            self.explainer = AudioForensicExplainer(self.model, self.scaler, self.feature_names)
+        except Exception as e:
+            print(f"[XAI Warning] Explainer initialization note: {e}")
+            self.explainer = None
+
         # Load metrics if available
         self.metadata = {}
         if self.metrics_path.exists():
@@ -64,31 +75,68 @@ class BaselineDetectorPredictor:
 
     def predict_waveform(self, y: np.ndarray, sr: int) -> Dict[str, Any]:
         """
-        Runs sliding-window inference over a raw audio waveform.
+        Runs fast sliding-window inference over a raw audio waveform.
+        For longer audio (>5s), samples representative slices and extracts features
+        in parallel with ThreadPoolExecutor for low latency.
         """
-        slices = list(self.extractor.slice_waveform(y, duration=SLICE_DURATION, hop=SLICE_HOP))
-        if not slices:
-            # If too short, pad or extract from full waveform
-            if len(y) > 0:
-                feat = self.extractor.extract_from_waveform(y, sr=sr)
-                feat_scaled = self.scaler.transform(feat.reshape(1, -1))
-                prob_ai = float(self.model.predict_proba(feat_scaled)[0, 1])
-                return {
-                    "overall_ai_probability": prob_ai,
-                    "overall_human_probability": 1.0 - prob_ai,
-                    "prediction": "SPOOF (AI-GENERATED)" if prob_ai >= 0.5 else "BONA-FIDE (HUMAN)",
-                    "confidence": round(abs(prob_ai - 0.5) * 200, 1),
-                    "total_slices_analyzed": 1,
-                    "timeline": [{"slice_idx": 0, "start_sec": 0.0, "ai_prob": round(prob_ai, 3)}]
-                }
+        from concurrent.futures import ThreadPoolExecutor
+
+        if len(y) == 0:
             raise ValueError("Audio waveform is empty.")
 
-        slice_features = []
-        slice_meta = []
-        for idx, start_sec, chunk in slices:
-            feat = self.extractor.extract_from_waveform(chunk, sr=sr)
-            slice_features.append(feat)
-            slice_meta.append({"slice_idx": idx, "start_sec": round(start_sec, 2)})
+        dur_sec = len(y) / sr
+        slice_samples = int(SLICE_DURATION * sr)
+
+        # 1. Short audio (<= 5.0 seconds): direct single extraction
+        if dur_sec <= SLICE_DURATION or len(y) <= slice_samples:
+            feat = self.extractor.extract_from_waveform(y, sr=sr)
+            feat_scaled = self.scaler.transform(feat.reshape(1, -1))
+            prob_ai = float(self.model.predict_proba(feat_scaled)[0, 1])
+            xai_res = None
+            if self.explainer is not None:
+                xai_res = self.explainer.explain_vector(feat, feat_scaled[0])
+            return {
+                "prediction": "SPOOF (AI-GENERATED)" if prob_ai >= 0.5 else "BONA-FIDE (HUMAN)",
+                "overall_ai_probability": round(prob_ai, 4),
+                "overall_human_probability": round(1.0 - prob_ai, 4),
+                "peak_ai_probability": round(prob_ai, 4),
+                "flagged_slices_ratio": 1.0 if prob_ai >= 0.5 else 0.0,
+                "confidence_percent": round(abs(prob_ai - 0.5) * 200, 1),
+                "total_slices_analyzed": 1,
+                "timeline": [{"slice_idx": 0, "start_sec": 0.0, "ai_prob": round(prob_ai, 3), "is_ai_flagged": prob_ai >= 0.5}],
+                "xai": xai_res
+            }
+
+        # 2. Longer audio: sample up to 8 representative 5-second slices across the track
+        max_slices = 8
+        n_slices = min(max_slices, max(2, int(dur_sec // SLICE_DURATION)))
+        step_sec = (dur_sec - SLICE_DURATION) / max(1, n_slices - 1)
+
+        sample_slices = []
+        for i in range(n_slices):
+            st = i * step_sec
+            start_sample = int(st * sr)
+            end_sample = min(len(y), start_sample + slice_samples)
+            chunk = y[start_sample:end_sample]
+            if len(chunk) < slice_samples:
+                chunk = np.pad(chunk, (0, slice_samples - len(chunk)))
+            sample_slices.append((i, round(st, 2), chunk))
+
+        # Parallel extraction across slices
+        def _extract_task(item):
+            idx, st, ch = item
+            f = self.extractor.extract_from_waveform(ch, sr=sr)
+            return idx, st, f
+
+        max_workers = min(4, os.cpu_count() or 4)
+        with ThreadPoolExecutor(max_workers=max_workers) as executor:
+            extracted_results = list(executor.map(_extract_task, sample_slices))
+
+        # Sort back in timeline order
+        extracted_results.sort(key=lambda r: r[0])
+
+        slice_features = [r[2] for r in extracted_results]
+        slice_meta = [{"slice_idx": r[0], "start_sec": r[1]} for r in extracted_results]
 
         X_slices = np.array(slice_features, dtype=np.float32)
         X_scaled = self.scaler.transform(X_slices)
@@ -110,6 +158,13 @@ class BaselineDetectorPredictor:
         prediction_label = "SPOOF (AI-GENERATED)" if mean_ai_prob >= 0.5 else "BONA-FIDE (HUMAN)"
         confidence = float(abs(mean_ai_prob - 0.5) * 200)
 
+        # Compute track-level explainability (SHAP & Forensic Synthesis)
+        xai_explanation = None
+        if self.explainer is not None and len(slice_features) > 0:
+            feat_mean = np.mean(slice_features, axis=0)
+            feat_scaled_mean = self.scaler.transform(feat_mean.reshape(1, -1))[0]
+            xai_explanation = self.explainer.explain_vector(feat_mean, feat_scaled_mean)
+
         return {
             "prediction": prediction_label,
             "overall_ai_probability": round(mean_ai_prob, 4),
@@ -117,8 +172,9 @@ class BaselineDetectorPredictor:
             "peak_ai_probability": round(max_ai_prob, 4),
             "flagged_slices_ratio": round(ai_slice_ratio, 3),
             "confidence_percent": round(confidence, 1),
-            "total_slices_analyzed": len(slices),
-            "timeline": timeline
+            "total_slices_analyzed": len(sample_slices),
+            "timeline": timeline,
+            "xai": xai_explanation
         }
 
     def predict_file(self, audio_path: Path) -> Dict[str, Any]:

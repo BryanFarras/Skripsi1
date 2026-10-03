@@ -22,8 +22,33 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.middleware("http")
+async def add_no_cache_headers(request, call_next):
+    response = await call_next(request)
+    if request.url.path == "/" or request.url.path.endswith((".html", ".js", ".css")):
+        response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate, max-age=0"
+        response.headers["Pragma"] = "no-cache"
+        response.headers["Expires"] = "0"
+    return response
+
 # Include API endpoints first so they take precedence
 app.include_router(api_router)
+
+@app.on_event("startup")
+async def startup_event():
+    print("\n" + "=" * 65)
+    print(" [XAI SYSTEM] Initializing Machine Learning & TreeSHAP Engine...")
+    print("=" * 65)
+    try:
+        from ml_baseline.baseline_adapter import get_baseline_adapter
+        adapter = get_baseline_adapter()
+        if adapter.is_loaded:
+            print("[XAI SYSTEM OK] Champion Baseline Model (Random Forest) & TreeSHAP Loaded!")
+        else:
+            print("[XAI SYSTEM NOTICE] Model adapter initialized in standby mode.")
+    except Exception as e:
+        print(f"[XAI SYSTEM NOTE] Startup initialization notice: {e}")
+
 
 # Mount exports directory
 if EXPORTS_DIR.exists():

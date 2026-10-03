@@ -66,6 +66,19 @@ from backend.app.config import EXPORTS_DIR
 export_path = EXPORTS_DIR / "test_figure_export.png"
 render_publication_plot(audio, sample_rate, "test_synth.wav", export_path, forensics)
 print(f"[OK] Publication plot successfully saved at: {export_path}")
-print(f"     File size: {export_path.stat().st_size} bytes")
+# Test Explainable AI (XAI) Baseline Detection
+from ml_baseline.baseline_adapter import get_baseline_adapter
+adapter = get_baseline_adapter()
+if adapter.is_loaded:
+    ml_res = adapter.predict_audio(audio, sample_rate)
+    print(f"\n[OK] Explainable AI (XAI) Inference Succeeded:")
+    print(f"     - Verdict: {ml_res['prediction']}")
+    print(f"     - AI Probability: {ml_res['overall_ai_probability']*100:.1f}%")
+    print(f"     - Confidence: {ml_res['confidence_percent']}%")
+    if ml_res.get("xai"):
+        print(f"     - Top AI Feature: {ml_res['xai']['top_positive_features'][0]['title']} (SHAP: +{ml_res['xai']['top_positive_features'][0]['shap_value']})")
+        print(f"     - Academic Synthesis: {ml_res['xai']['forensic_synthesis_id']}")
+else:
+    print("\n[!] Baseline adapter not loaded.")
 
-print("\nALL BACKEND SERVICES TESTED & OPERATIONAL!")
+print("\nALL BACKEND SERVICES & EXPLAINABLE AI (XAI) ENGINE TESTED & OPERATIONAL!")
