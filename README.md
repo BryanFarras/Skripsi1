@@ -177,24 +177,86 @@ MY-AIDETECTOR/
 
 ### 1. Prerequisites
 
-- **Python 3.10+** (tested on 3.11, 3.12, and 3.13)
-- **FFmpeg** installed and accessible on your system PATH (required for reading MP3, M4A, FLAC).
-- _(Optional)_ **NVIDIA GPU with CUDA** for accelerated stem separation via Demucs.
+- **Python 3.10+** (tested on Python 3.11, 3.12, and 3.13)
+- **FFmpeg** installed and accessible on system `PATH` (mandatory for decoding MP3, M4A, FLAC, and STEM.MP4 containers).
+- _(Optional, Highly Recommended)_ **NVIDIA GPU with CUDA 11.8+ / 12.1+** for GPU-accelerated stem separation via Demucs.
 
 ### 2. Environment Setup
 
-```powershell
-# Clone the repository
-git clone https://github.com/BryanFarras/Skripsi1.git
-cd Skripsi1/APPS/MY-AIDETECTOR
+Follow the steps below to configure a complete virtual environment with all core, forensic ML/XAI, and stem separation dependencies:
 
-# Create and activate virtual environment
+#### Step A: Clone & Navigate
+
+```powershell
+git clone https://github.com/BryanFarras/Skripsi1.git
+```
+
+#### Step B: Create & Activate Virtual Environment
+
+**Windows (PowerShell):**
+
+```powershell
 python -m venv .venv
 .\.venv\Scripts\activate
+```
 
-# Install dependencies
+**Linux / macOS (Bash):**
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+```
+
+#### Step C: Install FFmpeg (If not already installed)
+
+- **Windows (winget):** `winget install Gyan.FFmpeg`
+- **Windows (Chocolatey):** `choco install ffmpeg`
+- **macOS (Homebrew):** `brew install ffmpeg`
+- **Ubuntu/Debian:** `sudo apt update && sudo apt install -y ffmpeg`
+
+_Verify by running `ffmpeg -version` in your terminal._
+
+#### Step D: Install PyTorch (Demucs & Neural Processing Backend)
+
+Choose the command matching your hardware setup:
+
+- **NVIDIA GPU (CUDA 12.1+ - Recommended):**
+  ```powershell
+  pip install torch torchaudio --index-url https://download.pytorch.org/whl/cu121
+  ```
+- **NVIDIA GPU (CUDA 11.8):**
+  ```powershell
+  pip install torch torchaudio --index-url https://download.pytorch.org/whl/cu118
+  ```
+- **CPU-Only (No NVIDIA GPU):**
+  ```powershell
+  pip install torch torchaudio
+  ```
+
+#### Step E: Install Application, ML/XAI, & Demucs Dependencies
+
+Install the backend server, signal processing, machine learning, explainability engine (TreeSHAP), and stem separation tool:
+
+```powershell
+# 1. Upgrade pip, setuptools, and wheel
+python -m pip install --upgrade pip setuptools wheel
+
+# 2. Install FastAPI backend dependencies
 pip install -r backend/requirements.txt
-pip install shap matplotlib scikit-learn librosa scipy joblib soundfile
+
+# 3. Install ML, DSP, Feature Extraction & TreeSHAP XAI
+pip install scikit-learn librosa scipy joblib soundfile matplotlib pandas shap
+
+# 4. Install Meta Demucs for 5-stem neural separation
+pip install demucs
+```
+
+#### Step F: Verify Environment Installation
+
+Run this one-liner to verify that all core modules and hardware acceleration are properly detected:
+
+```powershell
+python -c "import torch, demucs, shap, librosa, fastapi; print(f'CUDA Available: {torch.cuda.is_available()} | Device: {torch.cuda.get_device_name(0) if torch.cuda.is_available() else \"CPU\"}'); print('Environment verification successful!')"
 ```
 
 ---
