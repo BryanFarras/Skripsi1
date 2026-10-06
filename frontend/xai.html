@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Is It? Or Is it Not? — TreeSHAP AI Music Forensic Detector</title>
+  
+  <!-- Typography: Fira Sans & Fira Code -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Fira+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,600&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="/css/xai.css">
+</head>
+<body class="xai-app-body">
+
+  <!-- =========================================================================
+       TOP SECTION (Warm Cream / Linen Canvas)
+       ========================================================================= -->
+  <section class="xai-top-section">
+    <div class="xai-top-container">
+      
+      <!-- Editorial Header -->
+      <header class="xai-editorial-header">
+        <div class="header-brand-wrap">
+          <h1 class="header-title-serif">Is It?<br>Or Is it Not?</h1>
+        </div>
+
+        <nav class="header-nav-links">
+          <button type="button" class="editorial-nav-btn" id="btnHowItWorks">How does it work?</button>
+          <button type="button" class="editorial-nav-btn" id="btnAbstract">Abstract</button>
+          <button type="button" class="editorial-nav-btn" id="btnPaper">Paper</button>
+          <a href="/visualizer" class="editorial-nav-btn visualizer-pill-link" title="Open High-Resolution Spectrogram Visualizer">
+            <span>Spectrogram Visualizer</span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+              <polyline points="15 3 21 3 21 9"></polyline>
+              <line x1="10" y1="14" x2="21" y2="3"></line>
+            </svg>
+          </a>
+        </nav>
+      </header>
+
+      <!-- Upper Grid: Upload Card & Audio Metadata Card -->
+      <div class="xai-hero-grid">
+        
+        <!-- LEFT CARD: Upload Audio Clip Here (Slate/Cerulean Blue) -->
+        <div class="hero-card upload-hero-card" id="dropArea">
+          <input type="file" id="fileInput" accept=".wav,.mp3,.flac,.ogg,.m4a" style="display: none;">
+
+          <!-- Standby / Drop Prompt View -->
+          <div class="upload-card-content" id="uploadPrompt">
+            <h2 class="hero-card-title">Upload Audio Clip Here</h2>
+            <p class="hero-card-sub">Drag and drop any audio recording (WAV, MP3, FLAC, M4A) or browse your files</p>
+            
+            <div class="upload-btn-group">
+              <button type="button" class="btn-hero-dark" id="browseBtn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="17 8 12 3 7 8"></polyline>
+                  <line x1="12" y1="3" x2="12" y2="15"></line>
+                </svg>
+                Choose File
+              </button>
+              
+              <button type="button" class="btn-hero-secondary" id="loadDemoBtn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                  <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                </svg>
+                Load Sample Demo
+              </button>
+            </div>
+          </div>
+
+          <!-- Active Audio Player View (Visible once track is loaded) -->
+          <div class="upload-player-content" id="uploadPlayer" style="display: none;">
+            <div class="player-top-meta">
+              <span class="player-label-tag">ACTIVE AUDIO TRACK</span>
+              <button type="button" class="btn-switch-track" id="switchTrackBtn" title="Upload another audio file">
+                Change File ↺
+              </button>
+            </div>
+
+            <div class="player-main-controls">
+              <button type="button" id="playBtn" class="hero-play-btn" title="Play / Pause">
+                <span id="playIcon">
+                  <polygon points="6 4 20 12 6 20" fill="currentColor"></polygon>
+                </span>
+              </button>
+              
+              <div class="player-track-info">
+                <span class="track-title-text" id="filenameEl">--</span>
+                <div class="track-meta-chips">
+                  <span id="metaDuration">--s</span>
+                  <span class="meta-dot">•</span>
+                  <span id="metaSr">-- kHz</span>
+                  <span class="meta-dot">•</span>
+                  <span id="metaSlicesCount">5.0s Windows</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="hero-waveform-seek-container">
+              <div class="waveform-canvas-wrap" id="waveformWrap">
+                <canvas id="waveformCanvas" class="hero-waveform-canvas"></canvas>
+                <div class="waveform-playhead" id="waveformPlayhead"></div>
+                <div class="waveform-hover-cursor" id="waveformHoverCursor" style="display: none;"></div>
+                <div class="waveform-hover-time" id="waveformHoverTime" style="display: none;">00:00</div>
+              </div>
+              <div class="hero-timecode-row">
+                <span id="timecodeEl" class="hero-timecode">00:00 / 00:00</span>
+                <span class="hero-seek-tip">Click or drag waveform to seek</span>
+              </div>
+            </div>
+
+            <audio id="audioEl" preload="auto"></audio>
+          </div>
+
+        </div>
+
+        <!-- RIGHT CARD: Audio Metadata Here (Warm Cream) -->
+        <div class="hero-card metadata-hero-card" id="metadataCard">
+          
+          <!-- Standby View when empty -->
+          <div class="metadata-card-content" id="metadataPrompt">
+            <h2 class="hero-card-title">Audio Metadata Here</h2>
+            <p class="hero-card-sub">110-D physical acoustic dimensions, temporal slices, and audio parameters will appear here.</p>
+            
+            <div class="local-path-quick-box">
+              <label for="localPathInput" class="local-path-label">Inspect local track path directly:</label>
+              <div class="local-path-row">
+                <input type="text" id="localPathInput" class="local-path-input" placeholder="backend/uploads/sample_ai_test.wav" />
+                <button type="button" id="analyzePathBtn" class="btn-local-analyze">Analyze</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Active Metadata View when loaded -->
+          <div class="metadata-active-content" id="metadataActive" style="display: none;">
+            <div class="metadata-card-header">
+              <h3 class="meta-header-title">Audio Signal Profile</h3>
+              <div class="meta-header-actions">
+                <button id="exportJsonBtn" class="btn-meta-export" title="Download TreeSHAP explanation in JSON">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                  </svg>
+                  JSON
+                </button>
+                <button id="exportPlotBtn" class="btn-meta-export export-primary" title="Export 200 DPI Skripsi publication figure">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                    <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                    <polyline points="21 15 16 10 5 21"></polyline>
+                  </svg>
+                  Plot (200 DPI)
+                </button>
+              </div>
+            </div>
+
+            <div class="metadata-chips-grid">
+              <div class="meta-cell">
+                <span class="meta-cell-label">File Format</span>
+                <span class="meta-cell-val" id="metaValFormat">WAV / PCM</span>
+              </div>
+              <div class="meta-cell">
+                <span class="meta-cell-label">Sample Rate</span>
+                <span class="meta-cell-val" id="metaValSr">44.1 kHz (Decoded 22.05k)</span>
+              </div>
+              <div class="meta-cell">
+                <span class="meta-cell-label">Duration</span>
+                <span class="meta-cell-val" id="metaValDuration">--s</span>
+              </div>
+              <div class="meta-cell">
+                <span class="meta-cell-label">Temporal Window</span>
+                <span class="meta-cell-val" id="metaValWindow">5.0s (50% Overlap)</span>
+              </div>
+              <div class="meta-cell">
+                <span class="meta-cell-label">Feature Space</span>
+                <span class="meta-cell-val" id="metaValFeatures">110 Acoustic Dims</span>
+              </div>
+              <div class="meta-cell">
+                <span class="meta-cell-label">Classifier Engine</span>
+                <span class="meta-cell-val">Random Forest Champion</span>
+              </div>
+            </div>
+
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       BOTTOM SECTION (Deep Midnight Navy: #0B2545 / #003049)
+       Forensic Classification Verdict, Synthesis & Interactive TreeSHAP
+       ========================================================================= -->
+  <section class="xai-bottom-section">
+    <div class="xai-bottom-container">
+      
+      <!-- TOP FULL-WIDTH BANNER: 5s Slice Probability Timeline (Above all analysis) -->
+      <div class="xai-panel-card timeline-panel timeline-top-banner" id="timelineCard">
+        <div class="panel-header-line">
+          <div class="narrative-title-wrap">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+            </svg>
+            <h3 class="panel-heading">5s Slice Probability Timeline</h3>
+          </div>
+          <span class="timeline-sub-cue">Click bar to seek</span>
+        </div>
+
+        <div class="timeline-barchart-container" id="timelineChart">
+          <!-- Populated dynamically via xai.js -->
+          <div class="xai-slice-col" data-start="0">
+            <span class="xai-slice-prob">34%</span>
+            <div class="xai-slice-bar-wrap">
+              <div class="xai-slice-bar slice-human" style="height: 34%;"></div>
+            </div>
+            <span class="xai-slice-time">0s</span>
+          </div>
+          <div class="xai-slice-col" data-start="5.63">
+            <span class="xai-slice-prob">68%</span>
+            <div class="xai-slice-bar-wrap">
+              <div class="xai-slice-bar slice-ai" style="height: 68%;"></div>
+            </div>
+            <span class="xai-slice-time">5.63s</span>
+          </div>
+          <div class="xai-slice-col" data-start="11.26">
+            <span class="xai-slice-prob">63%</span>
+            <div class="xai-slice-bar-wrap">
+              <div class="xai-slice-bar slice-ai" style="height: 63%;"></div>
+            </div>
+            <span class="xai-slice-time">11.26s</span>
+          </div>
+          <div class="xai-slice-col" data-start="16.89">
+            <span class="xai-slice-prob">67%</span>
+            <div class="xai-slice-bar-wrap">
+              <div class="xai-slice-bar slice-ai" style="height: 67%;"></div>
+            </div>
+            <span class="xai-slice-time">16.89s</span>
+          </div>
+          <div class="xai-slice-col" data-start="22.52">
+            <span class="xai-slice-prob">61%</span>
+            <div class="xai-slice-bar-wrap">
+              <div class="xai-slice-bar slice-ai" style="height: 61%;"></div>
+            </div>
+            <span class="xai-slice-time">22.52s</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2-Column Split: Left Verdict & Right TreeSHAP Attributions -->
+      <div class="xai-dashboard-layout" id="resultsSection">
+        
+        <!-- ======================= LEFT COLUMN ======================= -->
+        <aside class="xai-column-left">
+          
+          <!-- Card 1: Forensic Classification Verdict -->
+          <div class="xai-panel-card verdict-panel" id="verdictCard">
+            <div class="panel-header-line">
+              <span class="panel-sub-label">FORENSIC CLASSIFICATION VERDICT</span>
+              <span class="panel-badge-pill">TreeSHAP</span>
+            </div>
+
+            <h2 class="verdict-banner-title" id="verdictTitle">
+              <span class="verdict-dot">●</span> SPOOF (AI-GENERATED)
+            </h2>
+
+            <!-- Probability Meter -->
+            <div class="verdict-probability-container">
+              <div class="verdict-prob-labels">
+                <span class="prob-ai-label">AI (Spoof): <strong id="probAiText">55.9%</strong></span>
+                <span class="prob-human-label">Human (Bona-fide): <strong id="probHumanText">44.1%</strong></span>
+              </div>
+              
+              <div class="prob-bar-track">
+                <div class="prob-bar-fill-ai" id="meterAi" style="width: 55.9%;"></div>
+                <div class="prob-bar-fill-human" id="meterHuman" style="width: 44.1%;"></div>
+                <div class="prob-bar-center-marker" title="Decision Boundary (50%)"></div>
+              </div>
+            </div>
+
+            <!-- 2x2 Stats Grid -->
+            <div class="verdict-stats-grid">
+              <div class="stat-cell">
+                <span class="stat-cell-title">CONFIDENCE</span>
+                <span class="stat-cell-value" id="statConfidence">11.9%</span>
+              </div>
+              <div class="stat-cell">
+                <span class="stat-cell-title">FLAGGED SLICES</span>
+                <span class="stat-cell-value" id="statFlaggedSlices">83% (6 slices)</span>
+              </div>
+              <div class="stat-cell">
+                <span class="stat-cell-title">POPULATION BASE</span>
+                <span class="stat-cell-value" id="statBaseValue">ψ₀ = 0.29</span>
+              </div>
+              <div class="stat-cell">
+                <span class="stat-cell-title">EVALUATED DIMS</span>
+                <span class="stat-cell-value" id="statTotalFeatures">110 Acoustic Dims</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 2: Forensic Synthesis Narrative -->
+          <div class="xai-panel-card narrative-panel">
+            <div class="panel-header-line">
+              <div class="narrative-title-wrap">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                  <polyline points="14 2 14 8 20 8"></polyline>
+                  <line x1="16" y1="13" x2="8" y2="13"></line>
+                  <line x1="16" y1="17" x2="8" y2="17"></line>
+                  <polyline points="10 9 9 9 8 9"></polyline>
+                </svg>
+                <h3 class="panel-heading">Forensic Synthesis Narrative</h3>
+              </div>
+
+              <div class="lang-toggle-group">
+                <button type="button" class="lang-btn active" id="langBtnId">ID</button>
+                <button type="button" class="lang-btn" id="langBtnEn">EN</button>
+              </div>
+            </div>
+
+            <div class="narrative-textbox" id="synthesisText">
+              Audio diklasifikasikan sebagai <strong>SPOOF (AI-Generated)</strong> dengan keyakinan 56.0%. Bukti forensik utama yang mendorong prediksi ini adalah 'MFCC 16 (Upper Timbral Formant)' (+0.09) dan '85% Energy Spectral Rolloff' (+0.06). Pola amplop cepstral (MFCC orde tinggi) menunjukkan ketidakwajaran yang konsisten dengan artefak sintesis suara AI.
+            </div>
+
+            <button type="button" class="btn-copy-thesis" id="copySynthesisBtn">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+              </svg>
+              Copy Diagnosis for Thesis
+            </button>
+          </div>
+
+        </aside>
+
+        <!-- ======================= RIGHT COLUMN ======================= -->
+        <main class="xai-column-right">
+          
+          <!-- TreeSHAP Feature Attributions Panel -->
+          <div class="xai-panel-card shap-main-panel">
+            
+            <div class="shap-toolbar-row">
+              <div class="shap-filter-tabs">
+                <button type="button" class="filter-chip active" id="filterAll">All Significant Features</button>
+                <button type="button" class="filter-chip chip-ai" id="filterAi">Top AI Drivers (φ &gt; 0)</button>
+                <button type="button" class="filter-chip chip-human" id="filterHuman">Top Human Evidence (φ &lt; 0)</button>
+              </div>
+
+              <div class="shap-formula-badge">
+                f(x) = φ₀ + ∑ φᵢ(x)
+              </div>
+            </div>
+
+            <p class="shap-guide-caption">
+              Features pushing the bar to the right (red) indicate generative vocoder / diffusion artifacts. Bars pushing to the left (green) confirm natural acoustic dynamics. Click any feature to read its clinical physical interpretation.
+            </p>
+
+            <!-- Feature Rows Container -->
+            <div class="feature-attribution-list" id="featureList">
+              <!-- Populated via xai.js with rich cards matching design1.png -->
+            </div>
+
+          </div>
+
+        </main>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       MODALS: How Does It Work, Abstract, Paper
+       ========================================================================= -->
+  <div class="modal-backdrop" id="modalBackdrop" style="display: none;">
+    <div class="modal-card" id="modalCard">
+      <div class="modal-header">
+        <h3 id="modalTitle">Modal Title</h3>
+        <button type="button" class="modal-close-btn" id="modalCloseBtn">&times;</button>
+      </div>
+      <div class="modal-body" id="modalBody">
+        <!-- Injected via JavaScript -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading Overlay -->
+  <div class="xai-loading-overlay" id="loadingOverlay" style="display: none;">
+    <div class="xai-spinner"></div>
+    <span class="xai-loading-text" id="loadingText">Processing Audio...</span>
+    <span class="xai-loading-sub" id="loadingSub">Extracting 110 DSP dimensions & running TreeSHAP...</span>
+  </div>
+
+  <!-- JavaScript (Modular ES Architecture) -->
+  <script type="module" src="/js/xai.js"></script>
+</body>
+</html>

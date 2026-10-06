@@ -1,0 +1,178 @@
+/* ==========================================================================
+   Audio Metadata Card Component Styles
+   Color Palette: #C1121F (Crimson), #FDF0D5 (Cream), #003049 (Prussian Navy)
+   Typography: Fira Sans
+   Geometry: Sharp Edges (Zero Radius)
+   ========================================================================== */
+
+/* Right Card: Audio Metadata */
+.metadata-hero-card {
+  background-color: var(--c-cream);
+  border: 2px solid var(--c-navy);
+  box-shadow: none;
+}
+
+.metadata-card-content {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.local-path-quick-box {
+  width: 100%;
+  max-width: 480px;
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-align: left;
+}
+
+.local-path-label {
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: var(--c-navy);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.local-path-row {
+  display: flex;
+  gap: 8px;
+}
+
+.local-path-input {
+  flex: 1;
+  background: #ffffff;
+  border: 1.5px solid var(--c-navy);
+  padding: 8px 12px;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--c-navy);
+}
+
+.local-path-input:focus {
+  outline: none;
+  border-color: var(--c-crimson);
+}
+
+.btn-local-analyze {
+  background: var(--c-navy);
+  color: var(--c-cream);
+  border: 1.5px solid var(--c-navy);
+  font-size: 0.85rem;
+  font-weight: 800;
+  padding: 8px 16px;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  transition: all 0.2s ease;
+}
+
+.btn-local-analyze:hover {
+  background: var(--c-crimson);
+  border-color: var(--c-crimson);
+  color: var(--c-cream);
+}
+
+/* Active Metadata View */
+.metadata-active-content {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: 100%;
+}
+
+.metadata-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid var(--c-navy);
+  padding-bottom: 10px;
+}
+
+.meta-header-title {
+  font-family: var(--font-sans);
+  font-size: 1.45rem;
+  font-weight: 800;
+  color: var(--c-navy);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.meta-header-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-meta-export {
+  background: transparent;
+  border: 1.5px solid var(--c-navy);
+  color: var(--c-navy);
+  font-family: var(--font-sans);
+  font-size: 0.78rem;
+  font-weight: 800;
+  padding: 6px 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  transition: all 0.2s ease;
+}
+
+.btn-meta-export:hover {
+  background: var(--c-navy);
+  color: var(--c-cream);
+}
+
+.btn-meta-export.export-primary {
+  background: var(--c-navy);
+  color: var(--c-cream);
+  border-color: var(--c-navy);
+}
+
+.btn-meta-export.export-primary:hover {
+  background: var(--c-crimson);
+  border-color: var(--c-crimson);
+}
+
+.metadata-chips-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.meta-cell {
+  background: #ffffff;
+  border: 1.5px solid var(--c-navy);
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.meta-cell-label {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--c-navy);
+  opacity: 0.8;
+}
+
+.meta-cell-val {
+  font-family: var(--font-mono);
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--c-navy);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+

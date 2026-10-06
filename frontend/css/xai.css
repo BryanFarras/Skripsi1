@@ -1,0 +1,248 @@
+/* ==========================================================================
+   AI Music Forensic Detector — Explainable AI (TreeSHAP) Design System
+   Color Palette: #C1121F (Crimson), #FDF0D5 (Cream), #003049 (Prussian Navy)
+   Typography: Fira Sans & Fira Code
+   Geometry: Sharp Edges (Zero Radius)
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   COMPONENT IMPORTS
+   -------------------------------------------------------------------------- */
+@import url('./components/header-modals.css');
+@import url('./components/upload-waveform.css');
+@import url('./components/metadata-card.css');
+@import url('./components/verdict-narrative.css');
+@import url('./components/significant-features.css');
+
+:root {
+  /* -------------------------------------------------------------------------
+     3-COLOR SYSTEM (#C1121F, #FDF0D5, #003049)
+     ------------------------------------------------------------------------- */
+  --c-crimson:        #C1121F;
+  --c-crimson-vivid:  #C1121F;
+  --c-crimson-deep:   #8a0d16;
+  --c-crimson-soft:   rgba(193, 18, 31, 0.16);
+
+  --c-cream:          #FDF0D5;
+  --c-cream-warm:     #FDF0D5;
+  --c-cream-soft:     #FDF0D5;
+
+  --c-navy:           #003049;
+  --c-navy-prussian:  #003049;
+  --c-navy-dark:      #002438;
+  --c-navy-deep:      #001a29;
+
+  /* Semantic Mappings */
+  --c-bg-top:         var(--c-cream);
+  --c-bg-bottom:      var(--c-navy);
+  --c-card-dark:      var(--c-navy-dark);
+  --c-card-inner:     var(--c-navy-deep);
+  --c-border-dark:    rgba(253, 240, 213, 0.22);
+  --c-border-subtle:  rgba(253, 240, 213, 0.15);
+
+  --c-ai-red:         var(--c-crimson);
+  --c-ai-red-soft:    rgba(193, 18, 31, 0.2);
+  --c-ai-red-dark:    var(--c-crimson-deep);
+
+  --c-human-teal:     var(--c-cream);
+  --c-human-teal-soft: rgba(253, 240, 213, 0.16);
+
+  --c-text-dark-main: var(--c-navy);
+  --c-text-dark-sub:  #004468;
+  --c-text-light-main: var(--c-cream);
+  --c-text-light-sub:  rgba(253, 240, 213, 0.75);
+  --c-text-light-dim:  rgba(253, 240, 213, 0.5);
+
+  /* -------------------------------------------------------------------------
+     TYPOGRAPHY & ZERO RADIUS (SHARP EDGES)
+     ------------------------------------------------------------------------- */
+  --font-sans:  'Fira Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-serif: 'Fira Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono:  'Fira Code', 'JetBrains Mono', 'Consolas', monospace;
+
+  /* Sharp Geometric Edges */
+  --radius-sm: 0px;
+  --radius-md: 0px;
+  --radius-lg: 0px;
+  --radius-xl: 0px;
+}
+
+/* Reset */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  border-radius: 0 !important; /* Enforce Sharp Edges across all elements */
+}
+
+body.xai-app-body {
+  font-family: var(--font-sans);
+  background-color: var(--c-bg-top);
+  color: var(--c-text-dark-main);
+  min-height: 100vh;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* ==========================================================================
+   PAGE LAYOUT SECTIONS
+   ========================================================================== */
+/* TOP SECTION (Warm Cream #FDF0D5) */
+.xai-top-section {
+  background: var(--c-cream);
+  border-bottom: 3px solid var(--c-navy);
+  padding: 32px 48px 50px;
+}
+
+.xai-top-container {
+  max-width: 1440px;
+  margin: 0 auto;
+}
+
+/* Hero Grid: 2 Big Side-by-Side Cards */
+.xai-hero-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+}
+
+.hero-card {
+  min-height: 310px;
+  padding: 32px 36px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 4px 16px rgba(0, 48, 73, 0.08);
+}
+
+.hero-card-title {
+  font-family: var(--font-sans);
+  font-size: 2.2rem;
+  font-weight: 800;
+  letter-spacing: -0.015em;
+  text-transform: uppercase;
+}
+
+.hero-card-sub {
+  font-size: 0.95rem;
+  line-height: 1.45;
+}
+
+/* BOTTOM SECTION (Deep Prussian Navy #003049) */
+.xai-bottom-section {
+  background-color: var(--c-navy);
+  color: var(--c-text-light-main);
+  padding: 40px 48px 70px;
+  border-top: 1px solid rgba(253, 240, 213, 0.12);
+}
+
+.xai-bottom-container {
+  max-width: 1440px;
+  margin: 0 auto;
+}
+
+/* 2-Column Split: Left Verdict & Narrative | Right Significant Features */
+.xai-dashboard-layout {
+  display: grid;
+  grid-template-columns: 38% 62%;
+  gap: 28px;
+  align-items: start;
+}
+
+/* Sharp Panel Cards */
+.xai-panel-card {
+  background-color: var(--c-card-dark);
+  border: 1px solid var(--c-border-dark);
+  padding: 24px 26px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+}
+
+.panel-header-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.panel-sub-label {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--c-cream);
+}
+
+.panel-badge-pill {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--c-cream);
+  background: rgba(253, 240, 213, 0.12);
+  border: 1px solid var(--c-border-dark);
+  padding: 3px 10px;
+  letter-spacing: 0.04em;
+}
+
+/* Loading Overlay */
+.xai-loading-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 48, 73, 0.94);
+  backdrop-filter: blur(8px);
+  z-index: 2000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+}
+
+.xai-spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid rgba(253, 240, 213, 0.2);
+  border-top-color: var(--c-crimson);
+  border-right-color: var(--c-cream);
+  animation: spin 0.85s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.xai-loading-text {
+  font-family: var(--font-sans);
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--c-cream);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.xai-loading-sub {
+  font-size: 0.88rem;
+  color: rgba(253, 240, 213, 0.7);
+}
+
+/* Responsive Breakpoints */
+@media (max-width: 1100px) {
+  .xai-hero-grid {
+    grid-template-columns: 1fr;
+  }
+  .xai-dashboard-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .xai-top-section, .xai-bottom-section {
+    padding: 24px 20px;
+  }
+  .header-title-serif {
+    font-size: 2.3rem;
+  }
+}

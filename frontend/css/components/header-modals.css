@@ -1,0 +1,213 @@
+/* ==========================================================================
+   Header & Modal Dialogs Component Styles
+   Color Palette: #C1121F (Crimson), #FDF0D5 (Cream), #003049 (Prussian Navy)
+   Typography: Fira Sans
+   Geometry: Sharp Edges (Zero Radius)
+   ========================================================================== */
+
+/* Editorial Header */
+.xai-editorial-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 36px;
+}
+
+.header-brand-wrap {
+  flex: 1;
+}
+
+.header-title-serif {
+  font-family: var(--font-sans);
+  font-size: 3.2rem;
+  font-weight: 900;
+  line-height: 1.05;
+  color: var(--c-navy);
+  letter-spacing: -0.025em;
+  text-transform: uppercase;
+}
+
+.header-nav-links {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding-top: 8px;
+}
+
+.editorial-nav-btn {
+  background: transparent;
+  border: none;
+  font-family: var(--font-sans);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--c-navy);
+  cursor: pointer;
+  padding: 6px 12px;
+  position: relative;
+  transition: color 0.2s ease;
+  text-decoration: none;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.editorial-nav-btn::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background-color: var(--c-crimson);
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.2s ease;
+}
+
+.editorial-nav-btn:hover {
+  color: var(--c-crimson);
+}
+
+.editorial-nav-btn:hover::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+.visualizer-pill-link {
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--c-navy);
+  color: var(--c-cream) !important;
+  padding: 8px 16px;
+  border: 1px solid var(--c-navy);
+  box-shadow: none;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.visualizer-pill-link::after {
+  display: none;
+}
+
+.visualizer-pill-link:hover {
+  background: var(--c-crimson);
+  border-color: var(--c-crimson);
+  color: var(--c-cream) !important;
+}
+
+/* Modal Popups */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 48, 73, 0.85);
+  backdrop-filter: blur(6px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.modal-card {
+  background: var(--c-cream);
+  color: var(--c-navy);
+  max-width: 780px;
+  width: 100%;
+  max-height: 85vh;
+  border: 2px solid var(--c-navy);
+  box-shadow: 8px 8px 0px rgba(0, 48, 73, 0.25);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: modalFadeIn 0.2s ease-out;
+}
+
+@keyframes modalFadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.modal-header {
+  padding: 20px 28px;
+  border-bottom: 2px solid var(--c-navy);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--c-cream);
+}
+
+.modal-header h3 {
+  font-family: var(--font-sans);
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--c-navy);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.modal-close-btn {
+  background: transparent;
+  border: 1px solid transparent;
+  font-size: 1.6rem;
+  line-height: 1;
+  color: var(--c-navy);
+  cursor: pointer;
+  padding: 4px 10px;
+  transition: all 0.2s ease;
+}
+
+.modal-close-btn:hover {
+  color: var(--c-cream);
+  background: var(--c-crimson);
+  border-color: var(--c-crimson);
+}
+
+.modal-body {
+  padding: 28px;
+  overflow-y: auto;
+  font-size: 0.95rem;
+  line-height: 1.65;
+  color: var(--c-navy);
+}
+
+.modal-body h4 {
+  font-family: var(--font-sans);
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: var(--c-navy);
+  margin: 18px 0 8px;
+  text-transform: uppercase;
+}
+
+.modal-body p {
+  margin-bottom: 14px;
+}
+
+.modal-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 16px 0;
+  font-size: 0.88rem;
+}
+
+.modal-table th, .modal-table td {
+  border: 1px solid var(--c-navy);
+  padding: 8px 12px;
+  text-align: left;
+}
+
+.modal-table th {
+  background: var(--c-navy);
+  color: var(--c-cream);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.modal-table tr:nth-child(even) {
+  background: rgba(0, 48, 73, 0.05);
+}

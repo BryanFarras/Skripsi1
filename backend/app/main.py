@@ -64,6 +64,9 @@ if FRONTEND_DIR.exists():
 
 @app.get("/")
 async def root():
+    xai_file = FRONTEND_DIR / "xai.html"
+    if xai_file.exists():
+        return FileResponse(xai_file)
     index_file = FRONTEND_DIR / "index.html"
     if index_file.exists():
         return FileResponse(index_file)
@@ -73,3 +76,24 @@ async def root():
         "docs": "/docs",
         "endpoints": ["/api/upload", "/api/analyze-local-path", "/api/audio/{id}", "/api/export-plot/{id}"]
     }
+
+@app.get("/xai")
+async def xai_dashboard():
+    xai_file = FRONTEND_DIR / "xai.html"
+    if xai_file.exists():
+        return FileResponse(xai_file)
+    return {
+        "status": "error",
+        "message": "xai.html not found. Please ensure frontend/xai.html exists."
+    }
+
+@app.get("/visualizer")
+async def visualizer_dashboard():
+    index_file = FRONTEND_DIR / "index.html"
+    if index_file.exists():
+        return FileResponse(index_file)
+    return {
+        "status": "error",
+        "message": "index.html not found. Please ensure frontend/index.html exists."
+    }
+

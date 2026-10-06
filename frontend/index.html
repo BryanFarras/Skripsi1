@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Music Forensic Visualizer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+  <!-- Top Navigation Bar -->
+  <header class="navbar">
+    <div class="nav-container">
+      <div class="nav-left">
+        <a href="/" class="brand-logo">
+          <span class="brand-name">AI FORENSIC</span>
+        </a>
+        <nav class="nav-links">
+          <div class="nav-dropdown">
+            <button class="nav-link active">Visualizer <span class="arrow">▾</span></button>
+          </div>
+          <div class="nav-dropdown">
+            <a href="/xai" class="nav-link" style="text-decoration: none;">AI Detector (XAI SHAP)</a>
+          </div>
+          <div class="nav-dropdown">
+            <button class="nav-link">Tools <span class="arrow">▾</span></button>
+          </div>
+          <a href="/docs" target="_blank" class="nav-link">API Docs</a>
+        </nav>
+      </div>
+
+      <div class="nav-right">
+        <button id="loadDemoBtn" class="btn btn-nav">Load Sample Audio</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Breadcrumb Bar -->
+  <div class="breadcrumb-bar">
+    <div class="breadcrumb-container">
+      <span class="crumb">Home</span>
+      <span class="crumb-separator">›</span>
+      <span class="crumb active">Audio Forensic Visualizer & Spectrogram Analyzer</span>
+    </div>
+  </div>
+
+  <!-- Main Container -->
+  <div class="page-container">
+    <!-- 2-Column Split Workspace -->
+    <main class="split-layout">
+      <!-- LEFT COLUMN: Media Viewport & Visualizer (Drag & Drop + Player + 3D Waterfall) -->
+      <section class="media-column">
+        <!-- Main Media Player & Canvas Display Screen -->
+        <div class="media-viewport-card">
+          <!-- Drop Overlay when dragging or empty -->
+          <div class="media-drop-zone" id="mediaDropZone">
+            <input type="file" id="audioFileInput" accept=".wav,.mp3,.flac,.ogg,.m4a" style="display: none;">
+            
+            <!-- Empty State Prompt -->
+            <div class="drop-prompt" id="dropPrompt">
+              <div class="upload-icon-circle">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="17 8 12 3 7 8"></polyline>
+                  <line x1="12" y1="3" x2="12" y2="15"></line>
+                </svg>
+              </div>
+              <h4>Drag & drop any audio file here</h4>
+              <p>Or click to browse from your computer (WAV, MP3, FLAC, M4A)</p>
+              <button type="button" class="btn btn-browse" id="browseBtn">Choose Audio File</button>
+            </div>
+
+            <!-- Active Visualizer Screen (Wave Candy / 3D Waterfall style) -->
+            <div class="media-screen" id="mediaScreen" style="display: none;">
+              <!-- View Switcher Tabs inside Player -->
+              <div class="screen-tabs">
+                <button class="screen-tab active" data-view="spectrogram">Spectrogram (STFT)</button>
+                <button class="screen-tab" data-view="waterfall">3D Waterfall</button>
+                <button class="screen-tab" data-view="equalizer">Equalizer (Parametric EQ 2)</button>
+                <button class="screen-tab" data-view="tonal">Tonal Balance (Real-Time)</button>
+                <button class="screen-tab" data-view="stacked">All Stacked</button>
+              </div>
+
+              <!-- Canvas Container -->
+              <div class="screen-canvas-container" id="screenCanvasContainer">
+                <canvas id="mainSpecCanvas"></canvas>
+                <canvas id="mainWaterfallCanvas" style="display: none;"></canvas>
+                <canvas id="mainEqCanvas" style="display: none;"></canvas>
+                <canvas id="mainTonalCanvas" style="display: none;"></canvas>
+
+                <!-- Centered Play/Pause Overlay Button -->
+                <div class="play-overlay" id="playOverlay">
+                  <button class="big-play-btn" id="bigPlayBtn">
+                    <svg id="bigPlayIcon" width="36" height="36" viewBox="0 0 24 24" fill="currentColor">
+                      <polygon points="6 3 20 12 6 21 6 3"></polygon>
+                    </svg>
+                  </button>
+                </div>
+
+                <!-- Playhead Cursor Line for 2D Spectrogram -->
+                <div id="playheadCursor" class="playhead-line"></div>
+
+                <!-- Spectrogram Controls Toolbar (Moving / Wave Candy vs Full Track) -->
+                <div id="specToolbarTag" class="spec-toolbar-tag">
+                  <div class="spec-mode-switch">
+                    <button type="button" class="spec-mode-btn active" id="btnSpecScroll" data-mode="scroll" title="Smooth scrolling view like Wave Candy & Edison follow mode">Moving (Wave Candy)</button>
+                    <button type="button" class="spec-mode-btn" id="btnSpecFull" data-mode="full" title="Full clip overview with moving playback line like Edison">Full Track (Edison)</button>
+                  </div>
+                  <div class="spec-zoom-group" id="specZoomGroup">
+                    <span class="zoom-label">Window:</span>
+                    <button type="button" class="btn-zoom-chip" data-win="3">3s</button>
+                    <button type="button" class="btn-zoom-chip active" data-win="6">6s</button>
+                    <button type="button" class="btn-zoom-chip" data-win="12">12s</button>
+                  </div>
+                </div>
+
+                <!-- AI Cutoff Floating Tag on Canvas -->
+                <div id="canvasCutoffBadge" class="canvas-cutoff-tag" style="display: none;">
+                  <span class="cutoff-led"></span> AI Cutoff: <span id="cutoffValText">--</span>
+                </div>
+
+                <!-- 3D Waterfall Interaction Hint -->
+                <div id="waterfallHintTag" class="waterfall-hint-tag" style="display: none;">
+                  <span>Drag to rotate 360° • Scroll / Pinch to zoom • Click slice to seek</span>
+                </div>
+              </div>
+
+              <!-- Media Player Bottom Bar -->
+              <div class="player-bottom-bar">
+                <button id="miniPlayBtn" class="mini-control-btn">
+                  <svg id="miniPlayIcon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                    <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                  </svg>
+                </button>
+                <div class="progress-wrap">
+                  <div class="progress-bar-bg" id="progressBarBg">
+                    <div class="progress-bar-fill" id="progressBarFill"></div>
+                    <div class="trim-range-highlight" id="trimRangeHighlight"></div>
+                  </div>
+                </div>
+                <div class="timecode-display" id="timecodeDisplay">00:00:00.00 / 00:00:00.00</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bottom Position Buttons -->
+          <div class="position-actions-bar">
+            <span class="pos-label">Use current position as:</span>
+            <div class="pos-buttons">
+              <button id="useTrimStartBtn" class="btn btn-outline">Trim Start</button>
+              <button id="useTrimEndBtn" class="btn btn-outline">Trim End</button>
+              <button id="resetTrimBtn" class="btn btn-outline-subtle">Reset Selection</button>
+            </div>
+            <div class="track-stats" id="trackStats" style="display: none;">
+              <span id="statRate">44.1 kHz</span> • <span id="statChannels">Mono</span> • <span id="statDuration">0.00s</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Multi-Stem Audio Separator Card -->
+        <div class="stem-splitter-card" id="stemSplitterCard" style="display: none;">
+          <div class="stem-card-header">
+            <div class="stem-title-wrap">
+              <div class="stem-header-text">
+                <h4>Multi-Stem Forensic Separator</h4>
+                <p>Deconstruct track into Vocals, Drums, Bass, & Other. Temporary files are auto-deleted in 1 hour.</p>
+              </div>
+            </div>
+            <button id="splitStemsBtn" class="btn btn-split-action">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"></path>
+                <path d="M12 12v9"></path>
+                <path d="m8 17 4 4 4-4"></path>
+              </svg>
+              Split Audio Stems
+            </button>
+          </div>
+
+          <!-- Stems Processing Status / Progress Indicator -->
+          <div id="stemProcessStatus" class="stem-process-status" style="display: none;">
+            <div class="stem-loading-ring"></div>
+            <div class="stem-status-info">
+              <span id="stemStatusTitle" class="status-strong">Splitting Audio into 5 Forensic Stems...</span>
+              <span id="stemStatusSub" class="status-detail">Running Meta Hybrid Demucs neural separator. Temporary files auto-expire in 1 hour.</span>
+            </div>
+          </div>
+
+          <!-- Stems Output Results Container -->
+          <div id="stemResultsContainer" class="stem-results-container" style="display: none;">
+            <div class="stem-results-header">
+              <span class="stem-session-title">Extracted Forensic Components</span>
+              <span class="stem-expiry-tag">
+                <span class="expiry-dot"></span> Auto-deletes in 1 hour
+              </span>
+            </div>
+            <div class="stem-list" id="stemList">
+              <!-- Dynamically populated by stems.js -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Local Disk Path Analyzer Input -->
+        <div class="local-path-card">
+          <label for="localPathInput">Or analyze directly from local file path:</label>
+          <div class="local-path-group">
+            <input type="text" id="localPathInput" placeholder="C:\Users\asus\Documents\SKRIPSI\APPS\MY-AIDETECTOR\..." />
+            <button id="analyzePathBtn" class="btn btn-secondary">Analyze Path</button>
+          </div>
+        </div>
+
+        <!-- Secondary Visualizers (When in Stacked Mode) -->
+        <div class="stacked-visualizers-card" id="stackedVisualizersCard" style="display: none;">
+          <div class="sub-card">
+            <h4>Equalizer (Live Real-Time FFT & Peak Hold)</h4>
+            <div class="sub-canvas-wrap">
+              <canvas id="stackedEqCanvas"></canvas>
+            </div>
+          </div>
+          <div class="sub-card">
+            <h4>Tonal Balance (Live Multi-Band Spectral Energy)</h4>
+            <div class="sub-canvas-wrap">
+              <canvas id="stackedTonalCanvas"></canvas>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- RIGHT COLUMN: Options & Analysis Settings Panel -->
+      <aside class="options-column">
+        <div class="options-card">
+          <!-- Card Header with Gear Icon -->
+          <div class="options-header">
+            <div class="options-title">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="3"></circle>
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+              </svg>
+              <h3>Visualizer & Forensic Options</h3>
+            </div>
+            <span class="options-code-icon" title="JSON schema available">&lt;/&gt;</span>
+          </div>
+
+          <div class="options-body">
+            <!-- 3D Waterfall Camera Presets (Visible when in 3D Waterfall tab) -->
+            <div class="option-group" id="waterfallControlsGroup" style="display: none;">
+              <div class="option-label-row">
+                <label>3D Waterfall View Angle</label>
+                <span class="help-circle" title="Change 3D camera angle to inspect the waterfall from different perspectives">?</span>
+              </div>
+              <div class="camera-btn-row">
+                <button class="btn btn-sm btn-camera active" id="btnPresetSketch" data-preset="sketch">Sketch Angle</button>
+                <button class="btn btn-sm btn-camera" id="btnPresetIso" data-preset="iso">Isometric</button>
+                <button class="btn btn-sm btn-camera" id="btnPresetFront" data-preset="front">Front (EQ)</button>
+              </div>
+              <div class="option-label-row" style="margin-top: 12px;">
+                <label for="wfOpacitySlider">Inactive Frames Transparency</label>
+                <span class="slider-val-badge" id="wfOpacityBadge">Transparent (15%)</span>
+              </div>
+              <input type="range" id="wfOpacitySlider" min="0" max="80" step="5" value="15" class="form-range" />
+              <p class="option-desc">Keeps background frames transparent so the active wave cuts through clearly.</p>
+            </div>
+
+            <!-- 1. Trim Start -->
+            <div class="option-group">
+              <div class="option-label-row">
+                <label for="trimStartInput">Trim start</label>
+                <span class="help-circle" title="Specify the start timestamp for inspection">?</span>
+              </div>
+              <input type="text" id="trimStartInput" class="time-input" value="00 : 00 : 00 . 00" />
+              <p class="option-desc">Sets where the clip analysis starts, in hh:mm:ss.ms format.</p>
+              <button id="copyStartBtn" class="btn btn-purple">Copy Player Time</button>
+            </div>
+
+            <!-- 2. Trim End -->
+            <div class="option-group">
+              <div class="option-label-row">
+                <label for="trimEndInput">Trim end</label>
+                <span class="help-circle" title="Specify the end timestamp for inspection">?</span>
+              </div>
+              <input type="text" id="trimEndInput" class="time-input" value="00 : 00 : 00 . 00" />
+              <p class="option-desc">Sets where the clip analysis ends, in hh:mm:ss.ms format.</p>
+              <button id="copyEndBtn" class="btn btn-purple">Copy Player Time</button>
+            </div>
+
+            <!-- 3. FFT Resolution -->
+            <div class="option-group">
+              <div class="option-label-row">
+                <label for="fftSizeSelect">FFT Window Size</label>
+                <span class="help-circle" title="Higher values give finer frequency detail; lower values give sharper time transients">?</span>
+              </div>
+              <select id="fftSizeSelect" class="form-select">
+                <option value="1024">1024 samples (High time precision)</option>
+                <option value="2048" selected>2048 samples (Balanced - Standard)</option>
+                <option value="4096">4096 samples (High frequency resolution)</option>
+              </select>
+              <p class="option-desc">Select STFT window size for frequency decomposition.</p>
+            </div>
+
+            <!-- 4. Real-Time Averaging Window (3ms - 400ms) -->
+            <div class="option-group" id="averagingControlGroup">
+              <div class="option-label-row">
+                <label for="averagingSlider">Live Averaging Window</label>
+                <span class="help-circle" title="Controls temporal smoothing: 3ms captures instantaneous transient spikes; 400ms provides smooth rolling tonal balance (standard Ozone Tonal Balance style).">?</span>
+              </div>
+              <div class="slider-control-row">
+                <input type="range" id="averagingSlider" min="3" max="400" step="1" value="400" class="form-range" />
+                <span class="slider-val-badge" id="averagingValBadge">400 ms</span>
+              </div>
+              <div class="preset-chips-row">
+                <button type="button" class="preset-chip" data-avg="3">3ms (Fast)</button>
+                <button type="button" class="preset-chip" data-avg="50">50ms</button>
+                <button type="button" class="preset-chip" data-avg="150">150ms</button>
+                <button type="button" class="preset-chip active" data-avg="400">400ms (Ozone)</button>
+              </div>
+              <p class="option-desc">Temporal smoothing for real-time Equalizer and Tonal Balance visualizers (3ms – 400ms).</p>
+            </div>
+
+            <!-- 4. Colormap Palette -->
+            <div class="option-group">
+              <div class="option-label-row">
+                <label for="colorPaletteSelect">Color Palette</label>
+                <span class="help-circle" title="Color gradient used for spectrogram intensity">?</span>
+              </div>
+              <select id="colorPaletteSelect" class="form-select">
+                <option value="inferno" selected>Wave Candy / Inferno (High Contrast)</option>
+                <option value="magma">Magma (Warm Purple & Orange)</option>
+                <option value="plasma">Plasma (Vibrant Blue & Pink)</option>
+                <option value="cyan">Neon Cyan Glow</option>
+              </select>
+              <p class="option-desc">Color palette for visual frequency heatmap.</p>
+            </div>
+
+            <!-- 5. AI Detection Diagnostics Summary Card -->
+            <div class="forensics-summary-box" id="forensicsSummaryBox" style="display: none;">
+              <div class="summary-header">
+                <h4>AI Forensic Diagnostic</h4>
+                <span id="cutoffBadge" class="badge badge-normal">Analyzing...</span>
+              </div>
+              <div class="summary-metrics">
+                <div class="s-metric">
+                  <span class="s-label">Cutoff:</span>
+                  <span class="s-value" id="valCutoff">-- Hz</span>
+                </div>
+                <div class="s-metric">
+                  <span class="s-label">Rolloff (95%):</span>
+                  <span class="s-value" id="valRolloff">-- Hz</span>
+                </div>
+                <div class="s-metric">
+                  <span class="s-label">Centroid:</span>
+                  <span class="s-value" id="valCentroid">-- Hz</span>
+                </div>
+                <div class="s-metric">
+                  <span class="s-label">Air Power (&gt;16k):</span>
+                  <span class="s-value" id="valAirPower">-- %</span>
+                </div>
+              </div>
+              <div class="s-notes" id="forensicNotes"></div>
+              <a href="/xai" target="_blank" class="btn btn-purple" style="display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 12px; text-decoration: none; width: 100%; font-size: 0.82rem; padding: 8px 12px;">
+                <span>View TreeSHAP Feature Attributions</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                  <polyline points="15 3 21 3 21 9"></polyline>
+                  <line x1="10" y1="14" x2="21" y2="3"></line>
+                </svg>
+              </a>
+            </div>
+
+            <!-- Component Forensics Quick Action -->
+            <div class="option-group" id="quickStemGroup" style="display: none;">
+              <div class="option-label-row">
+                <label>Component Forensics</label>
+                <span class="help-circle" title="Split into isolated stems to verify vocoder smearing in vocals or transient blur in drums">?</span>
+              </div>
+              <button id="sideSplitStemsBtn" class="btn btn-outline-cyan btn-full">
+                Split Audio Stems (1h Temp)
+              </button>
+              <p class="option-desc">Decomposes mix into 5 stems with isolated spectral analysis.</p>
+            </div>
+
+            <!-- 6. AI Cutoff Checkbox -->
+            <div class="option-checkbox-row">
+              <input type="checkbox" id="aiCutoffCheck" checked />
+              <label for="aiCutoffCheck">Enable automated AI brickwall cutoff detection</label>
+            </div>
+          </div>
+
+          <!-- Bottom Full-Width Action Button -->
+          <div class="options-footer">
+            <button id="primaryActionBtn" class="btn btn-convert-full" disabled>
+              Export Skripsi Publication Plot (PNG)
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </aside>
+    </main>
+
+    <!-- Floating Action Button for Quick Upload -->
+    <button class="fab-btn" id="fabBtn" title="Upload Audio File">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <line x1="12" y1="5" x2="12" y2="19"></line>
+        <line x1="5" y1="12" x2="19" y2="12"></line>
+      </svg>
+    </button>
+
+    <!-- Audio Element for playback (preload auto enables instant seeking) -->
+    <audio id="audioElement" preload="auto" crossorigin="anonymous"></audio>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay" style="display: none;">
+      <div class="spinner"></div>
+      <p id="loadingText">Processing audio and computing spectral transforms...</p>
+    </div>
+  </div>
+
+  <script type="module" src="/js/main.js"></script>
+</body>
+</html>

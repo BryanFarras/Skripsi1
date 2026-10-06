@@ -1,0 +1,291 @@
+/* ==========================================================================
+   Verdict, Narrative, and Timeline Component Styles
+   Color Palette: #C1121F (Crimson), #FDF0D5 (Cream), #003049 (Prussian Navy)
+   Typography: Fira Sans & Fira Code
+   Geometry: Sharp Edges (Zero Radius)
+   ========================================================================== */
+
+/* Top Timeline Banner (Placed directly above analysis columns) */
+.timeline-top-banner {
+  width: 100%;
+  margin-bottom: 28px;
+  background-color: var(--c-navy-dark);
+  border: 1.5px solid var(--c-border-dark);
+}
+
+.timeline-sub-cue {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--c-text-light-sub);
+  letter-spacing: 0.04em;
+}
+
+.timeline-barchart-container {
+  display: flex;
+  align-items: flex-end;
+  gap: 16px;
+  height: 120px;
+  padding: 16px 14px 8px;
+  background: var(--c-navy-deep);
+  border: 1px solid var(--c-border-subtle);
+  overflow-x: auto;
+}
+
+.xai-slice-col {
+  flex: 1;
+  min-width: 48px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.xai-slice-col:hover {
+  transform: translateY(-2px);
+}
+
+.xai-slice-prob {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--c-cream);
+  margin-bottom: 6px;
+}
+
+.xai-slice-bar-wrap {
+  flex: 1;
+  width: 100%;
+  max-width: 32px;
+  background: rgba(253, 240, 213, 0.06);
+  border: 1px solid rgba(253, 240, 213, 0.12);
+  display: flex;
+  align-items: flex-end;
+  overflow: hidden;
+}
+
+.xai-slice-bar {
+  width: 100%;
+  transition: height 0.3s ease;
+}
+
+.xai-slice-bar.slice-ai {
+  background: var(--c-crimson);
+}
+
+.xai-slice-bar.slice-human {
+  background: var(--c-cream);
+}
+
+.xai-slice-time {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--c-text-light-sub);
+  margin-top: 6px;
+}
+
+/* Left Column Container */
+.xai-column-left {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Card 1: Forensic Verdict */
+.verdict-panel {
+  transition: border-color 0.2s ease;
+}
+
+.verdict-banner-title {
+  font-family: var(--font-sans);
+  font-size: 1.8rem;
+  font-weight: 900;
+  letter-spacing: -0.01em;
+  color: var(--c-crimson);
+  margin-bottom: 18px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-transform: uppercase;
+}
+
+.verdict-dot {
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+.verdict-panel.verdict-bonafide .verdict-banner-title {
+  color: var(--c-cream);
+}
+
+/* Probability meter */
+.verdict-probability-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 22px;
+}
+
+.verdict-prob-labels {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 0.84rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.prob-ai-label {
+  color: var(--c-crimson);
+}
+
+.prob-human-label {
+  color: var(--c-cream);
+}
+
+.prob-bar-track {
+  width: 100%;
+  height: 12px;
+  background: var(--c-navy-deep);
+  border: 1px solid var(--c-border-subtle);
+  display: flex;
+  overflow: hidden;
+  position: relative;
+}
+
+.prob-bar-fill-ai {
+  height: 100%;
+  background: var(--c-crimson);
+  transition: width 0.4s ease;
+}
+
+.prob-bar-fill-human {
+  height: 100%;
+  background: var(--c-cream);
+  transition: width 0.4s ease;
+}
+
+.prob-bar-center-marker {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: rgba(253, 240, 213, 0.6);
+  transform: translateX(-50%);
+}
+
+/* 2x2 Stats Grid */
+.verdict-stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.stat-cell {
+  background: var(--c-navy-deep);
+  border: 1px solid var(--c-border-subtle);
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.stat-cell-title {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--c-text-light-sub);
+}
+
+.stat-cell-value {
+  font-family: var(--font-mono);
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--c-cream);
+}
+
+/* Card 2: Narrative */
+.narrative-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--c-cream);
+}
+
+.panel-heading {
+  font-family: var(--font-sans);
+  font-size: 1.15rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.lang-toggle-group {
+  display: flex;
+  background: var(--c-navy-deep);
+  padding: 2px;
+  border: 1px solid var(--c-border-subtle);
+}
+
+.lang-btn {
+  background: transparent;
+  border: none;
+  color: var(--c-text-light-sub);
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.lang-btn.active {
+  background: var(--c-cream);
+  color: var(--c-navy);
+}
+
+.narrative-textbox {
+  background: var(--c-navy-deep);
+  border: 1px solid var(--c-border-subtle);
+  padding: 16px 18px;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--c-cream);
+  margin-bottom: 14px;
+}
+
+.narrative-textbox strong {
+  color: var(--c-cream);
+  background: var(--c-crimson);
+  padding: 1px 6px;
+}
+
+.btn-copy-thesis {
+  width: 100%;
+  background: transparent;
+  border: 1.5px solid var(--c-border-dark);
+  color: var(--c-cream);
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  font-weight: 800;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  transition: all 0.2s ease;
+}
+
+.btn-copy-thesis:hover {
+  background: var(--c-crimson);
+  border-color: var(--c-crimson);
+  color: var(--c-cream);
+}
