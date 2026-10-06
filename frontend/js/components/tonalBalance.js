@@ -55,7 +55,7 @@ export function renderTonalCanvas(canvas, tbData, isLive = false) {
     ctx.stroke();
 
     ctx.fillStyle = '#64748b';
-    ctx.font = '10px JetBrains Mono';
+    ctx.font = '10px "Times New Roman", Times, serif';
     ctx.fillText(`${f >= 1000 ? f / 1000 + 'k' : f}Hz`, x + 4, h - 6);
   });
 
@@ -70,7 +70,7 @@ export function renderTonalCanvas(canvas, tbData, isLive = false) {
     ctx.stroke();
 
     ctx.fillStyle = '#475569';
-    ctx.font = '9px JetBrains Mono';
+    ctx.font = '9px "Times New Roman", Times, serif';
     ctx.fillText(`${db}dB`, w - 38, y - 3);
   });
 
@@ -134,7 +134,7 @@ export function renderTonalCanvas(canvas, tbData, isLive = false) {
   // Live HUD: Multi-band energy percentage badges
   const hudY = 18;
   let hudX = 14;
-  ctx.font = '10px JetBrains Mono';
+  ctx.font = '10px "Times New Roman", Times, serif';
 
   BAND_DEFINITIONS.forEach((b, idx) => {
     const pct = isLive

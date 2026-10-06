@@ -91,7 +91,7 @@ export function renderWaterfall3DCanvas(canvas, waterfallData) {
   ctx.stroke();
 
   // Axis Labels
-  ctx.font = 'bold 12px JetBrains Mono';
+  ctx.font = 'bold 12px "Times New Roman", Times, serif';
   ctx.fillStyle = '#f8fafc';
   ctx.fillText('volume (y)', axY.sx - 36, axY.sy - 8);
   ctx.fillText('freq (x)', axX.sx + 8, axX.sy + 14);
@@ -233,7 +233,7 @@ export function renderWaterfall3DCanvas(canvas, waterfallData) {
       ctx.fill();
 
       const badgeText = `${slice.formatted_time}`;
-      ctx.font = 'bold 10px JetBrains Mono';
+      ctx.font = 'bold 10px "Times New Roman", Times, serif';
       const badgeW = ctx.measureText(badgeText).width + 10;
       ctx.fillStyle = 'rgba(15, 23, 42, 0.92)';
       ctx.strokeStyle = '#00e5ff';
@@ -264,7 +264,7 @@ export function renderWaterfall3DCanvas(canvas, waterfallData) {
   });
 
   // Status HUD indicator
-  ctx.font = '10px JetBrains Mono, monospace';
+  ctx.font = '10px "Times New Roman", Times, serif';
   if (isPlaying) {
     ctx.fillStyle = '#00ffcc';
     ctx.fillText(`● LIVE 3D FRAME: ${slices[activeSliceIdx].formatted_time} (Slice ${activeSliceIdx + 1}/${numSlices})`, w - 320, 24);

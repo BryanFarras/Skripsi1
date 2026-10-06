@@ -106,7 +106,7 @@ export function renderSpectrogramCanvas(canvas, specData, forensics, palette, sh
     if (hz < maxHz) {
       const y = h - (hz / maxHz) * h;
       ctx.fillStyle = 'rgba(255, 255, 255, 0.45)';
-      ctx.font = '9px JetBrains Mono';
+      ctx.font = '9px "Times New Roman", Times, serif';
       ctx.fillText(`${hz >= 1000 ? hz / 1000 + 'kHz' : hz + 'Hz'}`, 6, y - 3);
       ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
       ctx.lineWidth = 1;
@@ -158,7 +158,7 @@ export function renderSpectrogramCanvas(canvas, specData, forensics, palette, sh
 
     // Timecode badge
     const timeText = formatShortTime(curTime);
-    ctx.font = 'bold 10px JetBrains Mono';
+    ctx.font = 'bold 10px "Times New Roman", Times, serif';
     const textW = ctx.measureText(timeText).width;
     const badgeW = textW + 12;
     const badgeH = 18;

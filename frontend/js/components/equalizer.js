@@ -66,13 +66,13 @@ export function renderEqualizerCanvas(canvas, eqData, isLive = false) {
     ctx.fill();
 
     ctx.fillStyle = '#ffffff';
-    ctx.font = 'bold 8px JetBrains Mono, monospace';
+    ctx.font = 'regular 8px "Times New Roman", Times, serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText(`${b.id}`, px + 10, 15);
 
     ctx.textAlign = 'left';
-    ctx.font = 'bold 9px JetBrains Mono, monospace';
+    ctx.font = 'regular 9px "Times New Roman", Times, serif';
     ctx.fillStyle = '#cbd5e1';
     ctx.fillText(b.name, px + 20, 16);
   });
@@ -97,7 +97,7 @@ export function renderEqualizerCanvas(canvas, eqData, isLive = false) {
   majorFreqs.forEach(f => {
     const x = freqToX(f, contentW);
     ctx.fillStyle = '#64748b';
-    ctx.font = '9px JetBrains Mono, monospace';
+    ctx.font = '9px "Times New Roman", Times, serif';
     const txt = f >= 1000 ? `${f / 1000}k` : `${f}`;
     ctx.fillText(txt, x - 6, h - 6);
   });
@@ -116,7 +116,7 @@ export function renderEqualizerCanvas(canvas, eqData, isLive = false) {
     ctx.setLineDash([]);
 
     ctx.fillStyle = (db === 0) ? '#cbd5e1' : '#64748b';
-    ctx.font = '9px JetBrains Mono, monospace';
+    ctx.font = '9px "Times New Roman", Times, serif';
     ctx.fillText(`${db > 0 ? '+' : ''}${db}dB`, contentW + 6, y + 3);
   });
 
@@ -230,12 +230,12 @@ export function renderEqualizerCanvas(canvas, eqData, isLive = false) {
     ctx.restore();
 
     ctx.fillStyle = '#ffffff';
-    ctx.font = 'bold 9px JetBrains Mono, monospace';
+    ctx.font = 'regular 9px "Times New Roman", Times, serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText(`${b.id}`, bx, by);
 
-    ctx.font = '8px JetBrains Mono, monospace';
+    ctx.font = '8px "Times New Roman", Times, serif';
     ctx.fillStyle = b.color;
     const fLabel = b.freq >= 1000 ? `${(b.freq / 1000).toFixed(1)}k` : `${b.freq}Hz`;
     ctx.fillText(fLabel, bx, by + 14);
@@ -244,7 +244,7 @@ export function renderEqualizerCanvas(canvas, eqData, isLive = false) {
   ctx.textBaseline = 'alphabetic';
 
   // 7. Status Badge
-  ctx.font = '10px JetBrains Mono, monospace';
+  ctx.font = '10px "Times New Roman", Times, serif';
   if (isLive) {
     ctx.fillStyle = '#00ffcc';
     ctx.fillText(`● LIVE PARAMETRIC EQ 2 (${state.averagingMs}ms avg)`, contentW - 225, topY + 18);

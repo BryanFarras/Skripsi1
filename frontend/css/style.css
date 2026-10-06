@@ -22,8 +22,8 @@
   --accent-orange: #f97316;
   --accent-red: #ef4444;
 
-  --font-sans: 'Commissioner', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-mono: 'JetBrains Mono', 'Consolas', monospace;
+  --font-sans: 'Times New Roman', Times, serif;
+  --font-mono: 'Times New Roman', Times, serif;
 
   --radius-sm: 6px;
   --radius-md: 10px;
@@ -33,16 +33,20 @@
   --shadow-float: 0 10px 25px -3px rgba(99, 102, 241, 0.35);
 }
 
-* {
+*, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+  font-family: 'Times New Roman', Times, serif;
+}
+
+body, button, input, select, textarea {
+  font-family: 'Times New Roman', Times, serif;
 }
 
 body {
   background-color: var(--bg-page);
   color: var(--text-main);
-  font-family: var(--font-sans);
   min-height: 100vh;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
