@@ -72,8 +72,8 @@
             </div>
           </div>
 
-          <!-- Active Audio Player View (Visible once track is loaded) -->
-          <div class="upload-player-content" id="uploadPlayer" style="display: none;">
+          <!-- Active Audio Metadata View (Visible once track is loaded) - ONLY File Name & Metadata -->
+          <div class="upload-active-info" id="uploadActiveInfo" style="display: none;">
             <div class="player-top-meta">
               <span class="player-label-tag">ACTIVE AUDIO TRACK</span>
               <button type="button" class="btn-switch-track" id="switchTrackBtn" title="Upload another audio file">
@@ -81,39 +81,37 @@
               </button>
             </div>
 
-            <div class="player-main-controls">
-              <button type="button" id="playBtn" class="hero-play-btn" title="Play / Pause">
-                <span id="playIcon">
-                  <polygon points="6 4 20 12 6 20" fill="currentColor"></polygon>
-                </span>
-              </button>
-              
-              <div class="player-track-info">
-                <span class="track-title-text" id="filenameEl">--</span>
-                <div class="track-meta-chips">
-                  <span id="metaDuration">--s</span>
-                  <span class="meta-dot">•</span>
-                  <span id="metaSr">-- kHz</span>
-                  <span class="meta-dot">•</span>
-                  <span id="metaSlicesCount">5.0s Windows</span>
+            <div class="upload-active-meta-content">
+              <div class="active-track-name-badge">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M9 18V5l12-2v13"></path>
+                  <circle cx="6" cy="18" r="3"></circle>
+                  <circle cx="18" cy="16" r="3"></circle>
+                </svg>
+                <span class="active-filename-display" id="filenameEl">--</span>
+              </div>
+
+              <div class="active-drop-metadata-grid">
+                <div class="drop-meta-pill">
+                  <span class="drop-meta-label">Duration</span>
+                  <span class="drop-meta-value" id="metaDuration">--s</span>
+                </div>
+                <div class="drop-meta-pill">
+                  <span class="drop-meta-label">Sample Rate</span>
+                  <span class="drop-meta-value" id="metaSr">-- kHz</span>
+                </div>
+                <div class="drop-meta-pill">
+                  <span class="drop-meta-label">5s Segments</span>
+                  <span class="drop-meta-value" id="metaSlicesCount">-- Slices</span>
+                </div>
+                <div class="drop-meta-pill">
+                  <span class="drop-meta-label">Audio Format</span>
+                  <span class="drop-meta-value" id="dropMetaFormat">PCM / Waveform</span>
                 </div>
               </div>
-            </div>
 
-            <div class="hero-waveform-seek-container">
-              <div class="waveform-canvas-wrap" id="waveformWrap">
-                <canvas id="waveformCanvas" class="hero-waveform-canvas"></canvas>
-                <div class="waveform-playhead" id="waveformPlayhead"></div>
-                <div class="waveform-hover-cursor" id="waveformHoverCursor" style="display: none;"></div>
-                <div class="waveform-hover-time" id="waveformHoverTime" style="display: none;">00:00</div>
-              </div>
-              <div class="hero-timecode-row">
-                <span id="timecodeEl" class="hero-timecode">00:00 / 00:00</span>
-                <span class="hero-seek-tip">Click or drag waveform to seek</span>
-              </div>
+              <p class="drop-replace-hint">Click box or drop another audio file anytime to analyze</p>
             </div>
-
-            <audio id="audioEl" preload="auto"></audio>
           </div>
 
         </div>
@@ -174,7 +172,7 @@
               </div>
               <div class="meta-cell">
                 <span class="meta-cell-label">Temporal Window</span>
-                <span class="meta-cell-val" id="metaValWindow">5.0s (50% Overlap)</span>
+                <span class="meta-cell-val" id="metaValWindow">5.0s Contiguous</span>
               </div>
               <div class="meta-cell">
                 <span class="meta-cell-label">Feature Space</span>
@@ -186,11 +184,62 @@
               </div>
             </div>
 
-
           </div>
 
         </div>
 
+      </div>
+
+      <!-- FULL-WIDTH BOTTOM CONTAINER: Audio Playback + 5s Slice (do not add an outer box for the wave visualizer) -->
+      <div class="playback-hero-card" id="playbackCard">
+        <div class="playback-header-row">
+          <div class="playback-controls-left">
+            <button type="button" id="playBtn" class="hero-play-btn" title="Play / Pause">
+              <span id="playIcon">
+                <polygon points="6 4 20 12 6 20" fill="currentColor"></polygon>
+              </span>
+            </button>
+            <div class="playback-title-wrap">
+              <span class="playback-section-label">AUDIO PLAYBACK + 5S FORENSIC SLICES</span>
+              <div class="playback-time-badge-row">
+                <span id="timecodeEl" class="hero-timecode">00:00 / 00:00</span>
+                <span class="playback-active-slice-tag" id="activeSliceIndicator">Slice 1 • 0.0s - 5.0s</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="playback-legend-right">
+            <div class="playback-legend-group">
+              <span class="slice-legend-pill pill-ai">
+                <span class="legend-dot dot-ai"></span> AI Sounding (Red)
+              </span>
+              <span class="slice-legend-pill pill-human">
+                <span class="legend-dot dot-human"></span> Human Sounding (Blue)
+              </span>
+            </div>
+            <span class="playback-slices-total-badge" id="slicesTotalBadge">5s Slices Seeker</span>
+          </div>
+        </div>
+
+        <!-- Interactive 5s Slices Segment Track -->
+        <div class="slices-segments-track" id="sliceSegmentsHeader">
+          <!-- Populated dynamically with 5s slice buttons -->
+        </div>
+
+        <!-- Waveform Seeker: Frameless (no outer box around wave visualizer) -->
+        <div class="waveform-canvas-wrap" id="waveformWrap">
+          <canvas id="waveformCanvas" class="hero-waveform-canvas"></canvas>
+          <div class="waveform-seeking-line" id="waveformPlayhead">
+            <div class="seeking-line-handle"></div>
+          </div>
+          <div class="waveform-hover-cursor" id="waveformHoverCursor" style="display: none;"></div>
+          <div class="waveform-hover-time" id="waveformHoverTime" style="display: none;">00:00</div>
+        </div>
+
+        <!-- Time Axis Tick Marks (0s, 5s, 10s...) -->
+        <div class="waveform-bottom-axis" id="waveformAxis"></div>
+
+        <audio id="audioEl" preload="auto"></audio>
       </div>
 
     </div>
@@ -202,58 +251,6 @@
        ========================================================================= -->
   <section class="xai-bottom-section">
     <div class="xai-bottom-container">
-      
-      <!-- TOP FULL-WIDTH BANNER: 5s Slice Probability Timeline (Above all analysis) -->
-      <div class="xai-panel-card timeline-panel timeline-top-banner" id="timelineCard">
-        <div class="panel-header-line">
-          <div class="narrative-title-wrap">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
-            </svg>
-            <h3 class="panel-heading">5s Slice Probability Timeline</h3>
-          </div>
-          <span class="timeline-sub-cue">Click bar to seek</span>
-        </div>
-
-        <div class="timeline-barchart-container" id="timelineChart">
-          <!-- Populated dynamically via xai.js -->
-          <div class="xai-slice-col" data-start="0">
-            <span class="xai-slice-prob">34%</span>
-            <div class="xai-slice-bar-wrap">
-              <div class="xai-slice-bar slice-human" style="height: 34%;"></div>
-            </div>
-            <span class="xai-slice-time">0s</span>
-          </div>
-          <div class="xai-slice-col" data-start="5.63">
-            <span class="xai-slice-prob">68%</span>
-            <div class="xai-slice-bar-wrap">
-              <div class="xai-slice-bar slice-ai" style="height: 68%;"></div>
-            </div>
-            <span class="xai-slice-time">5.63s</span>
-          </div>
-          <div class="xai-slice-col" data-start="11.26">
-            <span class="xai-slice-prob">63%</span>
-            <div class="xai-slice-bar-wrap">
-              <div class="xai-slice-bar slice-ai" style="height: 63%;"></div>
-            </div>
-            <span class="xai-slice-time">11.26s</span>
-          </div>
-          <div class="xai-slice-col" data-start="16.89">
-            <span class="xai-slice-prob">67%</span>
-            <div class="xai-slice-bar-wrap">
-              <div class="xai-slice-bar slice-ai" style="height: 67%;"></div>
-            </div>
-            <span class="xai-slice-time">16.89s</span>
-          </div>
-          <div class="xai-slice-col" data-start="22.52">
-            <span class="xai-slice-prob">61%</span>
-            <div class="xai-slice-bar-wrap">
-              <div class="xai-slice-bar slice-ai" style="height: 61%;"></div>
-            </div>
-            <span class="xai-slice-time">22.52s</span>
-          </div>
-        </div>
-      </div>
 
       <!-- 2-Column Split: Left Verdict & Right TreeSHAP Attributions -->
       <div class="xai-dashboard-layout" id="resultsSection">

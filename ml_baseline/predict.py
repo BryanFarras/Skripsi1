@@ -103,30 +103,30 @@ class BaselineDetectorPredictor:
                 "flagged_slices_ratio": 1.0 if prob_ai >= 0.5 else 0.0,
                 "confidence_percent": round(abs(prob_ai - 0.5) * 200, 1),
                 "total_slices_analyzed": 1,
-                "timeline": [{"slice_idx": 0, "start_sec": 0.0, "ai_prob": round(prob_ai, 3), "is_ai_flagged": prob_ai >= 0.5}],
+                "timeline": [{"slice_idx": 0, "start_sec": 0.0, "end_sec": round(dur_sec, 2), "ai_prob": round(prob_ai, 4), "is_ai_flagged": bool(prob_ai >= 0.5)}],
                 "xai": xai_res
             }
 
-        # 2. Longer audio: sample up to 8 representative 5-second slices across the track
-        max_slices = 8
-        n_slices = min(max_slices, max(2, int(dur_sec // SLICE_DURATION)))
-        step_sec = (dur_sec - SLICE_DURATION) / max(1, n_slices - 1)
+        # 2. Longer audio: contiguous 5-second slices across the full audio (0-5s, 5-10s, 10-15s, etc.)
+        max_slices = 36  # Support up to 3 minutes of continuous 5s slices
+        n_slices = min(max_slices, max(1, int(np.ceil(dur_sec / SLICE_DURATION))))
 
         sample_slices = []
         for i in range(n_slices):
-            st = i * step_sec
+            st = i * SLICE_DURATION
+            end_t = min(dur_sec, (i + 1) * SLICE_DURATION)
             start_sample = int(st * sr)
             end_sample = min(len(y), start_sample + slice_samples)
             chunk = y[start_sample:end_sample]
             if len(chunk) < slice_samples:
                 chunk = np.pad(chunk, (0, slice_samples - len(chunk)))
-            sample_slices.append((i, round(st, 2), chunk))
+            sample_slices.append((i, round(st, 2), round(end_t, 2), chunk))
 
         # Parallel extraction across slices
         def _extract_task(item):
-            idx, st, ch = item
+            idx, st, end_t, ch = item
             f = self.extractor.extract_from_waveform(ch, sr=sr)
-            return idx, st, f
+            return idx, st, end_t, f
 
         max_workers = min(4, os.cpu_count() or 4)
         with ThreadPoolExecutor(max_workers=max_workers) as executor:
@@ -135,8 +135,8 @@ class BaselineDetectorPredictor:
         # Sort back in timeline order
         extracted_results.sort(key=lambda r: r[0])
 
-        slice_features = [r[2] for r in extracted_results]
-        slice_meta = [{"slice_idx": r[0], "start_sec": r[1]} for r in extracted_results]
+        slice_features = [r[3] for r in extracted_results]
+        slice_meta = [{"slice_idx": r[0], "start_sec": r[1], "end_sec": r[2]} for r in extracted_results]
 
         X_slices = np.array(slice_features, dtype=np.float32)
         X_scaled = self.scaler.transform(X_slices)
@@ -147,6 +147,7 @@ class BaselineDetectorPredictor:
             timeline.append({
                 "slice_idx": meta["slice_idx"],
                 "start_sec": meta["start_sec"],
+                "end_sec": meta["end_sec"],
                 "ai_prob": round(float(p), 4),
                 "is_ai_flagged": bool(p >= 0.5)
             })

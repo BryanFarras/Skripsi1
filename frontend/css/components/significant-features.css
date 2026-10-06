@@ -2,7 +2,7 @@
    TreeSHAP Significant Features Component Styles
    Color Palette: #C1121F (Crimson), #FDF0D5 (Cream), #003049 (Prussian Navy)
    Typography: Fira Sans & Fira Code
-   Geometry: Sharp Edges (Zero Radius)
+   Geometry: Sharp Edges, Borderless Boxes
    ========================================================================== */
 
 /* Right Column Container */
@@ -33,12 +33,12 @@
 
 .filter-chip {
   background: var(--c-navy-deep);
-  border: 1.5px solid var(--c-border-dark);
+  border: none !important;
   color: var(--c-cream);
   font-family: var(--font-sans);
   font-size: 0.82rem;
   font-weight: 800;
-  padding: 6px 14px;
+  padding: 8px 16px;
   cursor: pointer;
   text-transform: uppercase;
   letter-spacing: 0.03em;
@@ -46,26 +46,22 @@
 }
 
 .filter-chip:hover {
-  background: rgba(253, 240, 213, 0.12);
-  border-color: var(--c-cream);
+  background: rgba(253, 240, 213, 0.18);
 }
 
 .filter-chip.active {
   background: var(--c-cream);
   color: var(--c-navy);
-  border-color: var(--c-cream);
 }
 
 .filter-chip.chip-ai.active {
   background: var(--c-crimson);
   color: var(--c-cream);
-  border-color: var(--c-crimson);
 }
 
 .filter-chip.chip-human.active {
   background: var(--c-cream);
   color: var(--c-navy);
-  border-color: var(--c-cream);
 }
 
 .shap-formula-badge {
@@ -73,7 +69,7 @@
   font-size: 0.78rem;
   color: var(--c-cream);
   background: var(--c-navy-deep);
-  border: 1px solid var(--c-border-subtle);
+  border: none !important;
   padding: 6px 12px;
 }
 
@@ -91,19 +87,21 @@
   margin-top: 4px;
 }
 
-/* Feature Item Card */
+/* Feature Item Card (Borderless) */
 .feature-item-row {
   background: var(--c-navy-deep);
-  border: 1.5px solid var(--c-border-dark);
-  padding: 16px 18px;
+  border: none !important;
+  padding: 18px 20px;
   display: flex;
   flex-direction: column;
   gap: 12px;
-  transition: border-color 0.2s ease;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
+  transition: background-color 0.2s ease, transform 0.15s ease;
 }
 
 .feature-item-row:hover {
-  border-color: var(--c-cream);
+  background: #002237;
+  transform: translateY(-1px);
 }
 
 .feature-row-top {
@@ -154,26 +152,25 @@
   font-size: 0.78rem;
   font-weight: 800;
   padding: 4px 10px;
+  border: none !important;
 }
 
 .shap-pill.pill-ai {
-  background: rgba(193, 18, 31, 0.25);
-  color: #ff6b77;
-  border: 1px solid var(--c-crimson);
+  background: rgba(193, 18, 31, 0.3);
+  color: #ff858f;
 }
 
 .shap-pill.pill-human {
-  background: rgba(253, 240, 213, 0.2);
-  color: var(--c-cream);
-  border: 1px solid var(--c-cream);
+  background: rgba(29, 111, 165, 0.3);
+  color: #85c2ee;
 }
 
-/* Horizontal bar track */
+/* Horizontal bar track (Borderless) */
 .feature-bar-track {
   width: 100%;
   height: 8px;
   background: rgba(253, 240, 213, 0.08);
-  border: 1px solid rgba(253, 240, 213, 0.12);
+  border: none !important;
   overflow: hidden;
 }
 
@@ -187,10 +184,10 @@
 }
 
 .feature-bar-fill.fill-human {
-  background: var(--c-cream);
+  background: var(--c-human-blue, #1D6FA5);
 }
 
-/* Two Sub-Boxes side-by-side (Diagnostic Cue & Physical Meaning) */
+/* Two Sub-Boxes side-by-side (Diagnostic Cue & Physical Meaning - Borderless) */
 .feature-sub-boxes {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -199,24 +196,24 @@
 }
 
 .feature-box {
-  background: rgba(0, 48, 73, 0.5);
-  border: 1px solid var(--c-border-subtle);
-  padding: 10px 14px;
+  background: rgba(0, 48, 73, 0.55);
+  border: none !important;
+  padding: 12px 16px;
   font-size: 0.8rem;
   line-height: 1.5;
   color: var(--c-cream);
 }
 
 .feature-box.box-cue {
-  border-left: 3px solid var(--c-crimson);
+  border-left: none !important;
 }
 
 .feature-box.box-cue.cue-human {
-  border-left: 3px solid var(--c-cream);
+  border-left: none !important;
 }
 
 .feature-box.box-meaning {
-  border-left: 3px solid var(--c-cream);
+  border-left: none !important;
 }
 
 .feature-box strong {

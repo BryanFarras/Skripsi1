@@ -94,8 +94,14 @@ document.addEventListener('DOMContentLoaded', () => {
       state.duration,
       data.metadata.sample_rate,
       totalSlices,
-      rawBuffer
+      rawBuffer,
+      data.metadata
     );
+
+    // Pass 5s slice timeline to player for red/blue segment coloring and seeking
+    if (data.ml_detector && data.ml_detector.timeline) {
+      player.setTimeline(data.ml_detector.timeline);
+    }
 
     // Update metadata profile
     metadataInspector.render(data.metadata, totalSlices);
@@ -108,7 +114,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // 7. Auto-load initial demo track on first visit
-  uploader.analyzeLocalPath('backend/uploads/sample_ai_test.wav');
+  uploader.analyzeLocalPath('backend/uploads/02f6189c-c03.mp3');
 
   console.log('AI Music Detector — TreeSHAP Modular Architecture Initialized.');
 });

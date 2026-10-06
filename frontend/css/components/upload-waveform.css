@@ -1,25 +1,31 @@
 /* ==========================================================================
    Upload & Audio Waveform Player Component Styles
-   3-Color Palette: #C1121F (Crimson), #FDF0D5 (Cream), #003049 (Navy)
-   Sharp Edges & Frameless Waveform Visualizer
+   Palette: Slate Blue (#6C8EA4), Warm Cream (#FDF0D5), Prussian Navy (#003049),
+            AI Crimson Red (#C1121F), Human Cerulean Blue (#1D6FA5)
+   Sharp Edges, Borderless Container Boxes, Frameless Waveform Seeker
    ========================================================================== */
 
-/* Left Card: Upload Hero Card */
+/* --------------------------------------------------------------------------
+   LEFT CARD: Upload Audio Clip Here (Slate Blue Container, No Borders)
+   -------------------------------------------------------------------------- */
 .upload-hero-card {
-  background-color: var(--c-navy);
-  color: var(--c-cream);
-  border: 2px dashed rgba(253, 240, 213, 0.4);
+  background-color: var(--c-slate-blue) !important;
+  color: #ffffff !important;
+  border: none !important;
+  box-shadow: 0 4px 16px rgba(0, 48, 73, 0.08);
   cursor: pointer;
+  position: relative;
+  transition: transform 0.15s ease, background-color 0.15s ease;
 }
 
 .upload-hero-card:hover {
-  border-color: var(--c-crimson);
-  box-shadow: 0 8px 24px rgba(0, 48, 73, 0.2);
+  background-color: #5f8096 !important;
+  transform: translateY(-1px);
 }
 
 .upload-hero-card.dragover {
-  background-color: var(--c-navy-dark);
-  border-color: var(--c-crimson);
+  background-color: #517186 !important;
+  box-shadow: 0 8px 24px rgba(0, 48, 73, 0.22);
 }
 
 .upload-card-content {
@@ -31,11 +37,11 @@
 }
 
 .upload-hero-card .hero-card-title {
-  color: var(--c-cream);
+  color: #ffffff;
 }
 
 .upload-hero-card .hero-card-sub {
-  color: rgba(253, 240, 213, 0.8);
+  color: rgba(255, 255, 255, 0.9);
 }
 
 .upload-btn-group {
@@ -46,9 +52,9 @@
 }
 
 .btn-hero-dark {
-  background: var(--c-cream);
+  background: #ffffff;
   color: var(--c-navy);
-  border: 2px solid var(--c-cream);
+  border: none !important;
   font-family: var(--font-sans);
   font-size: 0.95rem;
   font-weight: 700;
@@ -63,18 +69,17 @@
 
 .btn-hero-dark:hover {
   background: var(--c-crimson);
-  border-color: var(--c-crimson);
-  color: var(--c-cream);
+  color: #ffffff;
 }
 
 .btn-hero-secondary {
-  background: transparent;
-  color: var(--c-cream);
-  border: 2px solid rgba(253, 240, 213, 0.6);
+  background: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  border: none !important;
   font-family: var(--font-sans);
   font-size: 0.95rem;
   font-weight: 700;
-  padding: 11px 20px;
+  padding: 12px 22px;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -83,19 +88,20 @@
 }
 
 .btn-hero-secondary:hover {
-  background: rgba(253, 240, 213, 0.15);
-  border-color: var(--c-cream);
+  background: rgba(255, 255, 255, 0.28);
 }
 
-/* Active Audio Player inside Left Card */
-.upload-player-content {
+/* --------------------------------------------------------------------------
+   ACTIVE AUDIO METADATA VIEW (Drop Box contains ONLY File Name & Metadata)
+   -------------------------------------------------------------------------- */
+.upload-active-info {
   display: flex;
   flex-direction: column;
   gap: 16px;
   width: 100%;
 }
 
-.player-top-meta {
+.upload-active-top {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -106,29 +112,115 @@
   font-size: 0.72rem;
   font-weight: 700;
   letter-spacing: 0.08em;
-  color: var(--c-cream);
-  background: rgba(253, 240, 213, 0.12);
-  border: 1px solid rgba(253, 240, 213, 0.25);
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.18);
+  border: none !important;
   padding: 4px 10px;
 }
 
 .btn-switch-track {
-  background: transparent;
-  border: 1px solid rgba(253, 240, 213, 0.4);
-  color: var(--c-cream);
+  background: rgba(255, 255, 255, 0.18);
+  border: none !important;
+  color: #ffffff;
   font-size: 0.8rem;
   font-weight: 700;
-  padding: 4px 10px;
+  padding: 5px 12px;
   cursor: pointer;
   transition: all 0.15s ease;
 }
 
 .btn-switch-track:hover {
   background: var(--c-crimson);
-  border-color: var(--c-crimson);
+  color: #ffffff;
 }
 
-.player-main-controls {
+.upload-active-meta-content {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.active-track-name-badge {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(0, 0, 0, 0.15);
+  padding: 12px 16px;
+}
+
+.active-filename-display {
+  font-family: var(--font-sans);
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #ffffff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  letter-spacing: -0.01em;
+}
+
+.active-drop-metadata-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.drop-meta-pill {
+  background: rgba(255, 255, 255, 0.12);
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.drop-meta-label {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.drop-meta-value {
+  font-family: var(--font-mono);
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.drop-replace-hint {
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.8);
+  margin-top: 4px;
+  text-align: center;
+}
+
+/* --------------------------------------------------------------------------
+   FULL-WIDTH CONTAINER: AUDIO PLAYBACK + 5S SLICE
+   Frameless Waveform Visualizer (No outer box around visualizer)
+   -------------------------------------------------------------------------- */
+.playback-hero-card {
+  background-color: var(--c-cream) !important;
+  color: var(--c-navy) !important;
+  border: none !important;
+  margin-top: 28px;
+  padding: 28px 36px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-shadow: 0 4px 16px rgba(0, 48, 73, 0.08);
+}
+
+.playback-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.playback-controls-left {
   display: flex;
   align-items: center;
   gap: 18px;
@@ -140,74 +232,211 @@
   height: 54px;
   background: var(--c-crimson);
   color: var(--c-cream);
-  border: 2px solid var(--c-crimson);
+  border: none !important;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
   transition: transform 0.15s ease, background 0.15s ease;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 4px 12px rgba(193, 18, 31, 0.35);
 }
 
 .hero-play-btn:hover {
-  transform: scale(1.04);
+  transform: scale(1.05);
   background: var(--c-crimson-deep);
 }
 
-.player-track-info {
+.playback-title-wrap {
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  gap: 4px;
 }
 
-.track-title-text {
-  font-family: var(--font-sans);
-  font-size: 1.35rem;
+.playback-section-label {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
   font-weight: 800;
-  color: var(--c-cream);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  letter-spacing: -0.01em;
+  letter-spacing: 0.08em;
+  color: var(--c-navy);
+  opacity: 0.8;
+  text-transform: uppercase;
 }
 
-.track-meta-chips {
+.playback-time-badge-row {
   display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.hero-timecode {
+  font-family: var(--font-mono);
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--c-navy);
+}
+
+.playback-active-slice-tag {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  background: rgba(0, 48, 73, 0.08);
+  color: var(--c-navy);
+  border: none !important;
+}
+
+.playback-active-slice-tag.tag-ai {
+  background: rgba(193, 18, 31, 0.15);
+  color: var(--c-crimson);
+}
+
+.playback-active-slice-tag.tag-human {
+  background: rgba(29, 111, 165, 0.15);
+  color: var(--c-human-blue);
+}
+
+.playback-legend-right {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.playback-legend-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.slice-legend-pill {
+  display: inline-flex;
   align-items: center;
   gap: 6px;
   font-family: var(--font-mono);
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: rgba(253, 240, 213, 0.85);
-  margin-top: 2px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border: none !important;
 }
 
-.meta-dot {
-  opacity: 0.4;
+.slice-legend-pill.pill-ai {
+  background: rgba(193, 18, 31, 0.12);
+  color: var(--c-ai-red);
+}
+
+.slice-legend-pill.pill-human {
+  background: rgba(29, 111, 165, 0.12);
+  color: var(--c-human-blue);
+}
+
+.legend-dot {
+  width: 8px;
+  height: 8px;
+  display: inline-block;
+}
+
+.legend-dot.dot-ai {
+  background: var(--c-ai-red);
+}
+
+.legend-dot.dot-human {
+  background: var(--c-human-blue);
+}
+
+.playback-slices-total-badge {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--c-navy);
+  background: rgba(0, 48, 73, 0.08);
+  padding: 4px 10px;
+  border: none !important;
 }
 
 /* --------------------------------------------------------------------------
-   WAVEFORM SEEK VISUALIZER: NO OUTER SQUARE (FRAMELESS)
+   INTERACTIVE 5S SLICES SEGMENT TRACK
    -------------------------------------------------------------------------- */
-.hero-waveform-seek-container {
+.slices-segments-track {
   display: flex;
-  flex-direction: column;
-  gap: 6px;
-  margin-top: 4px;
+  gap: 4px;
   width: 100%;
+  overflow-x: auto;
+  padding: 4px 0;
 }
 
-/* Outer square removed as requested */
+.slice-seg-tab {
+  flex: 1;
+  min-width: 90px;
+  padding: 8px 10px;
+  font-family: var(--font-mono);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  align-items: center;
+  justify-content: center;
+  border: none !important;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.slice-seg-tab .seg-tab-title {
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.slice-seg-tab .seg-tab-prob {
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+
+.slice-seg-tab .seg-tab-time {
+  font-size: 0.65rem;
+  opacity: 0.8;
+}
+
+/* AI Sounding Segment: Red */
+.slice-seg-tab.seg-ai {
+  background: rgba(193, 18, 31, 0.1);
+  color: var(--c-crimson);
+}
+
+.slice-seg-tab.seg-ai:hover,
+.slice-seg-tab.seg-ai.active-slice {
+  background: var(--c-crimson);
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 3px 8px rgba(193, 18, 31, 0.35);
+}
+
+/* Human Sounding Segment: Blue */
+.slice-seg-tab.seg-human {
+  background: rgba(29, 111, 165, 0.1);
+  color: var(--c-human-blue);
+}
+
+.slice-seg-tab.seg-human:hover,
+.slice-seg-tab.seg-human.active-slice {
+  background: var(--c-human-blue);
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 3px 8px rgba(29, 111, 165, 0.35);
+}
+
+/* --------------------------------------------------------------------------
+   WAVEFORM SEEK VISUALIZER: FRAMELESS (NO OUTER BOX AROUND WAVEFORM)
+   -------------------------------------------------------------------------- */
 .waveform-canvas-wrap {
   position: relative;
   width: 100%;
-  height: 72px;
+  height: 96px;
   background: transparent !important;
   border: none !important;
   box-shadow: none !important;
-  overflow: hidden;
   cursor: pointer;
+  overflow: visible;
 }
 
 .hero-waveform-canvas {
@@ -216,63 +445,100 @@
   display: block;
 }
 
-/* Sharp Playhead Needle */
-.waveform-playhead {
+/* Full-Height Seeking Line */
+.waveform-seeking-line {
   position: absolute;
-  top: 0;
-  bottom: 0;
+  top: -4px;
+  bottom: -4px;
   width: 2px;
-  background: var(--c-crimson);
+  background: var(--c-navy);
   pointer-events: none;
   left: 0;
   transform: translateX(-50%);
   display: block;
-  z-index: 5;
-  box-shadow: 0 0 6px rgba(193, 18, 31, 0.8);
+  z-index: 10;
+  box-shadow: 0 0 6px rgba(0, 48, 73, 0.6);
 }
 
+.seeking-line-handle {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 8px solid var(--c-navy);
+}
+
+/* Hover Cursor Needle & Tooltip */
 .waveform-hover-cursor {
   position: absolute;
   top: 0;
   bottom: 0;
   width: 1px;
-  background: rgba(253, 240, 213, 0.8);
+  background: rgba(0, 48, 73, 0.6);
   pointer-events: none;
   transform: translateX(-50%);
-  z-index: 4;
+  z-index: 8;
 }
 
 .waveform-hover-time {
   position: absolute;
   top: 4px;
-  background: var(--c-navy-dark);
+  background: var(--c-navy);
   color: var(--c-cream);
-  border: 1px solid rgba(253, 240, 213, 0.35);
+  border: none !important;
   font-family: var(--font-mono);
-  font-size: 0.68rem;
+  font-size: 0.7rem;
   font-weight: 700;
-  padding: 2px 6px;
+  padding: 3px 8px;
   pointer-events: none;
   transform: translateX(-50%);
   white-space: nowrap;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
-  z-index: 6;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+  z-index: 12;
 }
 
-.hero-timecode-row {
+/* Bottom Time Axis */
+.waveform-bottom-axis {
+  position: relative;
+  width: 100%;
+  height: 24px;
+  margin-top: 2px;
+}
+
+.axis-tick-wrap {
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
   align-items: center;
+  pointer-events: none;
 }
 
-.hero-timecode {
+.axis-tick-line {
+  width: 1px;
+  height: 5px;
+  background: rgba(0, 48, 73, 0.3);
+}
+
+.axis-tick-label {
   font-family: var(--font-mono);
-  font-size: 0.82rem;
+  font-size: 0.68rem;
   font-weight: 700;
-  color: var(--c-cream);
+  color: var(--c-navy);
+  opacity: 0.75;
+  margin-top: 2px;
 }
 
-.hero-seek-tip {
-  font-size: 0.74rem;
-  color: rgba(253, 240, 213, 0.65);
+.axis-seek-hint {
+  position: absolute;
+  right: 0;
+  top: 4px;
+  font-size: 0.72rem;
+  color: var(--c-navy);
+  opacity: 0.6;
 }

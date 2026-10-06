@@ -8,8 +8,8 @@
 /* Right Card: Audio Metadata */
 .metadata-hero-card {
   background-color: var(--c-cream);
-  border: 2px solid var(--c-navy);
-  box-shadow: none;
+  border: none !important;
+  box-shadow: 0 4px 16px rgba(0, 48, 73, 0.08);
 }
 
 .metadata-card-content {
@@ -148,11 +148,12 @@
 
 .meta-cell {
   background: #ffffff;
-  border: 1.5px solid var(--c-navy);
+  border: none !important;
   padding: 10px 12px;
   display: flex;
   flex-direction: column;
   gap: 3px;
+  box-shadow: 0 1px 4px rgba(0, 48, 73, 0.08);
 }
 
 .meta-cell-label {

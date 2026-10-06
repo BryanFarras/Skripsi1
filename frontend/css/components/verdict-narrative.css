@@ -186,7 +186,7 @@
 
 .stat-cell {
   background: var(--c-navy-deep);
-  border: 1px solid var(--c-border-subtle);
+  border: none !important;
   padding: 12px 14px;
   display: flex;
   flex-direction: column;

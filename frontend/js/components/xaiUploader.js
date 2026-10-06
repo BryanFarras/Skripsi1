@@ -15,7 +15,7 @@ export class AudioUploader {
       browseBtn: document.getElementById('browseBtn'),
       loadDemoBtn: document.getElementById('loadDemoBtn'),
       switchTrackBtn: document.getElementById('switchTrackBtn'),
-      uploadPlayer: document.getElementById('uploadPlayer')
+      uploadActiveInfo: document.getElementById('uploadActiveInfo')
     };
 
     this.init();
@@ -33,10 +33,8 @@ export class AudioUploader {
       this.dom.fileInput?.click();
     });
 
-    this.dom.dropArea?.addEventListener('click', () => {
-      if (this.dom.uploadPlayer && this.dom.uploadPlayer.style.display === 'flex') {
-        return;
-      }
+    this.dom.dropArea?.addEventListener('click', (e) => {
+      if (e.target.closest('button')) return;
       this.dom.fileInput?.click();
     });
 
@@ -67,7 +65,7 @@ export class AudioUploader {
     // 3. Demo Button
     this.dom.loadDemoBtn?.addEventListener('click', (e) => {
       e.stopPropagation();
-      this.analyzeLocalPath('backend/uploads/sample_ai_test.wav');
+      this.analyzeLocalPath('backend/uploads/02f6189c-c03.mp3');
     });
   }
 
