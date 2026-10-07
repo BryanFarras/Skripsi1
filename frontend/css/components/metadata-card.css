@@ -1,179 +1,278 @@
 /* ==========================================================================
-   Audio Metadata Card Component Styles
-   Color Palette: #C1121F (Crimson), #FDF0D5 (Cream), #003049 (Prussian Navy)
-   Typography: Fira Sans
-   Geometry: Sharp Edges (Zero Radius)
+   Song Similarity Search Card Component Styles
+   Replaces original metadata profile with Internet Audio Similarity Retrieval
+   Based on Similarity Song Finder & DISCO.ac acoustic discovery principles
+   Color Palette: Warm Cream (#FDF0D5), Prussian Navy (#003049), Crimson (#C1121F)
    ========================================================================== */
 
-/* Right Card: Audio Metadata */
-.metadata-hero-card {
-  background-color: var(--c-cream);
+.similarity-hero-card {
+  background-color: var(--c-cream) !important;
+  color: var(--c-navy) !important;
   border: none !important;
   box-shadow: 0 4px 16px rgba(0, 48, 73, 0.08);
-}
-
-.metadata-card-content {
-  text-align: center;
+  padding: 24px 28px !important;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 14px;
+  justify-content: flex-start !important;
+  gap: 12px;
+  overflow: hidden;
 }
 
-.local-path-quick-box {
-  width: 100%;
-  max-width: 480px;
-  margin-top: 10px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  text-align: left;
-}
-
-.local-path-label {
-  font-size: 0.78rem;
-  font-weight: 800;
-  color: var(--c-navy);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.local-path-row {
-  display: flex;
-  gap: 8px;
-}
-
-.local-path-input {
-  flex: 1;
-  background: #ffffff;
-  border: 1.5px solid var(--c-navy);
-  padding: 8px 12px;
-  font-family: var(--font-mono);
-  font-size: 0.8rem;
-  color: var(--c-navy);
-}
-
-.local-path-input:focus {
-  outline: none;
-  border-color: var(--c-crimson);
-}
-
-.btn-local-analyze {
-  background: var(--c-navy);
-  color: var(--c-cream);
-  border: 1.5px solid var(--c-navy);
-  font-size: 0.85rem;
-  font-weight: 800;
-  padding: 8px 16px;
-  cursor: pointer;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-  transition: all 0.2s ease;
-}
-
-.btn-local-analyze:hover {
-  background: var(--c-crimson);
-  border-color: var(--c-crimson);
-  color: var(--c-cream);
-}
-
-/* Active Metadata View */
-.metadata-active-content {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  width: 100%;
-}
-
-.metadata-card-header {
+.similarity-card-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 2px solid var(--c-navy);
-  padding-bottom: 10px;
-}
-
-.meta-header-title {
-  font-family: var(--font-sans);
-  font-size: 1.45rem;
-  font-weight: 800;
-  color: var(--c-navy);
-  text-transform: uppercase;
-  letter-spacing: 0.02em;
-}
-
-.meta-header-actions {
-  display: flex;
+  flex-wrap: wrap;
   gap: 8px;
 }
 
-.btn-meta-export {
-  background: transparent;
-  border: 1.5px solid var(--c-navy);
-  color: var(--c-navy);
-  font-family: var(--font-sans);
-  font-size: 0.78rem;
-  font-weight: 800;
-  padding: 6px 12px;
-  cursor: pointer;
+.similarity-header-titles {
   display: flex;
-  align-items: center;
-  gap: 5px;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.similarity-main-title {
+  font-family: var(--font-sans);
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--c-navy);
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+
+.similarity-subtitle {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--c-navy);
+  opacity: 0.75;
+}
+
+.similarity-acoustic-tag {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 800;
+  background: rgba(0, 48, 73, 0.08);
+  color: var(--c-navy);
+  padding: 4px 10px;
+  border: none !important;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* Search Bar Row */
+.similarity-search-row {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+}
+
+.similarity-search-input {
+  flex: 1;
+  background: #ffffff;
+  border: none !important;
+  padding: 8px 12px;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--c-navy);
+  box-shadow: 0 1px 4px rgba(0, 48, 73, 0.06);
+}
+
+.similarity-search-input:focus {
+  outline: 2px solid var(--c-navy);
+}
+
+.btn-similarity-search {
+  background: var(--c-navy);
+  color: var(--c-cream);
+  border: none !important;
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+  font-weight: 800;
+  padding: 8px 14px;
+  cursor: pointer;
   text-transform: uppercase;
   letter-spacing: 0.03em;
-  transition: all 0.2s ease;
+  transition: all 0.15s ease;
+  white-space: nowrap;
 }
 
-.btn-meta-export:hover {
-  background: var(--c-navy);
-  color: var(--c-cream);
-}
-
-.btn-meta-export.export-primary {
-  background: var(--c-navy);
-  color: var(--c-cream);
-  border-color: var(--c-navy);
-}
-
-.btn-meta-export.export-primary:hover {
+.btn-similarity-search:hover {
   background: var(--c-crimson);
-  border-color: var(--c-crimson);
 }
 
-.metadata-chips-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
+.similarity-status-cue {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: var(--c-navy);
+  opacity: 0.75;
 }
 
-.meta-cell {
+/* Similar Tracks List */
+.similarity-matches-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 220px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+/* Individual Song Match Card */
+.sim-track-card {
   background: #ffffff;
   border: none !important;
   padding: 10px 12px;
   display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 1px 4px rgba(0, 48, 73, 0.06);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.sim-track-card:hover {
+  transform: translateX(2px);
+  box-shadow: 0 3px 8px rgba(0, 48, 73, 0.1);
+}
+
+.sim-track-art-wrap {
+  position: relative;
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+  background: rgba(0, 48, 73, 0.05);
+  overflow: hidden;
+}
+
+.sim-track-artwork {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Play Preview Button Overlay */
+.btn-track-preview {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 48, 73, 0.6);
+  color: var(--c-cream);
+  border: none !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.sim-track-art-wrap:hover .btn-track-preview,
+.btn-track-preview.playing {
+  opacity: 1;
+}
+
+.btn-track-preview.playing {
+  background: var(--c-crimson);
+}
+
+.sim-track-info {
+  flex: 1;
+  display: flex;
   flex-direction: column;
-  gap: 3px;
-  box-shadow: 0 1px 4px rgba(0, 48, 73, 0.08);
+  gap: 2px;
+  overflow: hidden;
 }
 
-.meta-cell-label {
-  font-family: var(--font-mono);
-  font-size: 0.68rem;
+.sim-track-top-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.sim-track-title {
+  font-family: var(--font-sans);
+  font-size: 0.92rem;
   font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--c-navy);
-  opacity: 0.8;
-}
-
-.meta-cell-val {
-  font-family: var(--font-mono);
-  font-size: 0.88rem;
-  font-weight: 700;
   color: var(--c-navy);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
+.sim-match-badge {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 800;
+  background: rgba(29, 111, 165, 0.15);
+  color: var(--c-human-blue, #1D6FA5);
+  padding: 2px 6px;
+  white-space: nowrap;
+}
 
+.sim-track-artist-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--c-navy);
+  opacity: 0.85;
+}
+
+.sim-track-artist {
+  font-weight: 700;
+}
+
+.sim-meta-dot {
+  opacity: 0.4;
+}
+
+.sim-track-genre {
+  opacity: 0.75;
+}
+
+.sim-why-text {
+  font-size: 0.72rem;
+  line-height: 1.35;
+  color: var(--c-navy);
+  opacity: 0.8;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sim-why-label {
+  font-weight: 800;
+}
+
+.btn-sim-external {
+  color: var(--c-navy);
+  opacity: 0.6;
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.15s ease, color 0.15s ease;
+  flex-shrink: 0;
+}
+
+.btn-sim-external:hover {
+  opacity: 1;
+  color: var(--c-crimson);
+}
+
+.sim-empty-state {
+  padding: 24px;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--c-navy);
+  opacity: 0.7;
+}

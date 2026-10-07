@@ -30,6 +30,8 @@
           <button type="button" class="editorial-nav-btn" id="btnHowItWorks">How does it work?</button>
           <button type="button" class="editorial-nav-btn" id="btnAbstract">Abstract</button>
           <button type="button" class="editorial-nav-btn" id="btnPaper">Paper</button>
+          <button type="button" class="editorial-nav-btn" id="exportPlotBtn" title="Export 200 DPI Skripsi publication figure">Plot (200 DPI)</button>
+          <button type="button" class="editorial-nav-btn" id="exportJsonBtn" title="Download TreeSHAP explanation in JSON">JSON</button>
           <a href="/visualizer" class="editorial-nav-btn visualizer-pill-link" title="Open High-Resolution Spectrogram Visualizer">
             <span>Spectrogram Visualizer</span>
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
@@ -44,7 +46,7 @@
       <!-- Upper Grid: Upload Card & Audio Metadata Card -->
       <div class="xai-hero-grid">
         
-        <!-- LEFT CARD: Upload Audio Clip Here (Slate/Cerulean Blue) -->
+        <!-- LEFT CARD: Upload Audio Clip Here & Metadata (Slate/Cerulean Blue) -->
         <div class="hero-card upload-hero-card" id="dropArea">
           <input type="file" id="fileInput" accept=".wav,.mp3,.flac,.ogg,.m4a" style="display: none;">
 
@@ -116,76 +118,26 @@
 
         </div>
 
-        <!-- RIGHT CARD: Audio Metadata Here (Warm Cream) -->
-        <div class="hero-card metadata-hero-card" id="metadataCard">
-          
-          <!-- Standby View when empty -->
-          <div class="metadata-card-content" id="metadataPrompt">
-            <h2 class="hero-card-title">Audio Metadata Here</h2>
-            <p class="hero-card-sub">110-D physical acoustic dimensions, temporal slices, and audio parameters will appear here.</p>
-            
-            <div class="local-path-quick-box">
-              <label for="localPathInput" class="local-path-label">Inspect local track path directly:</label>
-              <div class="local-path-row">
-                <input type="text" id="localPathInput" class="local-path-input" placeholder="backend/uploads/sample_ai_test.wav" />
-                <button type="button" id="analyzePathBtn" class="btn-local-analyze">Analyze</button>
-              </div>
+        <!-- RIGHT CARD: Song Similarity (Warm Cream) -->
+        <div class="hero-card similarity-hero-card" id="similarityCard">
+          <div class="similarity-card-header">
+            <div class="similarity-header-titles">
+              <h2 class="similarity-main-title">Songs That Sounded Similar (Still In Progress)</h2>
+              <span class="similarity-subtitle">Internet Audio Match & Acoustic Retrieval</span>
             </div>
+            <span class="similarity-acoustic-tag" id="simAcousticTag">Acoustic Search</span>
           </div>
 
-          <!-- Active Metadata View when loaded -->
-          <div class="metadata-active-content" id="metadataActive" style="display: none;">
-            <div class="metadata-card-header">
-              <h3 class="meta-header-title">Audio Signal Profile</h3>
-              <div class="meta-header-actions">
-                <button id="exportJsonBtn" class="btn-meta-export" title="Download TreeSHAP explanation in JSON">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                    <polyline points="7 10 12 15 17 10"></polyline>
-                    <line x1="12" y1="15" x2="12" y2="3"></line>
-                  </svg>
-                  JSON
-                </button>
-                <button id="exportPlotBtn" class="btn-meta-export export-primary" title="Export 200 DPI Skripsi publication figure">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                    <circle cx="8.5" cy="8.5" r="1.5"></circle>
-                    <polyline points="21 15 16 10 5 21"></polyline>
-                  </svg>
-                  Plot (200 DPI)
-                </button>
-              </div>
-            </div>
-
-            <div class="metadata-chips-grid">
-              <div class="meta-cell">
-                <span class="meta-cell-label">File Format</span>
-                <span class="meta-cell-val" id="metaValFormat">WAV / PCM</span>
-              </div>
-              <div class="meta-cell">
-                <span class="meta-cell-label">Sample Rate</span>
-                <span class="meta-cell-val" id="metaValSr">44.1 kHz (Decoded 22.05k)</span>
-              </div>
-              <div class="meta-cell">
-                <span class="meta-cell-label">Duration</span>
-                <span class="meta-cell-val" id="metaValDuration">--s</span>
-              </div>
-              <div class="meta-cell">
-                <span class="meta-cell-label">Temporal Window</span>
-                <span class="meta-cell-val" id="metaValWindow">5.0s Contiguous</span>
-              </div>
-              <div class="meta-cell">
-                <span class="meta-cell-label">Feature Space</span>
-                <span class="meta-cell-val" id="metaValFeatures">110 Acoustic Dims</span>
-              </div>
-              <div class="meta-cell">
-                <span class="meta-cell-label">Classifier Engine</span>
-                <span class="meta-cell-val">Random Forest Champion</span>
-              </div>
-            </div>
-
+          <div class="similarity-search-row">
+            <input type="text" id="simSearchInput" class="similarity-search-input" placeholder="Search reference track or artist on web..." />
+            <button type="button" id="simSearchBtn" class="btn-similarity-search">Search Online</button>
           </div>
 
+          <span class="similarity-status-cue" id="simStatusCue">Scanning internet audio databases for matches...</span>
+
+          <div class="similarity-matches-list" id="simMatchesList">
+            <!-- Dynamically populated with real matching tracks -->
+          </div>
         </div>
 
       </div>

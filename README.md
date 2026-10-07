@@ -162,12 +162,16 @@ MY-AIDETECTOR/
 │   └── reports/                        # Markdown benchmark reports
 ├── misc/
 │   ├── app document/                   # Research notes, model guides, XAI documentation
-├── split_stems.py                      # Standalone 5-stem neural separation CLI
-├── run_server.py                       # Python launcher with automatic browser opening
-├── run_visualizer.bat                  # Windows batch launcher
-├── start_app.bat                       # One-click Windows starter
-├── start_app.ps1                       # PowerShell launcher
-├── test_backend.py                     # Automated end-to-end backend test suite
+├── requirements.txt                # Master dependencies specification
+├── install_dependencies.bat        # One-click Windows automated dependency installer
+├── install_dependencies.ps1        # PowerShell automated installer with CUDA/GPU auto-detection
+├── verify_env.py                   # Automated dependency & hardware diagnostic script
+├── split_stems.py                  # Standalone 5-stem neural separation CLI
+├── run_server.py                   # Python launcher with automatic browser opening
+├── run_visualizer.bat              # Windows batch launcher
+├── start_app.bat                   # One-click Windows starter
+├── start_app.ps1                   # PowerShell launcher
+├── test_backend.py                 # Automated end-to-end backend test suite
 └── README.md
 ```
 
@@ -183,15 +187,51 @@ MY-AIDETECTOR/
 
 ### 2. Environment Setup
 
-Follow the steps below to configure a complete virtual environment with all core, forensic ML/XAI, and stem separation dependencies:
+#### Option A: Automated Installation (Recommended for Windows)
 
-#### Step A: Clone & Navigate
+The repository provides automated installation scripts that handle Python virtual environment creation, FFmpeg detection, NVIDIA CUDA GPU detection, PyTorch acceleration setup, dependency installation, and end-to-end verification in a single step:
+
+**One-Click Batch Launcher:**
+```cmd
+double-click install_dependencies.bat
+```
+
+**PowerShell Launcher:**
+```powershell
+.\install_dependencies.ps1
+```
+
+*Optional installation switches for PowerShell:*
+```powershell
+# Force CPU-only installation (skip NVIDIA CUDA check):
+.\install_dependencies.ps1 -CpuOnly
+
+# Specify CUDA target (e.g. cu121 or cu118, default: cu121):
+.\install_dependencies.ps1 -CudaVersion cu121
+
+# Skip PyTorch reinstallation if already present in environment:
+.\install_dependencies.ps1 -SkipPyTorch
+```
+
+**Run Environment Diagnostics Anytime:**
+```powershell
+python verify_env.py
+```
+
+---
+
+#### Option B: Manual Step-by-Step Installation
+
+Follow the steps below to manually configure your environment (cross-platform / Linux / macOS):
+
+##### Step 1: Clone & Navigate
 
 ```powershell
 git clone https://github.com/BryanFarras/Skripsi1.git
+cd Skripsi1/APPS/MY-AIDETECTOR
 ```
 
-#### Step B: Create & Activate Virtual Environment
+##### Step 2: Create & Activate Virtual Environment
 
 **Windows (PowerShell):**
 
@@ -207,7 +247,7 @@ python3 -m venv .venv
 source .venv/bin/activate
 ```
 
-#### Step C: Install FFmpeg (If not already installed)
+##### Step 3: Install FFmpeg (If not already installed)
 
 - **Windows (winget):** `winget install Gyan.FFmpeg`
 - **Windows (Chocolatey):** `choco install ffmpeg`
@@ -216,7 +256,7 @@ source .venv/bin/activate
 
 _Verify by running `ffmpeg -version` in your terminal._
 
-#### Step D: Install PyTorch (Demucs & Neural Processing Backend)
+##### Step 4: Install PyTorch (Demucs & Neural Processing Backend)
 
 Choose the command matching your hardware setup:
 
@@ -233,30 +273,20 @@ Choose the command matching your hardware setup:
   pip install torch torchaudio
   ```
 
-#### Step E: Install Application, ML/XAI, & Demucs Dependencies
-
-Install the backend server, signal processing, machine learning, explainability engine (TreeSHAP), and stem separation tool:
+##### Step 5: Install Master Dependencies
 
 ```powershell
 # 1. Upgrade pip, setuptools, and wheel
 python -m pip install --upgrade pip setuptools wheel
 
-# 2. Install FastAPI backend dependencies
-pip install -r backend/requirements.txt
-
-# 3. Install ML, DSP, Feature Extraction & TreeSHAP XAI
-pip install scikit-learn librosa scipy joblib soundfile matplotlib pandas shap
-
-# 4. Install Meta Demucs for 5-stem neural separation
-pip install demucs
+# 2. Install all core REST, Audio DSP, TreeSHAP, and Demucs dependencies
+pip install -r requirements.txt
 ```
 
-#### Step F: Verify Environment Installation
-
-Run this one-liner to verify that all core modules and hardware acceleration are properly detected:
+##### Step 6: Verify Environment Installation
 
 ```powershell
-python -c "import torch, demucs, shap, librosa, fastapi; print(f'CUDA Available: {torch.cuda.is_available()} | Device: {torch.cuda.get_device_name(0) if torch.cuda.is_available() else \"CPU\"}'); print('Environment verification successful!')"
+python verify_env.py
 ```
 
 ---

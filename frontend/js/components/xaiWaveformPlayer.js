@@ -283,10 +283,8 @@ export class WaveformAudioPlayer {
           <span class="axis-tick-label">${sec.toFixed(0)}s</span>
         </div>
       `;
-      if (sec >= duration) break;
     }
 
-    html += `<span class="axis-seek-hint">Click or drag across 5s segments to seek</span>`;
     this.dom.waveformAxis.innerHTML = html;
   }
 

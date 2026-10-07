@@ -18,6 +18,7 @@ from ..services.visualizer_service import (
     render_publication_plot
 )
 from ..services.detector_service import extract_forensic_metrics
+from ..services.similarity_service import derive_acoustic_profile, search_internet_similar_songs
 from ..services.stem_service import StemService
 from ..models.schemas import AnalysisResponse, AudioMetadata
 
@@ -118,12 +119,20 @@ async def upload_audio_file(request: Request):
     forensics = extract_forensic_metrics(audio, sr)
     ml_result = run_ml_inference(audio, sr)
 
+    # Compute Song Similarity matches via internet search
+    acoustic_profile = derive_acoustic_profile(forensics, tonal_bal, original_filename)
+    similar_matches = search_internet_similar_songs(acoustic_profile["search_term"], acoustic_profile, limit=4)
+    similar_data = {"profile": acoustic_profile, "matches": similar_matches}
+
     _AUDIO_CACHE[file_id] = {
         "audio": audio,
         "sample_rate": sr,
         "metadata": metadata,
         "file_path": save_path,
-        "ml_result": ml_result
+        "ml_result": ml_result,
+        "forensics": forensics,
+        "tonal_balance": tonal_bal,
+        "similar_data": similar_data
     }
 
     return AnalysisResponse(
@@ -133,7 +142,8 @@ async def upload_audio_file(request: Request):
         spectrogram=spectro,
         waterfall_3d=waterfall_3d,
         forensics=forensics,
-        ml_detector=ml_result
+        ml_detector=ml_result,
+        similar_songs=similar_data
     )
 
 @router.post("/analyze-local-path")
@@ -171,12 +181,20 @@ async def analyze_local_path(payload: dict):
     forensics = extract_forensic_metrics(audio, sr)
     ml_result = run_ml_inference(audio, sr)
 
+    # Compute Song Similarity matches via internet search
+    acoustic_profile = derive_acoustic_profile(forensics, tonal_bal, file_path.name)
+    similar_matches = search_internet_similar_songs(acoustic_profile["search_term"], acoustic_profile, limit=4)
+    similar_data = {"profile": acoustic_profile, "matches": similar_matches}
+
     _AUDIO_CACHE[file_id] = {
         "audio": audio,
         "sample_rate": sr,
         "metadata": metadata,
         "file_path": file_path,
-        "ml_result": ml_result
+        "ml_result": ml_result,
+        "forensics": forensics,
+        "tonal_balance": tonal_bal,
+        "similar_data": similar_data
     }
 
     return AnalysisResponse(
@@ -186,8 +204,30 @@ async def analyze_local_path(payload: dict):
         spectrogram=spectro,
         waterfall_3d=waterfall_3d,
         forensics=forensics,
-        ml_detector=ml_result
+        ml_detector=ml_result,
+        similar_songs=similar_data
     )
+
+@router.get("/similar-songs")
+async def get_similar_songs(file_id: Optional[str] = None, query: Optional[str] = None, limit: int = 4):
+    """
+    Searches the internet for matching songs sounding acoustically similar to the audio.
+    Supports user custom keyword queries as well as automatic feature retrieval.
+    """
+    cached = _AUDIO_CACHE.get(file_id) if file_id else None
+    forensics = cached.get("forensics") if cached else None
+    tonal = cached.get("tonal_balance") if cached else None
+    fname = cached["metadata"].original_filename if (cached and cached.get("metadata")) else ""
+
+    profile = derive_acoustic_profile(forensics, tonal, filename=fname)
+    search_q = query or profile.get("search_term", "synthwave")
+    matches = search_internet_similar_songs(search_q, profile, limit=limit)
+    return {
+        "status": "success",
+        "query": search_q,
+        "profile": profile,
+        "matches": matches
+    }
 
 @router.get("/audio/{file_id}")
 async def stream_audio_file(file_id: str, request: Request):

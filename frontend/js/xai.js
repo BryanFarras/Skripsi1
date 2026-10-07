@@ -9,6 +9,7 @@ import { MetadataInspector } from './components/xaiMetadata.js';
 import { ForensicVerdictManager } from './components/xaiVerdict.js';
 import { SignificantFeaturesManager } from './components/xaiSignificantFeatures.js';
 import { AudioUploader } from './components/xaiUploader.js';
+import { SongSimilarityManager } from './components/xaiSongSimilarity.js';
 
 // Global Reactive State
 const state = {
@@ -67,7 +68,10 @@ document.addEventListener('DOMContentLoaded', () => {
     hideLoading
   );
 
-  // 6. Audio Uploader (Drag & Drop, File Picker, Sample Loader)
+  // 6. Song Similarity Manager (Internet audio match & acoustic retrieval)
+  const similarityManager = new SongSimilarityManager(state);
+
+  // 7. Audio Uploader (Drag & Drop, File Picker, Sample Loader)
   uploader = new AudioUploader(
     (analysisData, rawBuffer) => {
       handleAnalysisSuccess(analysisData, rawBuffer);
@@ -105,6 +109,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Update metadata profile
     metadataInspector.render(data.metadata, totalSlices);
+
+    // Update song similarity matches from web
+    if (data.similar_songs) {
+      similarityManager.render(data.similar_songs);
+    } else {
+      similarityManager.performSearch();
+    }
 
     // Update verdict, synthesis narrative and timeline
     verdictManager.renderAll(data.ml_detector, state.xai);

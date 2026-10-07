@@ -102,4 +102,5 @@ class AnalysisResponse(BaseModel):
     waterfall_3d: Optional[Waterfall3DData] = None
     forensics: AIForensicMetrics
     ml_detector: Optional[MLDetectorResult] = None
+    similar_songs: Optional[Dict[str, Any]] = None
 

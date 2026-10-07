@@ -1,0 +1,28 @@
+# ==============================================================================
+# AI Music Detector — Master Requirements Specification
+# Core Backend, Audio DSP, Explainable AI (TreeSHAP), & Neural Stem Separation
+# ==============================================================================
+
+# REST API & Web Backend
+fastapi>=0.104.0
+uvicorn[standard]>=0.24.0
+pydantic>=2.0.0
+python-multipart>=0.0.6
+requests>=2.31.0
+
+# Numerical & Digital Signal Processing (DSP)
+numpy>=1.24.0
+scipy>=1.11.0
+soundfile>=0.12.0
+librosa>=0.10.0
+matplotlib>=3.7.0
+
+# Machine Learning & Explainable AI (XAI)
+scikit-learn>=1.3.0
+pandas>=2.0.0
+joblib>=1.3.0
+shap>=0.42.0
+
+# Neural Multi-Stem Source Separation (Meta Demucs v4)
+# Note: PyTorch (torch, torchaudio) is managed matching system CUDA or CPU
+demucs>=4.0.0
