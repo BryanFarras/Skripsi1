@@ -230,7 +230,7 @@
 .hero-play-btn {
   width: 54px;
   height: 54px;
-  background: var(--c-crimson);
+  background: var(--c-forensic-red, #C1121F);
   color: var(--c-cream);
   border: none !important;
   cursor: pointer;
@@ -244,7 +244,7 @@
 
 .hero-play-btn:hover {
   transform: scale(1.05);
-  background: var(--c-crimson-deep);
+  background: var(--c-forensic-red-deep, #8a0d16);
 }
 
 .playback-title-wrap {
@@ -288,7 +288,7 @@
 
 .playback-active-slice-tag.tag-ai {
   background: rgba(193, 18, 31, 0.15);
-  color: var(--c-crimson);
+  color: var(--c-forensic-red, #C1121F);
 }
 
 .playback-active-slice-tag.tag-human {
@@ -321,7 +321,7 @@
 
 .slice-legend-pill.pill-ai {
   background: rgba(193, 18, 31, 0.12);
-  color: var(--c-ai-red);
+  color: var(--c-forensic-red, #C1121F);
 }
 
 .slice-legend-pill.pill-human {
@@ -336,7 +336,7 @@
 }
 
 .legend-dot.dot-ai {
-  background: var(--c-ai-red);
+  background: var(--c-forensic-red, #C1121F);
 }
 
 .legend-dot.dot-human {
@@ -400,12 +400,12 @@
 /* AI Sounding Segment: Red */
 .slice-seg-tab.seg-ai {
   background: rgba(193, 18, 31, 0.1);
-  color: var(--c-crimson);
+  color: var(--c-forensic-red, #C1121F);
 }
 
 .slice-seg-tab.seg-ai:hover,
 .slice-seg-tab.seg-ai.active-slice {
-  background: var(--c-crimson);
+  background: var(--c-forensic-red, #C1121F);
   color: #ffffff;
   transform: translateY(-2px);
   box-shadow: 0 3px 8px rgba(193, 18, 31, 0.35);

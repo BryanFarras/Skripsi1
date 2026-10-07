@@ -16,18 +16,18 @@
 
 :root {
   /* -------------------------------------------------------------------------
-     3-COLOR SYSTEM (#C1121F, #FDF0D5, #003049)
+     3-COLOR SYSTEM (#FFAFCC Pink, #FDF0D5 Cream, #003049 Prussian Navy)
      ------------------------------------------------------------------------- */
-  --c-crimson:        #C1121F;
-  --c-crimson-vivid:  #C1121F;
-  --c-crimson-deep:   #8a0d16;
-  --c-crimson-soft:   rgba(193, 18, 31, 0.16);
+  --c-crimson:        #ff6ea3;
+  --c-crimson-vivid:  #ff6ea3;
+  --c-crimson-deep:   #9b3857;
+  --c-crimson-soft:   rgba(255, 175, 204, 0.22);
 
   --c-cream:          #FDF0D5;
   --c-cream-warm:     #FDF0D5;
   --c-cream-soft:     #FDF0D5;
 
-  --c-navy:           #003049;
+  --c-navy:           #043550;
   --c-navy-prussian:  #003049;
   --c-navy-dark:      #002438;
   --c-navy-deep:      #001a29;
@@ -44,8 +44,15 @@
   --c-human-blue:     #1D6FA5;
   --c-human-blue-soft: rgba(29, 111, 165, 0.12);
 
+  /* Forensic Waveform & 5s Slice Audio Segments (Original Red & Blue) */
+  --c-forensic-red:       #C1121F;
+  --c-forensic-red-deep:  #8a0d16;
+  --c-forensic-red-soft:  rgba(193, 18, 31, 0.15);
+  --c-forensic-red-pill:  rgba(193, 18, 31, 0.12);
+  --c-forensic-red-tint:  rgba(193, 18, 31, 0.09);
+
   --c-ai-red:         var(--c-crimson);
-  --c-ai-red-soft:    rgba(193, 18, 31, 0.2);
+  --c-ai-red-soft:    rgba(255, 175, 204, 0.25);
   --c-ai-red-dark:    var(--c-crimson-deep);
 
   --c-human-teal:     var(--c-cream);
