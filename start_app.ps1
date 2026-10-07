@@ -10,16 +10,22 @@ Write-Host ""
 
 # Find Python
 $PythonCmd = $null
-if (Test-Path "$PSScriptRoot\..\..\.venv\Scripts\python.exe") {
+if (Test-Path "$PSScriptRoot\.venv\Scripts\python.exe") {
+    $PythonCmd = "$PSScriptRoot\.venv\Scripts\python.exe"
+} elseif (Test-Path "$PSScriptRoot\..\..\.venv\Scripts\python.exe") {
     $PythonCmd = "$PSScriptRoot\..\..\.venv\Scripts\python.exe"
 } elseif (Test-Path "..\..\.venv\Scripts\python.exe") {
     $PythonCmd = "..\..\.venv\Scripts\python.exe"
+} elseif (Get-Command "py" -ErrorAction SilentlyContinue) {
+    # Check py -3.12, py -3.11, py -3.10 first
+    $pyCheck = & py -3.12 -c "import sys; print(1)" 2>$null
+    if ($pyCheck -eq "1") {
+        $PythonCmd = "py -3.12"
+    } else {
+        $PythonCmd = "py -3"
+    }
 } elseif (Get-Command "python" -ErrorAction SilentlyContinue) {
     $PythonCmd = "python"
-} elseif (Get-Command "py" -ErrorAction SilentlyContinue) {
-    $PythonCmd = "py -3"
-} elseif (Test-Path "..\ACE-Step-1.5\python_embeded\python.exe") {
-    $PythonCmd = "..\ACE-Step-1.5\python_embeded\python.exe"
 }
 
 if (-not $PythonCmd) {

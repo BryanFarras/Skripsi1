@@ -11,7 +11,13 @@ echo.
 :: Detect Python executable
 set "PYTHON_EXE="
 
-:: 0. Try Skripsi virtual environment (Recommended)
+:: 0. Try local .venv in application directory (Standalone install)
+if exist "%~dp0.venv\Scripts\python.exe" (
+    set "PYTHON_EXE=%~dp0.venv\Scripts\python.exe"
+    goto :FOUND_PYTHON
+)
+
+:: 0b. Try Skripsi workspace virtual environment (Workspace repo)
 if exist "%~dp0..\..\.venv\Scripts\python.exe" (
     set "PYTHON_EXE=%~dp0..\..\.venv\Scripts\python.exe"
     goto :FOUND_PYTHON

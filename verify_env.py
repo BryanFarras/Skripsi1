@@ -33,10 +33,10 @@ def main():
 
     # 1. Python Version
     py_ver = f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
-    if sys.version_info >= (3, 10):
-        print(f" [PASS] Python Version:        {py_ver} (Supported)")
+    if sys.version_info >= (3, 10) and sys.version_info < (3, 13):
+        print(f" [PASS] Python Version:        {py_ver} (Supported: 3.10 - 3.12)")
     else:
-        print(f" [FAIL] Python Version:        {py_ver} (Requires 3.10+)")
+        print(f" [FAIL] Python Version:        {py_ver} (Incompatible: PyTorch & Demucs require Python 3.10 - 3.12)")
         all_passed = False
 
     # 2. FFmpeg Executable

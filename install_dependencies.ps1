@@ -5,7 +5,7 @@
 [CmdletBinding()]
 param(
     [switch]$CpuOnly = $false,
-    [ValidateSet("cu121", "cu118")]
+    [ValidateSet("cu121", "cu124", "cu118")]
     [string]$CudaVersion = "cu121",
     [switch]$SkipPyTorch = $false,
     [string]$VenvPath = ""
@@ -40,6 +40,50 @@ function Write-Err($text) {
     Write-Host "[ERROR] $text" -ForegroundColor Red
 }
 
+function Get-CompatiblePythonCommand {
+    $candidates = @(
+        @{ Exe = "py"; Arg = "-3.12" },
+        @{ Exe = "py"; Arg = "-3.11" },
+        @{ Exe = "py"; Arg = "-3.10" },
+        @{ Exe = "python3.12"; Arg = "" },
+        @{ Exe = "python3.11"; Arg = "" },
+        @{ Exe = "python3.10"; Arg = "" },
+        @{ Exe = "python"; Arg = "" },
+        @{ Exe = "py"; Arg = "-3" }
+    )
+
+    foreach ($c in $candidates) {
+        $exe = $c.Exe
+        $arg = $c.Arg
+        if (-not (Get-Command $exe -ErrorAction SilentlyContinue)) { continue }
+
+        try {
+            $ver = if ($arg) {
+                & $exe $arg -c "import sys; print(sys.version.split()[0])" 2>$null
+            } else {
+                & $exe -c "import sys; print(sys.version.split()[0])" 2>$null
+            }
+
+            if ($ver) {
+                $ver = $ver.Trim()
+                $parts = $ver.Split('.')
+                if ($parts.Count -ge 2) {
+                    $maj = [int]$parts[0]
+                    $min = [int]$parts[1]
+                    if ($maj -eq 3 -and $min -ge 10 -and $min -le 12) {
+                        return @{
+                            Exe = $exe
+                            Arg = $arg
+                            Version = $ver
+                        }
+                    }
+                }
+            }
+        } catch {}
+    }
+    return $null
+}
+
 Write-Header "AI MUSIC DETECTOR - DEPENDENCY INSTALLER AND ENVIRONMENT SETUP"
 
 # ------------------------------------------------------------------------------
@@ -51,49 +95,106 @@ $PythonBin = $null
 $PipBin = $null
 $ActiveVenv = $null
 
-if ($VenvPath -and (Test-Path "$VenvPath\Scripts\python.exe")) {
-    $ActiveVenv = (Resolve-Path $VenvPath).Path
-} elseif (Test-Path "$ScriptDir\.venv\Scripts\python.exe") {
-    $ActiveVenv = (Resolve-Path "$ScriptDir\.venv").Path
-} elseif (Test-Path "$ScriptDir\..\..\.venv\Scripts\python.exe") {
-    $ActiveVenv = (Resolve-Path "$ScriptDir\..\..\.venv").Path
+# Check potential existing virtual environments
+$CandidatesVenv = @()
+if ($VenvPath) { $CandidatesVenv += $VenvPath }
+if (Test-Path "$ScriptDir\.venv\Scripts\python.exe") { $CandidatesVenv += "$ScriptDir\.venv" }
+if (Test-Path "$ScriptDir\..\..\.venv\Scripts\python.exe") { $CandidatesVenv += "$ScriptDir\..\..\.venv" }
+
+foreach ($v in $CandidatesVenv) {
+    if (-not $v) { continue }
+    $pyCandidate = "$v\Scripts\python.exe"
+    if (Test-Path $pyCandidate) {
+        try {
+            $ver = & $pyCandidate -c "import sys; print(sys.version.split()[0])" 2>$null
+            if ($ver) {
+                $ver = $ver.Trim()
+                $parts = $ver.Split('.')
+                $maj = [int]$parts[0]
+                $min = [int]$parts[1]
+                if ($maj -eq 3 -and $min -ge 10 -and $min -le 12) {
+                    $ActiveVenv = (Resolve-Path $v).Path
+                    Write-Success "Found compatible virtual environment: $ActiveVenv (Python v$ver)"
+                    break
+                } else {
+                    Write-Warn "Virtual environment at $v uses Python v$ver (incompatible: requires Python 3.10 - 3.12)."
+                }
+            }
+        } catch {}
+    }
 }
 
 if ($ActiveVenv) {
     $PythonBin = "$ActiveVenv\Scripts\python.exe"
     $PipBin = "$ActiveVenv\Scripts\pip.exe"
-    Write-Success "Found existing virtual environment: $ActiveVenv"
 } else {
-    Write-Host "[*] No existing virtual environment found. Searching for system Python..."
-    $SysPython = $null
-    if (Get-Command "python" -ErrorAction SilentlyContinue) {
-        $SysPython = "python"
-    } elseif (Get-Command "py" -ErrorAction SilentlyContinue) {
-        $SysPython = "py -3"
-    }
+    Write-Host "[*] Searching for a compatible system Python (Python 3.10, 3.11, or 3.12)..." -ForegroundColor Cyan
+    $CompatPython = Get-CompatiblePythonCommand
 
-    if (-not $SysPython) {
-        Write-Err "Python was not found on your system PATH."
-        Write-Host "Please install Python 3.10+ from https://www.python.org/ or via winget: winget install Python.Python.3.11"
+    if ($CompatPython) {
+        $cExe = $CompatPython.Exe
+        $cArg = $CompatPython.Arg
+        $cVer = $CompatPython.Version
+        Write-Success "Found compatible system Python: $cExe $cArg (v$cVer)"
+
+        $NewVenv = "$ScriptDir\.venv"
+        if (Test-Path $NewVenv) {
+            Write-Host "[*] Removing incompatible virtual environment at: $NewVenv" -ForegroundColor Yellow
+            try {
+                Remove-Item -Recurse -Force $NewVenv -ErrorAction SilentlyContinue
+            } catch {
+                Write-Warn "Could not automatically remove old .venv. Please close running Python processes and try again."
+            }
+        }
+
+        Write-Host "[*] Creating new virtual environment with Python v$cVer at: $NewVenv" -ForegroundColor Cyan
+        if ($cArg) {
+            & $cExe $cArg -m venv "$NewVenv"
+        } else {
+            & $cExe -m venv "$NewVenv"
+        }
+
+        if ($LASTEXITCODE -ne 0 -or -not (Test-Path "$NewVenv\Scripts\python.exe")) {
+            Write-Err "Failed to create virtual environment using $cExe $cArg."
+            exit 1
+        }
+
+        $ActiveVenv = (Resolve-Path $NewVenv).Path
+        $PythonBin = "$ActiveVenv\Scripts\python.exe"
+        $PipBin = "$ActiveVenv\Scripts\pip.exe"
+        Write-Success "Created compatible virtual environment: $ActiveVenv"
+    } else {
+        # Check whatever system python is installed to show a helpful message
+        $AnyVer = $null
+        try {
+            $AnyVer = & python -c "import sys; print(sys.version.split()[0])" 2>$null
+        } catch {}
+        if (-not $AnyVer) {
+            try { $AnyVer = & py -c "import sys; print(sys.version.split()[0])" 2>$null } catch {}
+        }
+
+        Write-Host ""
+        Write-Err "Incompatible Python version detected ($AnyVer)."
+        Write-Host "    Machine Learning and Audio DSP libraries (PyTorch, TorchAudio, Demucs," -ForegroundColor Yellow
+        Write-Host "    Librosa, SHAP, and Numba) currently require Python 3.10, 3.11, or 3.12." -ForegroundColor Yellow
+        Write-Host "    Pre-compiled C++/CUDA wheels do NOT exist for Python 3.13 or 3.14 yet." -ForegroundColor Yellow
+        Write-Host ""
+        Write-Host "HOW TO RESOLVE ON WINDOWS (Takes 1-2 minutes):" -ForegroundColor Cyan
+        Write-Host "  1. Open PowerShell or Command Prompt." -ForegroundColor Cyan
+        Write-Host "  2. Install Python 3.12 via Windows Package Manager:" -ForegroundColor Cyan
+        Write-Host "         winget install Python.Python.3.12" -ForegroundColor Green
+        Write-Host "     (or download the official installer: https://www.python.org/downloads/release/python-3129/)" -ForegroundColor Gray
+        Write-Host "  3. If an incompatible .venv exists, delete it:" -ForegroundColor Cyan
+        Write-Host "         Remove-Item -Recurse -Force .venv" -ForegroundColor Green
+        Write-Host "  4. Re-run this installer:" -ForegroundColor Cyan
+        Write-Host "         .\install_dependencies.ps1" -ForegroundColor Green
+        Write-Host ""
         exit 1
     }
-
-    $NewVenv = "$ScriptDir\.venv"
-    Write-Host "[*] Creating new virtual environment at: $NewVenv" -ForegroundColor Cyan
-    & $SysPython -m venv "$NewVenv"
-    if ($LASTEXITCODE -ne 0 -or -not (Test-Path "$NewVenv\Scripts\python.exe")) {
-        Write-Err "Failed to create virtual environment."
-        exit 1
-    }
-
-    $ActiveVenv = (Resolve-Path $NewVenv).Path
-    $PythonBin = "$ActiveVenv\Scripts\python.exe"
-    $PipBin = "$ActiveVenv\Scripts\pip.exe"
-    Write-Success "Created virtual environment: $ActiveVenv"
 }
 
-$PyVersion = & $PythonBin -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}')"
-Write-Success "Python Executable: $PythonBin (v$PyVersion)"
+$PyVersion = & $PythonBin -c "import sys; print(sys.version.split()[0])"
+Write-Success "Active Python: $PythonBin (v$PyVersion)"
 
 # ------------------------------------------------------------------------------
 # STEP 2: Check FFmpeg Availability
@@ -136,7 +237,7 @@ Write-Step "4/6" "Configuring PyTorch and Neural Backend (Demucs Engine)..."
 
 $TorchInstalled = $false
 try {
-    $TorchCheck = & $PythonBin -c "import torch; print(f'{torch.__version__}|{torch.cuda.is_available()}')" 2>$null
+    $TorchCheck = & $PythonBin -c "import torch; print(str(torch.__version__) + '|' + str(torch.cuda.is_available()))" 2>$null
     if ($TorchCheck) {
         $Parts = $TorchCheck.Trim().Split('|')
         $TorchVer = $Parts[0]
@@ -165,20 +266,32 @@ if (-not $TorchInstalled -or (-not $SkipPyTorch -and -not $TorchInstalled)) {
         }
     }
 
+    $TorchInstalledSuccessfully = $false
+
     if ($HasNvidia -and -not $CpuOnly) {
-        Write-Host "[*] NVIDIA GPU detected! Installing PyTorch with CUDA acceleration ($CudaVersion)..." -ForegroundColor Green
-        $TorchIndexUrl = "https://download.pytorch.org/whl/$CudaVersion"
-        & $PipBin install torch torchaudio --index-url $TorchIndexUrl
-    } else {
-        if ($CpuOnly) {
-            Write-Host "[*] CPU-only mode selected. Installing standard PyTorch wheels..." -ForegroundColor Cyan
-        } else {
-            Write-Host "[*] No NVIDIA GPU detected. Installing standard CPU PyTorch wheels..." -ForegroundColor Cyan
+        $CudaTargets = @($CudaVersion, "cu124", "cu118")
+        foreach ($target in $CudaTargets) {
+            Write-Host "[*] NVIDIA GPU detected! Attempting PyTorch with CUDA acceleration ($target)..." -ForegroundColor Green
+            $TorchIndexUrl = "https://download.pytorch.org/whl/$target"
+            & $PipBin install torch torchaudio --index-url $TorchIndexUrl
+            if ($LASTEXITCODE -eq 0) {
+                $TorchInstalledSuccessfully = $true
+                break
+            } else {
+                Write-Warn "PyTorch install with index $target failed; trying next candidate..."
+            }
         }
-        & $PipBin install torch torchaudio
     }
 
-    if ($LASTEXITCODE -ne 0) {
+    if (-not $TorchInstalledSuccessfully) {
+        Write-Host "[*] Installing standard PyTorch wheels from PyPI..." -ForegroundColor Cyan
+        & $PipBin install torch torchaudio
+        if ($LASTEXITCODE -eq 0) {
+            $TorchInstalledSuccessfully = $true
+        }
+    }
+
+    if (-not $TorchInstalledSuccessfully) {
         Write-Err "PyTorch installation encountered an error."
         exit 1
     }
