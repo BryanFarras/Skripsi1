@@ -8,11 +8,20 @@ def load_audio_via_ffmpeg(file_path: Path, target_sr: int = 44100) -> Tuple[np.n
     """
     Decodes any audio file (mp3, wav, flac, m4a, ogg) to float32 mono waveform using bundled ffmpeg.
     """
+    import shutil
     try:
         import imageio_ffmpeg
         ffmpeg_exe = imageio_ffmpeg.get_ffmpeg_exe()
     except Exception:
+        ffmpeg_exe = None
+
+    if not ffmpeg_exe or not shutil.which(str(ffmpeg_exe)):
         ffmpeg_exe = "ffmpeg"
+        for p in Path(__file__).resolve().parents:
+            cand = p / ".venv" / "Scripts" / "ffmpeg.exe"
+            if cand.exists():
+                ffmpeg_exe = str(cand)
+                break
 
     cmd = [
         ffmpeg_exe,

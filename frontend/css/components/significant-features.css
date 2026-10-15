@@ -135,6 +135,19 @@
   color: var(--c-text-light-sub);
 }
 
+.empirical-rank-badge {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 800;
+  padding: 3px 8px;
+  background: rgba(193, 18, 31, 0.22);
+  color: #FFAFCC;
+  border: 1px solid rgba(255, 175, 204, 0.35) !important;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+}
+
 .feature-metrics-badge {
   display: flex;
   align-items: center;

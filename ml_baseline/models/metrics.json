@@ -1,172 +1,399 @@
 {
-  "best_model_name": "Random Forest",
+  "best_model_name": "Support Vector Machine (RBF)",
   "results": {
     "Random Forest": {
-      "accuracy": 0.9666666666666667,
-      "precision": 1.0,
-      "recall": 0.9555555555555556,
-      "f1_score": 0.9772727272727273,
-      "roc_auc": 1.0,
-      "eer": 0.0,
-      "eer_threshold": 0.2888888888888889,
+      "accuracy": 0.9976201808662541,
+      "precision": 0.9973132724341752,
+      "recall": 1.0,
+      "f1_score": 0.9986548291633037,
+      "roc_auc": 0.9998856439127375,
+      "eer": 0.010008356790992275,
+      "eer_threshold": 0.8686979803696173,
       "confusion_matrix": [
         [
-          30,
-          0
+          240,
+          5
         ],
         [
-          4,
-          86
+          0,
+          1856
         ]
       ],
-      "train_time_sec": 0.176
+      "train_time_sec": 0.443
     },
     "Support Vector Machine (RBF)": {
-      "accuracy": 0.9583333333333334,
+      "accuracy": 1.0,
       "precision": 1.0,
-      "recall": 0.9444444444444444,
-      "f1_score": 0.9714285714285714,
-      "roc_auc": 0.997037037037037,
-      "eer": 0.05555555555555553,
-      "eer_threshold": 0.17405678604906394,
+      "recall": 1.0,
+      "f1_score": 1.0,
+      "roc_auc": 1.0,
+      "eer": 0.0,
+      "eer_threshold": 0.962818799916519,
       "confusion_matrix": [
         [
-          30,
+          245,
           0
         ],
         [
-          5,
-          85
+          0,
+          1856
         ]
       ],
-      "train_time_sec": 0.018
+      "train_time_sec": 1.261
     },
     "Logistic Regression": {
-      "accuracy": 0.9666666666666667,
+      "accuracy": 1.0,
       "precision": 1.0,
-      "recall": 0.9555555555555556,
-      "f1_score": 0.9772727272727273,
-      "roc_auc": 0.9907407407407407,
-      "eer": 0.03888888888888886,
-      "eer_threshold": 0.16576968133449554,
+      "recall": 1.0,
+      "f1_score": 1.0,
+      "roc_auc": 1.0,
+      "eer": 0.0,
+      "eer_threshold": 0.9854617118835449,
       "confusion_matrix": [
         [
-          30,
+          245,
           0
         ],
         [
-          4,
-          86
+          0,
+          1856
         ]
       ],
-      "train_time_sec": 0.005
+      "train_time_sec": 0.025
     },
     "Multi-Layer Perceptron (MLP)": {
-      "accuracy": 0.8583333333333333,
-      "precision": 0.9866666666666667,
-      "recall": 0.8222222222222222,
-      "f1_score": 0.896969696969697,
-      "roc_auc": 0.9151851851851852,
-      "eer": 0.12777777777777777,
-      "eer_threshold": 0.29877302050590515,
+      "accuracy": 0.9919086149452642,
+      "precision": 0.990923651895355,
+      "recall": 1.0,
+      "f1_score": 0.9954411370340573,
+      "roc_auc": 0.9969706632653061,
+      "eer": 0.020979943701618584,
+      "eer_threshold": 0.9390481114387512,
       "confusion_matrix": [
         [
-          29,
-          1
+          228,
+          17
         ],
         [
-          16,
-          74
+          0,
+          1856
         ]
       ],
-      "train_time_sec": 0.07
+      "train_time_sec": 0.764
     }
   },
   "top_features": [
     {
       "feature": "spec_contrast_b6_mean",
-      "importance": 0.16928010281208086
-    },
-    {
-      "feature": "mfcc_17_mean",
-      "importance": 0.10614610118683529
-    },
-    {
-      "feature": "spec_rolloff85_mean",
-      "importance": 0.057584868016357996
-    },
-    {
-      "feature": "mfcc_16_mean",
-      "importance": 0.046790015871518216
-    },
-    {
-      "feature": "mfcc_2_mean",
-      "importance": 0.043449690619136616
-    },
-    {
-      "feature": "spec_bandwidth_mean",
-      "importance": 0.0413617785089306
+      "importance": 0.391055354969295
     },
     {
       "feature": "spec_contrast_b6_std",
-      "importance": 0.034320638356512195
+      "importance": 0.1501974987120473
     },
     {
-      "feature": "spec_centroid_mean",
-      "importance": 0.026843201345714048
+      "feature": "spec_contrast_b3_std",
+      "importance": 0.026222702114377727
     },
     {
-      "feature": "mfcc_12_mean",
-      "importance": 0.02610656525154275
+      "feature": "spec_contrast_b3_mean",
+      "importance": 0.02317589300337048
+    },
+    {
+      "feature": "spec_contrast_b0_mean",
+      "importance": 0.019838413911645515
+    },
+    {
+      "feature": "mfcc_1_mean",
+      "importance": 0.017143985628468337
+    },
+    {
+      "feature": "mfcc_3_mean",
+      "importance": 0.01609424991023103
+    },
+    {
+      "feature": "spec_contrast_b2_std",
+      "importance": 0.016065610928062572
+    },
+    {
+      "feature": "spec_contrast_b4_mean",
+      "importance": 0.013846258794783219
+    },
+    {
+      "feature": "mfcc_6_mean",
+      "importance": 0.01174525342334571
+    },
+    {
+      "feature": "mfcc_13_mean",
+      "importance": 0.011099944133268461
+    },
+    {
+      "feature": "spec_contrast_b4_std",
+      "importance": 0.011050266754894076
     },
     {
       "feature": "spec_rolloff95_mean",
-      "importance": 0.02314572683321094
+      "importance": 0.0093561157441213
     },
     {
-      "feature": "mfcc_15_mean",
-      "importance": 0.020284033372353766
+      "feature": "mfcc_6_std",
+      "importance": 0.009178339714956452
     },
     {
-      "feature": "spec_rolloff95_std",
-      "importance": 0.019103658548816873
-    },
-    {
-      "feature": "mfcc_7_mean",
-      "importance": 0.01768202668073284
-    },
-    {
-      "feature": "spec_contrast_b2_mean",
-      "importance": 0.01751914342671727
-    },
-    {
-      "feature": "mfcc_20_mean",
-      "importance": 0.016621337899029656
+      "feature": "spec_bandwidth_mean",
+      "importance": 0.008727335145930512
     }
   ],
   "dataset_summary": {
-    "total_samples": 420,
-    "train_samples": 300,
-    "test_samples": 120,
+    "total_samples": 8297,
+    "train_samples": 6196,
+    "test_samples": 2101,
     "num_features": 110,
     "train_tracks": [
-      "bonafide_8",
-      "bonafide_7",
-      "spoof_6",
-      "bonafide_13",
-      "bonafide_11",
+      "spoof_203",
+      "spoof_176",
+      "spoof_114",
+      "spoof_215",
+      "spoof_28",
+      "spoof_184",
+      "spoof_118",
+      "spoof_112",
+      "spoof_137",
+      "spoof_190",
+      "spoof_96",
+      "spoof_211",
+      "spoof_3",
+      "spoof_180",
+      "bonafide_239",
+      "spoof_45",
+      "spoof_13",
+      "spoof_60",
+      "spoof_173",
+      "spoof_122",
+      "spoof_91",
+      "spoof_142",
+      "spoof_186",
+      "spoof_188",
+      "spoof_162",
+      "spoof_23",
+      "spoof_164",
+      "spoof_143",
       "spoof_1",
-      "bonafide_9",
-      "bonafide_12",
-      "bonafide_14",
-      "spoof_3"
+      "spoof_104",
+      "spoof_75",
+      "spoof_117",
+      "spoof_24",
+      "spoof_10",
+      "spoof_49",
+      "spoof_206",
+      "spoof_98",
+      "spoof_72",
+      "spoof_217",
+      "spoof_116",
+      "spoof_101",
+      "spoof_126",
+      "spoof_16",
+      "spoof_128",
+      "spoof_171",
+      "spoof_65",
+      "spoof_136",
+      "spoof_123",
+      "spoof_15",
+      "spoof_86",
+      "spoof_99",
+      "spoof_19",
+      "spoof_58",
+      "spoof_198",
+      "spoof_127",
+      "spoof_36",
+      "spoof_92",
+      "spoof_199",
+      "bonafide_236",
+      "spoof_89",
+      "spoof_152",
+      "spoof_21",
+      "bonafide_233",
+      "spoof_113",
+      "spoof_172",
+      "spoof_84",
+      "spoof_29",
+      "spoof_167",
+      "spoof_50",
+      "spoof_105",
+      "spoof_26",
+      "spoof_163",
+      "spoof_174",
+      "spoof_119",
+      "spoof_53",
+      "spoof_63",
+      "spoof_79",
+      "spoof_201",
+      "spoof_146",
+      "bonafide_223",
+      "spoof_52",
+      "spoof_154",
+      "spoof_31",
+      "spoof_32",
+      "bonafide_227",
+      "spoof_51",
+      "bonafide_234",
+      "bonafide_222",
+      "spoof_66",
+      "spoof_41",
+      "spoof_34",
+      "spoof_109",
+      "spoof_160",
+      "spoof_71",
+      "spoof_4",
+      "spoof_166",
+      "spoof_93",
+      "bonafide_229",
+      "spoof_48",
+      "spoof_78",
+      "bonafide_225",
+      "spoof_59",
+      "spoof_170",
+      "spoof_193",
+      "spoof_131",
+      "spoof_54",
+      "spoof_12",
+      "spoof_17",
+      "spoof_62",
+      "spoof_30",
+      "spoof_111",
+      "spoof_208",
+      "spoof_33",
+      "spoof_145",
+      "spoof_177",
+      "bonafide_235",
+      "spoof_138",
+      "spoof_83",
+      "spoof_11",
+      "bonafide_224",
+      "spoof_161",
+      "spoof_144",
+      "bonafide_226",
+      "spoof_107",
+      "spoof_46",
+      "spoof_129",
+      "spoof_205",
+      "spoof_194",
+      "spoof_18",
+      "spoof_132",
+      "spoof_39",
+      "spoof_73",
+      "spoof_175",
+      "spoof_214",
+      "spoof_100",
+      "spoof_43",
+      "spoof_207",
+      "spoof_220",
+      "spoof_192",
+      "spoof_148",
+      "spoof_68",
+      "spoof_120",
+      "spoof_221",
+      "spoof_125",
+      "spoof_202",
+      "spoof_55",
+      "spoof_44",
+      "spoof_191",
+      "spoof_178",
+      "spoof_151",
+      "spoof_156",
+      "spoof_94",
+      "spoof_169",
+      "spoof_124",
+      "spoof_14",
+      "spoof_81",
+      "spoof_200",
+      "spoof_74",
+      "spoof_134",
+      "spoof_64",
+      "spoof_37",
+      "spoof_90",
+      "bonafide_230",
+      "spoof_213",
+      "spoof_139",
+      "spoof_158",
+      "spoof_61",
+      "spoof_218",
+      "spoof_2",
+      "spoof_106",
+      "spoof_153",
+      "spoof_197",
+      "spoof_189",
+      "spoof_8",
+      "spoof_9",
+      "spoof_209",
+      "spoof_212",
+      "spoof_150",
+      "spoof_25",
+      "spoof_133"
     ],
     "test_tracks": [
-      "bonafide_10",
-      "spoof_2",
-      "spoof_4",
-      "spoof_5"
+      "spoof_204",
+      "spoof_183",
+      "spoof_210",
+      "bonafide_240",
+      "bonafide_237",
+      "spoof_165",
+      "spoof_108",
+      "spoof_115",
+      "spoof_85",
+      "spoof_155",
+      "spoof_57",
+      "spoof_141",
+      "spoof_87",
+      "spoof_40",
+      "spoof_196",
+      "spoof_182",
+      "spoof_42",
+      "spoof_95",
+      "spoof_38",
+      "spoof_121",
+      "spoof_140",
+      "spoof_216",
+      "spoof_20",
+      "spoof_6",
+      "spoof_110",
+      "spoof_103",
+      "spoof_97",
+      "bonafide_231",
+      "spoof_47",
+      "spoof_157",
+      "spoof_102",
+      "spoof_80",
+      "spoof_187",
+      "spoof_168",
+      "spoof_185",
+      "spoof_27",
+      "spoof_76",
+      "spoof_35",
+      "spoof_67",
+      "spoof_195",
+      "bonafide_238",
+      "spoof_5",
+      "spoof_77",
+      "spoof_130",
+      "spoof_149",
+      "spoof_181",
+      "spoof_56",
+      "spoof_69",
+      "spoof_7",
+      "spoof_147",
+      "spoof_159",
+      "spoof_135",
+      "bonafide_241",
+      "spoof_70",
+      "spoof_82",
+      "bonafide_228",
+      "spoof_179",
+      "spoof_219",
+      "spoof_22",
+      "bonafide_232",
+      "spoof_88"
     ]
   },
-  "timestamp": "2026-09-25 00:21:26"
+  "timestamp": "2026-10-15 09:34:52"
 }

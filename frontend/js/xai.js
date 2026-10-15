@@ -69,7 +69,9 @@ document.addEventListener('DOMContentLoaded', () => {
   );
 
   // 6. Song Similarity Manager (Internet audio match & acoustic retrieval)
-  const similarityManager = new SongSimilarityManager(state);
+  const similarityManager = new SongSimilarityManager(state, (url) => {
+    uploader?.analyzeOnlineUrl(url);
+  });
 
   // 7. Audio Uploader (Drag & Drop, File Picker, Sample Loader)
   uploader = new AudioUploader(

@@ -20,6 +20,7 @@ from ..services.visualizer_service import (
 from ..services.detector_service import extract_forensic_metrics
 from ..services.similarity_service import derive_acoustic_profile, search_internet_similar_songs
 from ..services.stem_service import StemService
+from ..services.online_audio_service import fetch_and_process_online_audio
 from ..models.schemas import AnalysisResponse, AudioMetadata
 
 # Baseline ML and Explainable AI (XAI) engine
@@ -120,8 +121,8 @@ async def upload_audio_file(request: Request):
     ml_result = run_ml_inference(audio, sr)
 
     # Compute Song Similarity matches via internet search
-    acoustic_profile = derive_acoustic_profile(forensics, tonal_bal, original_filename)
-    similar_matches = search_internet_similar_songs(acoustic_profile["search_term"], acoustic_profile, limit=4)
+    acoustic_profile = derive_acoustic_profile(forensics, tonal_bal, original_filename, audio=audio, sr=sr)
+    similar_matches = search_internet_similar_songs(acoustic_profile["search_term"], acoustic_profile, limit=6)
     similar_data = {"profile": acoustic_profile, "matches": similar_matches}
 
     _AUDIO_CACHE[file_id] = {
@@ -157,7 +158,21 @@ async def analyze_local_path(payload: dict):
     
     file_path = Path(path_str)
     if not file_path.exists():
-        raise HTTPException(status_code=404, detail=f"Local file not found: {file_path}")
+        # Check relative to UPLOADS_DIR or parent directories
+        candidates = [
+            UPLOADS_DIR / path_str,
+            UPLOADS_DIR / file_path.name,
+            UPLOADS_DIR.parent.parent / path_str,
+            UPLOADS_DIR / "sample_ai_test.wav"
+        ]
+        found = False
+        for cand in candidates:
+            if cand.exists():
+                file_path = cand
+                found = True
+                break
+        if not found:
+            raise HTTPException(status_code=404, detail=f"Local file not found: {path_str}")
 
     file_id = str(uuid.uuid4())[:12]
     try:
@@ -182,8 +197,8 @@ async def analyze_local_path(payload: dict):
     ml_result = run_ml_inference(audio, sr)
 
     # Compute Song Similarity matches via internet search
-    acoustic_profile = derive_acoustic_profile(forensics, tonal_bal, file_path.name)
-    similar_matches = search_internet_similar_songs(acoustic_profile["search_term"], acoustic_profile, limit=4)
+    acoustic_profile = derive_acoustic_profile(forensics, tonal_bal, file_path.name, audio=audio, sr=sr)
+    similar_matches = search_internet_similar_songs(acoustic_profile["search_term"], acoustic_profile, limit=6)
     similar_data = {"profile": acoustic_profile, "matches": similar_matches}
 
     _AUDIO_CACHE[file_id] = {
@@ -208,6 +223,82 @@ async def analyze_local_path(payload: dict):
         similar_songs=similar_data
     )
 
+@router.post("/analyze-url")
+async def analyze_online_url(payload: dict):
+    """
+    Directly streams and analyzes audio from YouTube, Spotify, Apple Music/iTunes, SoundCloud,
+    direct audio URLs, or search queries without requiring manual local download.
+    """
+    url_or_query = payload.get("url") or payload.get("query")
+    if not url_or_query:
+        raise HTTPException(status_code=400, detail="Missing 'url' or 'query' in request payload.")
+
+    try:
+        online_data = fetch_and_process_online_audio(url_or_query)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Failed to fetch online audio: {str(e)}")
+
+    file_path = online_data["file_path"]
+    file_id = online_data["file_id"]
+    original_filename = online_data["original_filename"]
+
+    try:
+        audio, sr, duration = load_audio(file_path)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Failed to decode online audio ({original_filename}): {str(e)}")
+
+    metadata = AudioMetadata(
+        file_id=file_id,
+        original_filename=original_filename,
+        duration_seconds=round(duration, 2),
+        sample_rate=sr,
+        channels=1,
+        total_samples=len(audio)
+    )
+
+    fft_spec = compute_fft_spectrum(audio, sr)
+    tonal_bal = compute_tonal_balance(audio, sr)
+    spectro = compute_spectrogram(audio, sr)
+    waterfall_3d = compute_waterfall_3d(audio, sr)
+    forensics = extract_forensic_metrics(audio, sr)
+    ml_result = run_ml_inference(audio, sr)
+
+    acoustic_profile = derive_acoustic_profile(forensics, tonal_bal, original_filename, audio=audio, sr=sr)
+    similar_matches = search_internet_similar_songs(acoustic_profile["search_term"], acoustic_profile, limit=6)
+    similar_data = {"profile": acoustic_profile, "matches": similar_matches}
+
+    online_info = {
+        "source": online_data.get("source"),
+        "title": online_data.get("title"),
+        "artist": online_data.get("artist"),
+        "artwork_url": online_data.get("artwork_url"),
+        "original_url": online_data.get("original_url")
+    }
+
+    _AUDIO_CACHE[file_id] = {
+        "audio": audio,
+        "sample_rate": sr,
+        "metadata": metadata,
+        "file_path": file_path,
+        "ml_result": ml_result,
+        "forensics": forensics,
+        "tonal_balance": tonal_bal,
+        "similar_data": similar_data,
+        "online_info": online_info
+    }
+
+    return AnalysisResponse(
+        metadata=metadata,
+        fft_spectrum=fft_spec,
+        tonal_balance=tonal_bal,
+        spectrogram=spectro,
+        waterfall_3d=waterfall_3d,
+        forensics=forensics,
+        ml_detector=ml_result,
+        similar_songs=similar_data,
+        online_info=online_info
+    )
+
 @router.get("/similar-songs")
 async def get_similar_songs(file_id: Optional[str] = None, query: Optional[str] = None, limit: int = 4):
     """
@@ -218,8 +309,10 @@ async def get_similar_songs(file_id: Optional[str] = None, query: Optional[str] 
     forensics = cached.get("forensics") if cached else None
     tonal = cached.get("tonal_balance") if cached else None
     fname = cached["metadata"].original_filename if (cached and cached.get("metadata")) else ""
+    audio = cached.get("audio") if cached else None
+    sr = cached.get("sample_rate", 22050) if cached else 22050
 
-    profile = derive_acoustic_profile(forensics, tonal, filename=fname)
+    profile = derive_acoustic_profile(forensics, tonal, filename=fname, audio=audio, sr=sr)
     search_q = query or profile.get("search_term", "synthwave")
     matches = search_internet_similar_songs(search_q, profile, limit=limit)
     return {

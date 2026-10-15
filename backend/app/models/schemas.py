@@ -103,4 +103,5 @@ class AnalysisResponse(BaseModel):
     forensics: AIForensicMetrics
     ml_detector: Optional[MLDetectorResult] = None
     similar_songs: Optional[Dict[str, Any]] = None
+    online_info: Optional[Dict[str, Any]] = None
 

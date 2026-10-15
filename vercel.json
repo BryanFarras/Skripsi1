@@ -1,0 +1,37 @@
+{
+  "version": 2,
+  "rewrites": [
+    {
+      "source": "/api/:match*",
+      "destination": "https://YOUR-BACKEND-URL.onrender.com/api/:match*"
+    },
+    {
+      "source": "/exports/:match*",
+      "destination": "https://YOUR-BACKEND-URL.onrender.com/exports/:match*"
+    },
+    {
+      "source": "/static/:match*",
+      "destination": "/frontend/:match*"
+    },
+    {
+      "source": "/css/:match*",
+      "destination": "/frontend/css/:match*"
+    },
+    {
+      "source": "/js/:match*",
+      "destination": "/frontend/js/:match*"
+    },
+    {
+      "source": "/xai",
+      "destination": "/frontend/xai.html"
+    },
+    {
+      "source": "/visualizer",
+      "destination": "/frontend/index.html"
+    },
+    {
+      "source": "/",
+      "destination": "/frontend/xai.html"
+    }
+  ]
+}

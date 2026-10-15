@@ -92,6 +92,213 @@
 }
 
 /* --------------------------------------------------------------------------
+   SOURCE MODE TABS (Upload File vs Online Stream)
+   -------------------------------------------------------------------------- */
+.upload-standby-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.source-mode-tabs {
+  display: flex;
+  background: rgba(0, 0, 0, 0.16);
+  padding: 3px;
+  gap: 4px;
+  width: 100%;
+}
+
+.source-tab-btn {
+  flex: 1;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.78);
+  border: none !important;
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  font-weight: 700;
+  padding: 8px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.source-tab-btn:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.source-tab-btn.active {
+  background: #ffffff !important;
+  color: var(--c-navy) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+}
+
+/* --------------------------------------------------------------------------
+   ONLINE STREAM PANEL (YouTube, Spotify, Apple Music, SoundCloud)
+   -------------------------------------------------------------------------- */
+.online-stream-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 12px;
+  width: 100%;
+}
+
+.online-stream-header .hero-card-title {
+  color: #ffffff;
+  font-size: 1.35rem;
+  margin-bottom: 3px;
+}
+
+.online-stream-header .hero-card-sub {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.86rem;
+}
+
+.platform-badges-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: center;
+}
+
+.platform-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 8px;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  background: rgba(0, 0, 0, 0.24);
+  color: #ffffff;
+}
+
+.platform-pill.pill-yt svg { color: #ff3b3b; }
+.platform-pill.pill-spotify svg { color: #1db954; }
+.platform-pill.pill-itunes svg { color: #fa2d48; }
+.platform-pill.pill-soundcloud svg { color: #ff7700; }
+
+.online-input-row {
+  display: flex;
+  gap: 6px;
+  width: 100%;
+}
+
+.online-url-field {
+  flex: 1;
+  background: #ffffff;
+  color: var(--c-navy);
+  border: none !important;
+  font-family: var(--font-sans);
+  font-size: 0.88rem;
+  padding: 9px 12px;
+  outline: none;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.online-url-field::placeholder {
+  color: #7b8e99;
+}
+
+.btn-analyze-online {
+  background: var(--c-crimson);
+  color: #ffffff;
+  border: none !important;
+  font-family: var(--font-sans);
+  font-size: 0.88rem;
+  font-weight: 700;
+  padding: 9px 16px;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  box-shadow: 0 2px 8px rgba(193, 18, 31, 0.3);
+}
+
+.btn-analyze-online:hover {
+  background: #9b0e18;
+  transform: translateY(-1px);
+}
+
+.online-presets-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.online-presets-label {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.btn-online-chip {
+  background: rgba(255, 255, 255, 0.16);
+  color: #ffffff;
+  border: none !important;
+  font-family: var(--font-sans);
+  font-size: 0.74rem;
+  font-weight: 600;
+  padding: 3px 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-online-chip:hover {
+  background: #ffffff;
+  color: var(--c-navy);
+}
+
+.active-badge-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.player-source-tag {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: #ffffff;
+  background: var(--c-navy);
+  padding: 4px 8px;
+}
+
+/* Similar songs direct analysis button */
+.sim-track-actions-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.btn-analyze-similar {
+  background: var(--c-navy);
+  color: #ffffff;
+  border: none !important;
+  font-family: var(--font-sans);
+  font-size: 0.74rem;
+  font-weight: 700;
+  padding: 5px 9px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-analyze-similar:hover {
+  background: var(--c-crimson);
+}
+
+/* --------------------------------------------------------------------------
    ACTIVE AUDIO METADATA VIEW (Drop Box contains ONLY File Name & Metadata)
    -------------------------------------------------------------------------- */
 .upload-active-info {

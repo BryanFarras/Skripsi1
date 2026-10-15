@@ -74,6 +74,10 @@ export class SignificantFeaturesManager {
       const barClass = isAi ? 'fill-ai' : 'fill-human';
       const cueClass = isAi ? '' : 'cue-human';
 
+      const empiricalBadge = item.empirical_rank
+        ? `<span class="empirical-rank-badge" title="Ranked #${item.empirical_rank} in baseline evaluation on 8,297 slices (${item.empirical_importance}% importance)">⚡ #${item.empirical_rank} Global Driver (${item.empirical_importance}%)</span>`
+        : '';
+
       html += `
         <div class="feature-item-row" data-feature="${item.feature}">
           <div class="feature-row-top">
@@ -81,6 +85,7 @@ export class SignificantFeaturesManager {
               <span class="feature-rank">#${idx + 1}</span>
               <span class="feature-title-name">${item.title}</span>
               <span class="feature-code-tag">${item.feature}</span>
+              ${empiricalBadge}
             </div>
             <div class="feature-metrics-badge">
               <span class="feature-raw-val">Raw: ${item.raw_value.toFixed(2)} ${item.unit || ''}</span>
