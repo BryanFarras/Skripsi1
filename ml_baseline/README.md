@@ -92,35 +92,33 @@ The baseline pipeline trained and cross-evaluated 4 candidate architectures:
 
 ## 5. Usage & CLI Commands
 
-Always run using the workspace virtual environment Python:
-`c:\Users\asus\Documents\SKRIPSI\.venv\Scripts\python.exe`
+Ensure your virtual environment is activated before running the CLI modules:
 
-### 1. Extract Features & Rebuild Dataset
+### 1. Train and Benchmark Models
 ```powershell
-& "..\..\.venv\Scripts\python.exe" -m ml_baseline.dataset --max-bonafide 10 --max-slices 30
+python -m ml_baseline.train
 ```
 
-### 2. Train and Benchmark Models
+### 2. Generate Academic Evaluation Report
 ```powershell
-& "..\..\.venv\Scripts\python.exe" -m ml_baseline.train
+python -m ml_baseline.evaluate
 ```
 
-### 3. Generate Academic Evaluation Report
+### 3. Run Sliding-Window Inference on Audio
 ```powershell
-& "..\..\.venv\Scripts\python.exe" -m ml_baseline.evaluate
+# Inference on the included sample audio
+python -m ml_baseline.predict "backend/uploads/sample_ai_test.wav"
+
+# Inference on any custom audio track (MP3 / WAV / FLAC / STEM.MP4)
+python -m ml_baseline.predict "path/to/your_audio.wav"
 ```
 
-### 4. Run Inference on Any Song or Stem
-```powershell
-# Inference on an AI song (MP3 / WAV)
-& "..\..\.venv\Scripts\python.exe" -m ml_baseline.predict "..\..\Datasets\suno\original\Hybrid Trap_Hybrid Trap Isoxo.mp3"
-
-# Inference on a bona-fide human track (.stem.mp4 / WAV)
-& "..\..\.venv\Scripts\python.exe" -m ml_baseline.predict "..\..\Datasets\musdb18\train\A Classic Education - NightOwl.stem.mp4"
-
-# Inference on an isolated stem
-& "..\..\.venv\Scripts\python.exe" -m ml_baseline.predict "..\..\Datasets\suno\splits\Hybrid Trap_Hybrid Trap Isoxo_stems\Hybrid Trap_Hybrid Trap Isoxo_vocals.wav"
-```
+> [!NOTE]
+> **Rebuilding Dataset (Optional)**:
+> The pre-extracted dataset is provided in `ml_baseline/data/`. If you wish to rebuild the dataset from raw audio collections, configure your dataset directories in `ml_baseline/config.py` and run:
+> ```powershell
+> python -m ml_baseline.dataset --max-bonafide 12 --max-slices 40 --rebuild
+> ```
 
 ---
 

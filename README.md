@@ -148,6 +148,13 @@ MY-AIDETECTOR/
 │   ├── uploads/                        # Temporary cached audio files (.gitkeep)
 │   ├── stems_temp/                     # Temporary decomposed stems (.gitkeep)
 │   └── requirements.txt                # Backend dependencies
+├── frontend/
+│   ├── index.html                      # Forensic dashboard single-page web app
+│   ├── css/
+│   │   └── style.css                   # Responsive dark-theme forensic styling
+│   └── js/
+│       ├── app.js                      # Core frontend controller & API client
+│       └── visualizer.js               # WebAudio FFT & interactive audio player
 ├── ml_baseline/
 │   ├── config.py                       # Audio hyperparameters (sample_rate=22050, slice_sec=5.0)
 │   ├── features.py                     # 110-dimensional DSP feature extraction engine
@@ -185,7 +192,14 @@ MY-AIDETECTOR/
 - **FFmpeg** installed and accessible on system `PATH` (mandatory for decoding MP3, M4A, FLAC, and STEM.MP4 containers).
 - _(Optional, Highly Recommended)_ **NVIDIA GPU with CUDA 11.8+ / 12.1+** for GPU-accelerated stem separation via Demucs.
 
-### 2. Environment Setup
+### 2. Clone the Repository
+
+```bash
+git clone https://github.com/BryanFarras/Skripsi1.git
+cd Skripsi1
+```
+
+### 3. Environment Setup
 
 #### Option A: Automated Installation (Recommended for Windows)
 
@@ -220,18 +234,11 @@ python verify_env.py
 
 ---
 
-#### Option B: Manual Step-by-Step Installation
+#### Option B: Manual Step-by-Step Installation (Cross-Platform / Linux / macOS)
 
-Follow the steps below to manually configure your environment (cross-platform / Linux / macOS):
+Follow the steps below to manually configure your environment:
 
-##### Step 1: Clone & Navigate
-
-```powershell
-git clone https://github.com/BryanFarras/Skripsi1.git
-cd Skripsi1/APPS/MY-AIDETECTOR
-```
-
-##### Step 2: Create & Activate Virtual Environment
+##### Step 1: Create & Activate Virtual Environment
 
 **Windows (PowerShell):**
 
@@ -247,7 +254,7 @@ python3 -m venv .venv
 source .venv/bin/activate
 ```
 
-##### Step 3: Install FFmpeg (If not already installed)
+##### Step 2: Install FFmpeg (If not already installed)
 
 - **Windows (winget):** `winget install Gyan.FFmpeg`
 - **Windows (Chocolatey):** `choco install ffmpeg`
@@ -256,7 +263,7 @@ source .venv/bin/activate
 
 _Verify by running `ffmpeg -version` in your terminal._
 
-##### Step 4: Install PyTorch (Demucs & Neural Processing Backend)
+##### Step 3: Install PyTorch (Demucs & Neural Processing Backend)
 
 Choose the command matching your hardware setup:
 
@@ -273,7 +280,7 @@ Choose the command matching your hardware setup:
   pip install torch torchaudio
   ```
 
-##### Step 5: Install Master Dependencies
+##### Step 4: Install Master Dependencies
 
 ```powershell
 # 1. Upgrade pip, setuptools, and wheel
@@ -283,7 +290,7 @@ python -m pip install --upgrade pip setuptools wheel
 pip install -r requirements.txt
 ```
 
-##### Step 6: Verify Environment Installation
+##### Step 5: Verify Environment Installation
 
 ```powershell
 python verify_env.py
@@ -316,37 +323,42 @@ python run_server.py
 
 ## Machine Learning Workflow (CLI)
 
-The machine learning module is completely self-contained within `ml_baseline/`:
+The machine learning module is completely self-contained within `ml_baseline/`. The pre-extracted tabular dataset (`ml_baseline/data/dataset.csv`, `dataset.npz`) and pre-trained champion Random Forest model (`ml_baseline/models/baseline_classifier.joblib`) are packaged directly in the repository, enabling immediate training, benchmarking, and forensic inference out of the box:
 
-### 1. Extract 110-D Features & Build Dataset
-
-```bash
-python ml_baseline/dataset.py --bona-dir path/to/musdb18 --spoof-dir path/to/suno_ai
-```
-
-### 2. Train Classifiers & Benchmark
+### 1. Train Classifiers & Benchmark
 
 ```bash
 python ml_baseline/train.py
 ```
 
-_Trains Random Forest, SVM, Logistic Regression, and MLP with strict 75/25 track-level grouping. Automatically saves `baseline_classifier.joblib`, `feature_scaler.joblib`, and `metrics.json`._
+_Trains Random Forest, SVM, Logistic Regression, and MLP with strict 75/25 track-level grouping using `ml_baseline/data/dataset.npz`. Automatically updates `baseline_classifier.joblib`, `feature_scaler.joblib`, and `metrics.json`._
 
-### 3. Generate Evaluation Report
+### 2. Generate Evaluation Report
 
 ```bash
 python ml_baseline/evaluate.py
 ```
 
-### 4. Run Sliding-Window Inference & XAI on Any Song
+_Generates the academic evaluation report (`ml_baseline/reports/baseline_evaluation_report.md`) detailing Accuracy, F1-Score, ROC-AUC, and Equal Error Rate (EER)._
+
+### 3. Run Sliding-Window Inference on Audio
 
 ```bash
-# Predict classification verdict
-python ml_baseline/predict.py path/to/mystery_song.mp3
+# Run sliding-window inference on the included test sample
+python ml_baseline/predict.py backend/uploads/sample_ai_test.wav
 
-# Predict with detailed TreeSHAP local attribution explanation
-python ml_baseline/predict.py path/to/mystery_song.mp3 --explain
+# Or analyze any custom audio track (MP3, WAV, FLAC, M4A, STEM.MP4)
+python ml_baseline/predict.py path/to/your_song.wav
 ```
+
+_Outputs the forensic verdict (`SPOOF` vs. `BONA-FIDE`), overall AI/Human probability, confidence percentage, peak AI spike, and a slice-by-slice temporal timeline._
+
+> [!NOTE]
+> **Custom Audio Dataset Extraction (Optional / Advanced)**:
+> If you have access to raw audio directories and want to rebuild a new dataset, configure your local dataset paths in `ml_baseline/config.py` and run:
+> ```bash
+> python ml_baseline/dataset.py --max-bonafide 12 --max-slices 40 --rebuild
+> ```
 
 ---
 
@@ -355,14 +367,17 @@ python ml_baseline/predict.py path/to/mystery_song.mp3 --explain
 Split any audio track into 5 discrete stems (`mixture`, `vocals`, `drums`, `bass`, `other`) using Meta's Demucs model:
 
 ```bash
-# Single audio file (generates 'song_stems/' next to input file)
+# Decompose the included test sample into separated stems
+python split_stems.py backend/uploads/sample_ai_test.wav --output-dir exports/stems
+
+# Decompose any audio track (creates '<song>_stems/' next to input file)
 python split_stems.py path/to/song.wav
 
-# Specify custom output directory
+# Specify a custom output directory
 python split_stems.py path/to/song.mp3 --output-dir my_stems/
 
 # Batch process an entire directory of audio files
-python split_stems.py --batch-dir Datasets/raw/ai_suno --output-dir Datasets/stems/ai_suno
+python split_stems.py --batch-dir path/to/audio_folder/ --output-dir exports/stems/
 ```
 
 ---

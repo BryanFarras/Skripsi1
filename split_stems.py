@@ -26,8 +26,21 @@ def ensure_venv():
         import torch
         import demucs
     except ImportError:
-        venv_python = PROJECT_ROOT.parent.parent / ".venv" / "Scripts" / "python.exe"
-        if venv_python.exists() and str(venv_python) != sys.executable:
+        candidate_paths = [
+            PROJECT_ROOT / ".venv" / "Scripts" / "python.exe",
+            PROJECT_ROOT / ".venv" / "bin" / "python",
+            PROJECT_ROOT.parent / ".venv" / "Scripts" / "python.exe",
+            PROJECT_ROOT.parent / ".venv" / "bin" / "python",
+            PROJECT_ROOT.parent.parent / ".venv" / "Scripts" / "python.exe",
+            PROJECT_ROOT.parent.parent / ".venv" / "bin" / "python",
+        ]
+        venv_python = None
+        for candidate in candidate_paths:
+            if candidate.exists():
+                venv_python = candidate
+                break
+
+        if venv_python and str(venv_python) != sys.executable:
             print(f"[*] Switching to virtual environment Python: {venv_python}")
             import subprocess
             cmd = [str(venv_python), str(__file__)] + sys.argv[1:]
@@ -94,12 +107,12 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  python split_stems.py "song1.wav"
-    -> Creates folder: song1_stems/
-  python split_stems.py "song1.wav" --output-dir "my_folder"
-    -> Creates folder: my_folder/song1_stems/
-  python split_stems.py --batch-dir "Datasets/raw/ai_suno" --output-dir "Datasets/stems/ai_suno"
-    -> Creates folder for each track: Datasets/stems/ai_suno/<track>_stems/
+  python split_stems.py "backend/uploads/sample_ai_test.wav"
+    -> Creates folder: backend/uploads/sample_ai_test_stems/
+  python split_stems.py "backend/uploads/sample_ai_test.wav" --output-dir "exports/stems"
+    -> Creates folder: exports/stems/sample_ai_test_stems/
+  python split_stems.py --batch-dir "path/to/audio_folder" --output-dir "exports/stems"
+    -> Creates folder for each track: exports/stems/<track>_stems/
         """
     )
     parser.add_argument("input_file", nargs="?", default=None, help="Path to single audio file (WAV, MP3, FLAC, M4A, STEM.MP4)")
