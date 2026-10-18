@@ -48,15 +48,18 @@ document.addEventListener('DOMContentLoaded', () => {
   // 1. Navbar & Editorial Modals
   setupNavbar();
 
-  // 2. Audio Waveform Player (Waves seekbar visualizer)
-  const player = new WaveformAudioPlayer(state);
-
-  // 3. Significant Features Manager (TreeSHAP attributions & filters)
+  // 2. Significant Features Manager (TreeSHAP attributions & filters)
   const featuresManager = new SignificantFeaturesManager(state);
 
-  // 4. Forensic Verdict, Narrative & Timeline
+  // 3. Forensic Verdict, Narrative & Timeline
+  let player;
   const verdictManager = new ForensicVerdictManager(state, (seekTimestamp) => {
-    player.seekTo(seekTimestamp);
+    player?.seekTo(seekTimestamp);
+  });
+
+  // 4. Audio Waveform Player (Waves seekbar visualizer)
+  player = new WaveformAudioPlayer(state, (activeSlice) => {
+    verdictManager.updateActiveSlice(activeSlice);
   });
 
   // 5. Metadata Inspector (Audio signal profile & exports)

@@ -12,9 +12,11 @@ export function formatTime(sec) {
 }
 
 export class WaveformAudioPlayer {
-  constructor(state) {
+  constructor(state, onActiveSliceChange = null) {
     this.state = state;
+    this.onActiveSliceChange = onActiveSliceChange;
     this.timeline = null;
+    this.lastReportedSliceIdx = null;
     this.isDraggingSeek = false;
 
     this.dom = {
@@ -23,6 +25,7 @@ export class WaveformAudioPlayer {
       playIcon: document.getElementById('playIcon'),
       timecodeEl: document.getElementById('timecodeEl'),
       audioEl: document.getElementById('audioEl'),
+      trackVerdictTag: document.getElementById('trackVerdictTag'),
       activeSliceIndicator: document.getElementById('activeSliceIndicator'),
       slicesTotalBadge: document.getElementById('slicesTotalBadge'),
 
@@ -131,8 +134,10 @@ export class WaveformAudioPlayer {
         const slice = this.getSliceAtTime(hoverTime);
         let tipText = formatTime(hoverTime);
         if (slice) {
-          const typeStr = slice.is_ai_flagged ? 'AI' : 'Human';
-          const probVal = (slice.ai_prob * 100).toFixed(0);
+          const isAi = slice.is_ai_flagged;
+          const typeStr = isAi ? 'AI' : 'Human';
+          const displayProb = isAi ? slice.ai_prob : (slice.human_prob !== undefined ? slice.human_prob : (1.0 - slice.ai_prob));
+          const probVal = (displayProb * 100).toFixed(0);
           tipText = `${formatTime(hoverTime)} • Slice ${slice.slice_idx + 1} (${typeStr} ${probVal}%)`;
         }
         this.dom.waveformHoverTime.innerText = tipText;
@@ -163,9 +168,18 @@ export class WaveformAudioPlayer {
   updatePlayIcon() {
     if (!this.dom.playIcon) return;
     if (this.state.isPlaying) {
-      this.dom.playIcon.innerHTML = '<rect x="6" y="4" width="4" height="16" fill="currentColor"></rect><rect x="14" y="4" width="4" height="16" fill="currentColor"></rect>';
+      this.dom.playIcon.innerHTML = `
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+          <rect x="6" y="4" width="4" height="16"></rect>
+          <rect x="14" y="4" width="4" height="16"></rect>
+        </svg>
+      `;
     } else {
-      this.dom.playIcon.innerHTML = '<polygon points="6 4 20 12 6 20" fill="currentColor"></polygon>';
+      this.dom.playIcon.innerHTML = `
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+          <polygon points="6 4 20 12 6 20"></polygon>
+        </svg>
+      `;
     }
   }
 
@@ -207,9 +221,24 @@ export class WaveformAudioPlayer {
 
   setTimeline(timeline) {
     this.timeline = timeline;
+    this.updateTrackVerdictTag();
     this.renderSliceSegmentsHeader(timeline);
     this.renderTimeAxis(this.state.duration);
     this.drawWaveform();
+  }
+
+  updateTrackVerdictTag() {
+    if (!this.dom.trackVerdictTag || !this.state.mlDetector) return;
+    const ml = this.state.mlDetector;
+    const isSpoof = ml.prediction.includes('SPOOF');
+    const aiPct = (ml.overall_ai_probability * 100).toFixed(0);
+    const humanPct = (ml.overall_human_probability * 100).toFixed(0);
+
+    this.dom.trackVerdictTag.innerHTML = isSpoof 
+      ? `Track: SPOOF (${aiPct}% AI)` 
+      : `Track: HUMAN (${humanPct}%)`;
+    this.dom.trackVerdictTag.className = `playback-track-verdict-tag ${isSpoof ? 'pill-spoof' : 'pill-bonafide'}`;
+    this.dom.trackVerdictTag.title = `Full Song Forensic Verdict: ${ml.prediction} (${(ml.overall_ai_probability * 100).toFixed(1)}% AI / ${(ml.overall_human_probability * 100).toFixed(1)}% Human across ${ml.total_slices_analyzed || 36} slices)`;
   }
 
   getSliceAtTime(sec) {
@@ -237,9 +266,12 @@ export class WaveformAudioPlayer {
       const endSec = s.end_sec !== undefined ? s.end_sec : (s.start_sec + 5.0);
       const spanSec = endSec - s.start_sec;
       const widthPct = Math.max(8, (spanSec / duration) * 100);
-      const probPct = (s.ai_prob * 100).toFixed(0);
+      const displayProb = isAi ? s.ai_prob : (s.human_prob !== undefined ? s.human_prob : (1.0 - s.ai_prob));
+      const probPct = (displayProb * 100).toFixed(0);
       const badgeClass = isAi ? 'seg-ai' : 'seg-human';
       const labelType = isAi ? 'AI' : 'Human';
+      const aiPct = (s.ai_prob * 100).toFixed(0);
+      const humanPct = (((s.human_prob !== undefined ? s.human_prob : (1.0 - s.ai_prob))) * 100).toFixed(0);
 
       html += `
         <button type="button" 
@@ -247,7 +279,7 @@ export class WaveformAudioPlayer {
           style="flex-basis: ${widthPct}%;" 
           data-start="${s.start_sec}" 
           data-idx="${s.slice_idx}"
-          title="Jump to Slice #${s.slice_idx + 1} (${s.start_sec}s - ${endSec}s): ${probPct}% AI Probability">
+          title="Jump to Slice #${s.slice_idx + 1} (${s.start_sec}s - ${endSec}s): ${labelType} ${probPct}% (Human: ${humanPct}% | AI: ${aiPct}%)">
           <span class="seg-tab-title">Slice ${s.slice_idx + 1}</span>
           <span class="seg-tab-prob">${labelType} ${probPct}%</span>
           <span class="seg-tab-time">${s.start_sec}s-${endSec}s</span>
@@ -262,7 +294,13 @@ export class WaveformAudioPlayer {
       tab.addEventListener('click', (e) => {
         e.stopPropagation();
         const startSec = parseFloat(tab.getAttribute('data-start') || '0');
+        const idx = parseInt(tab.getAttribute('data-idx') || '0', 10);
         this.seekTo(startSec);
+        const sl = this.timeline?.find(s => s.slice_idx === idx);
+        if (sl && this.onActiveSliceChange) {
+          this.lastReportedSliceIdx = sl.slice_idx;
+          this.onActiveSliceChange(sl);
+        }
       });
     });
 
@@ -479,10 +517,17 @@ export class WaveformAudioPlayer {
     if (this.dom.activeSliceIndicator) {
       const isAi = activeSlice.is_ai_flagged;
       const label = isAi ? 'AI' : 'Human';
-      const prob = (activeSlice.ai_prob * 100).toFixed(0);
+      const displayProb = isAi ? activeSlice.ai_prob : (activeSlice.human_prob !== undefined ? activeSlice.human_prob : (1.0 - activeSlice.ai_prob));
+      const prob = (displayProb * 100).toFixed(0);
       const endSec = activeSlice.end_sec !== undefined ? activeSlice.end_sec : (activeSlice.start_sec + 5.0);
       this.dom.activeSliceIndicator.innerHTML = `Slice ${activeSlice.slice_idx + 1} • ${activeSlice.start_sec}s - ${endSec}s (${label} ${prob}%)`;
       this.dom.activeSliceIndicator.className = `playback-active-slice-tag ${isAi ? 'tag-ai' : 'tag-human'}`;
+    }
+
+    // Notify active slice change to synchronized components (e.g. verdictCard)
+    if (this.onActiveSliceChange && (!this.lastReportedSliceIdx || this.lastReportedSliceIdx !== activeSlice.slice_idx)) {
+      this.lastReportedSliceIdx = activeSlice.slice_idx;
+      this.onActiveSliceChange(activeSlice);
     }
 
     // Update tab active highlight

@@ -235,25 +235,43 @@ def derive_acoustic_profile(
         constellation_info = extract_shazam_constellation_peaks(clip_y, sr)
         vocal_presence = estimate_vocal_presence(clip_y, sr)
 
+    # Check for actual artificial brickwall cutoff (>12kHz)
+    has_ai_cutoff = False
+    cutoff_hz_val = None
+    if forensics and hasattr(forensics, "cutoff_detected") and forensics.cutoff_detected:
+        cutoff_hz_val = getattr(forensics, "estimated_cutoff_hz", None)
+        if cutoff_hz_val and cutoff_hz_val >= 12000:
+            has_ai_cutoff = True
+
     # Multi-dimensional aesthetic taxonomy (Similar Song Finder)
-    if rolloff <= 16500:
-        timbre = "Compressed Neural / Vintage Rolloff"
+    if has_ai_cutoff and cutoff_hz_val:
+        timbre = "Compressed Neural / Brickwall Cutoff"
         vibe = "Synthwave / Electronic / Lo-Fi"
-        mood = "Hypnotic & Nostalgic"
-        era = "80s Analog Revival / AI Diffusion"
+        mood = "Hypnotic & Synthetic"
+        era = "AI Generative / Codec Truncated"
         search_kw = "synthwave electronic"
+        freq_rolloff_str = f"~{cutoff_hz_val:.0f} Hz Ceiling"
+    elif rolloff <= 7500:
+        timbre = "Warm Acoustic / Organic Studio Tone"
+        vibe = "Acoustic / Indie Folk / Warm Melodic"
+        mood = "Intimate & Reflective"
+        era = "Organic Acoustic / Modern Indie"
+        search_kw = "indie acoustic folk"
+        freq_rolloff_str = f"Natural Acoustic Rolloff (~{rolloff:.0f} Hz)"
     elif centroid > 2600:
         timbre = "Bright Commercial Studio Master"
         vibe = "Modern Pop / Dance EDM"
         mood = "High Energy & Uplifting"
         era = "Modern Hi-Fi Pop"
         search_kw = "modern electronic pop"
+        freq_rolloff_str = f"Hi-Fi Full Air (~{rolloff:.0f} Hz)"
     else:
-        timbre = "Warm Acoustic / Organic Studio Tone"
-        vibe = "Indie Melodic / Ambient"
-        mood = "Intimate & Reflective"
-        era = "Organic Acoustic / Modern Indie"
-        search_kw = "indie electronic ambient"
+        timbre = "Balanced Studio Master"
+        vibe = "Indie Melodic / Alternative"
+        mood = "Expressive & Dynamic"
+        era = "Contemporary Studio Mix"
+        search_kw = "indie melodic alternative"
+        freq_rolloff_str = f"Balanced Rolloff (~{rolloff:.0f} Hz)"
 
     # If filename contains meaningful artist or track name, prioritize it
     clean_name = Path(filename).stem
@@ -275,7 +293,7 @@ def derive_acoustic_profile(
         "transient_activity": constellation_info["transient_activity"],
         "search_term": search_kw,
         "dominant_band": dominant_band,
-        "frequency_rolloff": f"~{rolloff:.0f} Hz Ceiling"
+        "frequency_rolloff": freq_rolloff_str
     }
 
 def search_internet_similar_songs(query: str, acoustic_profile: Dict[str, Any], limit: int = 6) -> List[Dict[str, Any]]:

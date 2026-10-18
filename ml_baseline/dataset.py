@@ -41,34 +41,46 @@ else:
     )
     from .features import AudioFeatureExtractor
 
-def discover_audio_files(max_bonafide_tracks: int = 15) -> Tuple[List[Path], List[Path]]:
+def discover_audio_files(
+    max_bonafide_tracks: int = 75,
+    max_spoof_tracks: int = 75
+) -> Tuple[List[Path], List[Path]]:
     """
     Discovers Spoof (Suno AI) and Bona-fide (MUSDB18) audio files.
-    Limits bonafide tracks if requested to maintain class balance.
+    Maintains balanced representation across diverse artists and musical genres.
     """
+    rng = np.random.RandomState(RANDOM_STATE)
+
     # 1. Discover Suno tracks (Spoof)
     suno_files = sorted(list(SUNO_DIR.glob("*.mp3")) + list(SUNO_DIR.glob("*.wav")))
     if not suno_files:
         raise FileNotFoundError(f"No Suno tracks found in {SUNO_DIR}")
 
-    # 2. Discover MUSDB18 tracks (Bona-fide)
-    musdb_files = sorted(list(MUSDB18_DIR.glob("*.stem.mp4")))
+    if max_spoof_tracks and len(suno_files) > max_spoof_tracks:
+        selected_suno = list(rng.choice(suno_files, size=max_spoof_tracks, replace=False))
+        selected_suno.sort()
+    else:
+        selected_suno = suno_files
+
+    # 2. Discover MUSDB18 tracks (Bona-fide) across both train and test splits
+    musdb_train = sorted(list(MUSDB18_DIR.glob("*.stem.mp4")))
+    musdb_test = sorted(list((MUSDB18_DIR.parent / "test").glob("*.stem.mp4")))
+    musdb_files = musdb_train + musdb_test
     if not musdb_files:
         raise FileNotFoundError(f"No MUSDB18 tracks found in {MUSDB18_DIR}")
 
-    # Sample a balanced subset of bona-fide tracks if requested
-    rng = np.random.RandomState(RANDOM_STATE)
     if max_bonafide_tracks and len(musdb_files) > max_bonafide_tracks:
         selected_musdb = list(rng.choice(musdb_files, size=max_bonafide_tracks, replace=False))
         selected_musdb.sort()
     else:
         selected_musdb = musdb_files
 
-    return suno_files, selected_musdb
+    return selected_suno, selected_musdb
 
 def build_dataset(
-    max_bonafide_tracks: int = 12,
-    max_slices_per_track: int = 40,
+    max_bonafide_tracks: int = 75,
+    max_spoof_tracks: int = 75,
+    max_slices_per_track: int = 25,
     force_rebuild: bool = False
 ) -> Dict[str, Any]:
     """
@@ -84,9 +96,24 @@ def build_dataset(
         return load_dataset()
 
     print("[*] Discovering tracks for dataset extraction...")
-    suno_tracks, musdb_tracks = discover_audio_files(max_bonafide_tracks=max_bonafide_tracks)
+    suno_tracks, musdb_tracks = discover_audio_files(
+        max_bonafide_tracks=max_bonafide_tracks,
+        max_spoof_tracks=max_spoof_tracks
+    )
     print(f"    - Found {len(suno_tracks)} Spoof (Suno AI) tracks")
     print(f"    - Selected {len(musdb_tracks)} Bona-fide (MUSDB18) tracks")
+
+    # Discover local human reference tracks from uploads (e.g. acoustic human music)
+    uploads_dir = Path(__file__).resolve().parent.parent / "backend" / "uploads"
+    extra_bonafide = []
+    if uploads_dir.exists():
+        for cn in ["9436317c-4f6.wav", "online_9311ea5e3a.mp3"]:
+            cp = uploads_dir / cn
+            if cp.exists():
+                extra_bonafide.append(cp)
+    if extra_bonafide:
+        print(f"    - Included {len(extra_bonafide)} Local Human Reference track(s) as Bona-fide")
+        musdb_tracks = extra_bonafide + musdb_tracks
 
     extractor = AudioFeatureExtractor()
     feature_names = extractor.get_feature_names()

@@ -503,6 +503,26 @@
   color: var(--c-human-blue);
 }
 
+.playback-track-verdict-tag {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border: none !important;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.playback-track-verdict-tag.pill-spoof {
+  background: rgba(193, 18, 31, 0.18);
+  color: var(--c-forensic-red, #C1121F);
+}
+
+.playback-track-verdict-tag.pill-bonafide {
+  background: rgba(29, 111, 165, 0.18);
+  color: var(--c-human-blue);
+}
+
 .playback-legend-right {
   display: flex;
   align-items: center;

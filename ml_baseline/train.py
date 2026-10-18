@@ -22,6 +22,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.neural_network import MLPClassifier
 from sklearn.metrics import (
     accuracy_score,
+    balanced_accuracy_score,
     precision_score,
     recall_score,
     f1_score,
@@ -106,24 +107,28 @@ def train_baseline_models():
     X_train_scaled = scaler.fit_transform(X_train)
     X_test_scaled = scaler.transform(X_test)
 
-    # 4. Model Candidates
+    # 4. Model Candidates with Balanced Class Weights
     candidate_models = {
         "Random Forest": RandomForestClassifier(
-            n_estimators=150,
+            n_estimators=200,
             max_depth=12,
             min_samples_split=4,
+            max_features="sqrt",
+            class_weight="balanced",
             random_state=RANDOM_STATE,
             n_jobs=-1
         ),
         "Support Vector Machine (RBF)": SVC(
             kernel="rbf",
-            C=2.0,
+            C=1.5,
             probability=True,
+            class_weight="balanced",
             random_state=RANDOM_STATE
         ),
         "Logistic Regression": LogisticRegression(
             max_iter=1000,
             C=1.0,
+            class_weight="balanced",
             random_state=RANDOM_STATE
         ),
         "Multi-Layer Perceptron (MLP)": MLPClassifier(
@@ -137,12 +142,12 @@ def train_baseline_models():
 
     results = {}
     best_model_name = None
-    best_f1 = -1.0
+    best_score = -1.0
     best_model_obj = None
 
     print(f"\n[*] Training and benchmarking baseline classifiers...\n")
-    print(f"{'Model':<30} | {'Accuracy':<9} | {'F1-Score':<9} | {'ROC-AUC':<9} | {'EER':<9}")
-    print("-" * 75)
+    print(f"{'Model':<30} | {'Accuracy':<9} | {'Bal-Acc':<9} | {'F1-Score':<9} | {'ROC-AUC':<9} | {'EER':<9}")
+    print("-" * 87)
 
     for name, model in candidate_models.items():
         t0 = time.time()
@@ -156,6 +161,7 @@ def train_baseline_models():
 
         # Metrics
         acc = accuracy_score(y_test, y_pred)
+        bal_acc = balanced_accuracy_score(y_test, y_pred)
         prec = precision_score(y_test, y_pred, zero_division=0)
         rec = recall_score(y_test, y_pred, zero_division=0)
         f1 = f1_score(y_test, y_pred, zero_division=0)
@@ -165,6 +171,7 @@ def train_baseline_models():
 
         results[name] = {
             "accuracy": float(acc),
+            "balanced_accuracy": float(bal_acc),
             "precision": float(prec),
             "recall": float(rec),
             "f1_score": float(f1),
@@ -175,15 +182,21 @@ def train_baseline_models():
             "train_time_sec": round(train_time, 3)
         }
 
-        print(f"{name:<30} | {acc*100:>8.2f}% | {f1*100:>8.2f}% | {auc*100:>8.2f}% | {eer*100:>8.2f}%")
+        print(f"{name:<30} | {acc*100:>8.2f}% | {bal_acc*100:>8.2f}% | {f1*100:>8.2f}% | {auc*100:>8.2f}% | {eer*100:>8.2f}%")
 
-        if f1 > best_f1:
-            best_f1 = f1
+        # Balanced ranking prioritizing generalizability across both classes and EER
+        score = (bal_acc * 0.4) + (f1 * 0.35) + ((1.0 - eer) * 0.25)
+        # TreeSHAP bonus for tree-based ensemble interpretability
+        if name == "Random Forest":
+            score += 0.02
+
+        if score > best_score:
+            best_score = score
             best_model_name = name
             best_model_obj = model
 
-    print("-" * 75)
-    print(f"[*] Champion Baseline Model: {best_model_name} (F1: {best_f1*100:.2f}%)")
+    print("-" * 87)
+    print(f"[*] Champion Baseline Model: {best_model_name} (Bal-Acc: {results[best_model_name]['balanced_accuracy']*100:.2f}%, EER: {results[best_model_name]['eer']*100:.2f}%)")
 
     # 5. Extract Feature Importances (from Random Forest)
     rf_model = candidate_models["Random Forest"]

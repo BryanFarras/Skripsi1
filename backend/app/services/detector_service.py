@@ -51,19 +51,16 @@ def detect_brickwall_cutoff(freqs: np.ndarray, avg_db: np.ndarray, sample_rate: 
     # Calculate negative gradient (steep drops)
     gradients = np.diff(region_db)
     
-    # Check for steep drop cliff
-    steep_drop_idx = np.where(gradients < -8.0)[0]
-    if len(steep_drop_idx) > 0:
-        cutoff_candidate = region_freqs[steep_drop_idx[0]]
-        # Verify subsequent bins stay low
-        subsequent = region_db[steep_drop_idx[0]:]
-        if np.mean(subsequent) < drop_threshold_db:
-            return round(float(cutoff_candidate), 1)
-
-    # Check for sustained floor
-    sub_floor_idx = np.where(region_db < drop_threshold_db)[0]
-    if len(sub_floor_idx) > len(region_db) * 0.4:
-        return round(float(region_freqs[sub_floor_idx[0]]), 1)
+    # Check for steep drop cliff typical of artificial brickwall filters (14kHz - 21.5kHz)
+    steep_drop_idx = np.where(gradients < -10.0)[0]
+    for idx in steep_drop_idx:
+        pre_val = region_db[idx]
+        post_mean = np.mean(region_db[idx+1:idx+6]) if idx + 6 <= len(region_db) else np.mean(region_db[idx+1:])
+        # The drop must be a sharp cliff (>= 15 dB drop) dropping below the relative noise floor
+        if (pre_val - post_mean) >= 15.0 and post_mean < drop_threshold_db:
+            cutoff_candidate = region_freqs[idx]
+            if 13500 <= cutoff_candidate <= 21500:
+                return round(float(cutoff_candidate), 1)
 
     return None
 

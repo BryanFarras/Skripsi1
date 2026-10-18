@@ -97,6 +97,53 @@
   transition: border-color 0.2s ease;
 }
 
+/* Scope Toolbar: Full Track vs Active Slice */
+.verdict-scope-toolbar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid var(--c-border-subtle);
+  padding-bottom: 12px;
+}
+
+.scope-tab-btn {
+  background: rgba(253, 240, 213, 0.08);
+  color: var(--c-text-light-sub);
+  border: 1px solid var(--c-border-subtle) !important;
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  font-weight: 700;
+  padding: 6px 12px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  user-select: none;
+}
+
+.scope-tab-btn:hover {
+  background: rgba(253, 240, 213, 0.16);
+  color: var(--c-cream);
+}
+
+.scope-tab-btn.active {
+  background: var(--c-cream);
+  color: var(--c-navy);
+  border-color: var(--c-cream) !important;
+}
+
+.verdict-scope-hint {
+  font-size: 0.8rem;
+  line-height: 1.45;
+  color: var(--c-text-light-sub);
+  margin-top: 16px;
+  padding: 8px 12px;
+  background: rgba(0, 0, 0, 0.22);
+  border-left: 3px solid var(--c-slate-blue);
+  font-family: var(--font-sans);
+}
+
 .verdict-banner-title {
   font-family: var(--font-sans);
   font-size: 1.8rem;

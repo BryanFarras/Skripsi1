@@ -59,8 +59,8 @@ class AudioFeatureExtractor:
         names.extend(["spec_rolloff95_mean", "spec_rolloff95_std"])
         # Spectral Flatness
         names.extend(["spec_flatness_mean", "spec_flatness_std"])
-        # Spectral Contrast (7 bands: 6 octave sub-bands + 1)
-        for i in range(7):
+        # Spectral Contrast (Bands 0-5: 100Hz to 6.4kHz; omitting band 6 to prevent cymbal floor bias)
+        for i in range(6):
             names.append(f"spec_contrast_b{i}_mean")
             names.append(f"spec_contrast_b{i}_std")
         # Temporal & Dynamic Features
@@ -77,6 +77,11 @@ class AudioFeatureExtractor:
             sr = self.sample_rate
         if len(y.shape) > 1:
             y = np.mean(y, axis=0) # Convert to mono for feature extraction
+
+        # Always standardize sample rate to model training sample rate
+        if sr != self.sample_rate:
+            y = librosa.resample(y, orig_sr=sr, target_sr=self.sample_rate)
+            sr = self.sample_rate
 
         features = []
 
@@ -116,9 +121,11 @@ class AudioFeatureExtractor:
         features.append(float(np.mean(flatness)))
         features.append(float(np.std(flatness)))
 
-        # 7. Spectral Contrast (6 bands + 1 = 7)
+        # 7. Spectral Contrast (Bands 0 to 5: 100Hz to 6.4kHz)
         contrast = librosa.feature.spectral_contrast(y=y, sr=sr, n_fft=N_FFT, hop_length=HOP_LENGTH, fmin=100.0)
-        for band in contrast:
+        for band_idx, band in enumerate(contrast):
+            if band_idx >= 6:
+                break
             features.append(float(np.mean(band)))
             features.append(float(np.std(band)))
 

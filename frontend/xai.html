@@ -264,14 +264,17 @@
           <div class="playback-controls-left">
             <button type="button" id="playBtn" class="hero-play-btn" title="Play / Pause">
               <span id="playIcon">
-                <polygon points="6 4 20 12 6 20" fill="currentColor"></polygon>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                  <polygon points="6 4 20 12 6 20"></polygon>
+                </svg>
               </span>
             </button>
             <div class="playback-title-wrap">
               <span class="playback-section-label">AUDIO PLAYBACK + 5S FORENSIC SLICES</span>
               <div class="playback-time-badge-row">
                 <span id="timecodeEl" class="hero-timecode">00:00 / 00:00</span>
-                <span class="playback-active-slice-tag" id="activeSliceIndicator">Slice 1 • 0.0s - 5.0s</span>
+                <span class="playback-track-verdict-tag" id="trackVerdictTag" title="Overall Track Verdict">Track: --</span>
+                <span class="playback-active-slice-tag" id="activeSliceIndicator" title="Currently Selected 5s Slice">Slice 1 • 0.0s - 5.0s</span>
               </div>
             </div>
           </div>
@@ -314,6 +317,12 @@
   </section>
 
   <!-- =========================================================================
+       TRANSITION GRADIENT
+       Long smooth editorial gradient bridge from Cream (#FDF0D5) to Navy (#043550)
+       ========================================================================= -->
+  <div class="xai-section-gradient-transition" aria-hidden="true"></div>
+
+  <!-- =========================================================================
        BOTTOM SECTION (Deep Midnight Navy: #0B2545 / #003049)
        Forensic Classification Verdict, Synthesis & Interactive TreeSHAP
        ========================================================================= -->
@@ -329,8 +338,14 @@
           <!-- Card 1: Forensic Classification Verdict -->
           <div class="xai-panel-card verdict-panel" id="verdictCard">
             <div class="panel-header-line">
-              <span class="panel-sub-label">FORENSIC CLASSIFICATION VERDICT</span>
-              <span class="panel-badge-pill">TreeSHAP</span>
+              <span class="panel-sub-label" id="verdictSubLabel">OVERALL TRACK FORENSIC VERDICT</span>
+              <span class="panel-badge-pill" id="verdictScopeBadge">Full Track</span>
+            </div>
+
+            <!-- Scope Toggle Toolbar: Track Overall vs Selected Slice -->
+            <div class="verdict-scope-toolbar">
+              <button type="button" class="scope-tab-btn active" id="btnScopeTrack">Full Song (Track Overall)</button>
+              <button type="button" class="scope-tab-btn" id="btnScopeSlice">Selected Slice (<span id="scopeSliceName">Slice 1</span>)</button>
             </div>
 
             <h2 class="verdict-banner-title" id="verdictTitle">
@@ -340,8 +355,8 @@
             <!-- Probability Meter -->
             <div class="verdict-probability-container">
               <div class="verdict-prob-labels">
-                <span class="prob-ai-label">AI (Spoof): <strong id="probAiText">55.9%</strong></span>
-                <span class="prob-human-label">Human (Bona-fide): <strong id="probHumanText">44.1%</strong></span>
+                <span class="prob-ai-label" id="probAiLabel">AI (Spoof): <strong id="probAiText">55.9%</strong></span>
+                <span class="prob-human-label" id="probHumanLabel">Human (Bona-fide): <strong id="probHumanText">44.1%</strong></span>
               </div>
               
               <div class="prob-bar-track">
@@ -354,21 +369,26 @@
             <!-- 2x2 Stats Grid -->
             <div class="verdict-stats-grid">
               <div class="stat-cell">
-                <span class="stat-cell-title">CONFIDENCE</span>
+                <span class="stat-cell-title" id="statTitle1">CONFIDENCE</span>
                 <span class="stat-cell-value" id="statConfidence">11.9%</span>
               </div>
               <div class="stat-cell">
-                <span class="stat-cell-title">FLAGGED SLICES</span>
+                <span class="stat-cell-title" id="statTitle2">FLAGGED SLICES</span>
                 <span class="stat-cell-value" id="statFlaggedSlices">83% (6 slices)</span>
               </div>
               <div class="stat-cell">
-                <span class="stat-cell-title">POPULATION BASE</span>
+                <span class="stat-cell-title" id="statTitle3">POPULATION BASE</span>
                 <span class="stat-cell-value" id="statBaseValue">ψ₀ = 0.29</span>
               </div>
               <div class="stat-cell">
-                <span class="stat-cell-title">EVALUATED DIMS</span>
+                <span class="stat-cell-title" id="statTitle4">EVALUATED DIMS</span>
                 <span class="stat-cell-value" id="statTotalFeatures">110 Acoustic Dims</span>
               </div>
+            </div>
+
+            <!-- Context Hint Explaining Scope & Selected Slice Relation -->
+            <div class="verdict-scope-hint" id="verdictScopeHint">
+              Track diagnosis across all slices. Click any slice in the seeker above to inspect individual 5s slice metrics.
             </div>
           </div>
 

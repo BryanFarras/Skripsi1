@@ -10,6 +10,7 @@ import json
 import argparse
 import joblib
 import numpy as np
+import librosa
 from pathlib import Path
 from typing import Dict, Any, List, Optional
 
@@ -84,6 +85,16 @@ class BaselineDetectorPredictor:
         if len(y) == 0:
             raise ValueError("Audio waveform is empty.")
 
+        # Ensure audio is 1D mono
+        if len(y.shape) > 1:
+            y = np.mean(y, axis=0)
+
+        # Standardize sample rate to model training sample rate (22050 Hz)
+        target_sr = self.extractor.sample_rate
+        if sr != target_sr:
+            y = librosa.resample(y, orig_sr=sr, target_sr=target_sr)
+            sr = target_sr
+
         dur_sec = len(y) / sr
         slice_samples = int(SLICE_DURATION * sr)
 
@@ -103,7 +114,14 @@ class BaselineDetectorPredictor:
                 "flagged_slices_ratio": 1.0 if prob_ai >= 0.5 else 0.0,
                 "confidence_percent": round(abs(prob_ai - 0.5) * 200, 1),
                 "total_slices_analyzed": 1,
-                "timeline": [{"slice_idx": 0, "start_sec": 0.0, "end_sec": round(dur_sec, 2), "ai_prob": round(prob_ai, 4), "is_ai_flagged": bool(prob_ai >= 0.5)}],
+                "timeline": [{
+                    "slice_idx": 0,
+                    "start_sec": 0.0,
+                    "end_sec": round(dur_sec, 2),
+                    "ai_prob": round(prob_ai, 4),
+                    "human_prob": round(1.0 - prob_ai, 4),
+                    "is_ai_flagged": bool(prob_ai >= 0.5)
+                }],
                 "xai": xai_res
             }
 
@@ -144,12 +162,14 @@ class BaselineDetectorPredictor:
 
         timeline = []
         for meta, p in zip(slice_meta, probs_ai):
+            p_ai = float(p)
             timeline.append({
                 "slice_idx": meta["slice_idx"],
                 "start_sec": meta["start_sec"],
                 "end_sec": meta["end_sec"],
-                "ai_prob": round(float(p), 4),
-                "is_ai_flagged": bool(p >= 0.5)
+                "ai_prob": round(p_ai, 4),
+                "human_prob": round(1.0 - p_ai, 4),
+                "is_ai_flagged": bool(p_ai >= 0.5)
             })
 
         mean_ai_prob = float(np.mean(probs_ai))

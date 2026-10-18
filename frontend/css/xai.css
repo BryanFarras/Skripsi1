@@ -108,7 +108,7 @@ body.xai-app-body {
 .xai-top-section {
   background: var(--c-cream);
   border-bottom: none;
-  padding: 32px 48px 50px;
+  padding: 32px 48px 36px;
 }
 
 .xai-top-container {
@@ -161,11 +161,33 @@ body.xai-app-body {
   box-shadow: 0 4px 16px rgba(0, 48, 73, 0.08);
 }
 
+/* ==========================================================================
+   SECTION TRANSITION GRADIENT
+   Long editorial gradient smoothly blending Warm Cream (#FDF0D5) to Deep Navy (#043550)
+   ========================================================================== */
+.xai-section-gradient-transition {
+  width: 100%;
+  height: 220px;
+  background: linear-gradient(
+    to bottom,
+    #FDF0D5 0%,
+    #ece3d0 12%,
+    #cfd3c9 25%,
+    #9cb3bf 42%,
+    #5a869e 60%,
+    #255674 78%,
+    #0c415d 90%,
+    #043550 100%
+  );
+  pointer-events: none;
+  display: block;
+}
+
 /* BOTTOM SECTION (Deep Prussian Navy #003049) */
 .xai-bottom-section {
   background-color: var(--c-navy);
   color: var(--c-text-light-main);
-  padding: 40px 48px 70px;
+  padding: 36px 48px 70px;
   border-top: none;
 }
 
@@ -271,6 +293,9 @@ body.xai-app-body {
 @media (max-width: 768px) {
   .xai-top-section, .xai-bottom-section {
     padding: 24px 20px;
+  }
+  .xai-section-gradient-transition {
+    height: 130px;
   }
   .header-title-serif {
     font-size: 2.3rem;
