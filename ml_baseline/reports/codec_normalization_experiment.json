@@ -1,0 +1,228 @@
+{
+  "experiment_title": "Audio Codec and Loudness Normalization Confounding Bias Test",
+  "timestamp": "2026-11-03 17:45:51",
+  "raw_condition": {
+    "condition": "Raw (Unnormalized)",
+    "total_samples": 270,
+    "train_samples": 195,
+    "test_samples": 75,
+    "train_tracks": 13,
+    "test_tracks": 5,
+    "models": {
+      "Logistic Regression (Linear)": {
+        "accuracy": 0.7066666666666667,
+        "balanced_accuracy": 0.7,
+        "f1_score": 0.6451612903225806,
+        "roc_auc": 0.7688888888888888,
+        "eer": 0.3055555555555556,
+        "eer_threshold": 0.4221498966217041,
+        "fit_time_sec": 0.013,
+        "top_10_features": [
+          {
+            "feature": "mfcc_3_mean",
+            "abs_coefficient": 1.3183
+          },
+          {
+            "feature": "mfcc_6_mean",
+            "abs_coefficient": 0.9953
+          },
+          {
+            "feature": "spec_contrast_b0_mean",
+            "abs_coefficient": 0.8943
+          },
+          {
+            "feature": "mfcc_20_mean",
+            "abs_coefficient": 0.7621
+          },
+          {
+            "feature": "spec_contrast_b3_std",
+            "abs_coefficient": 0.7254
+          },
+          {
+            "feature": "spec_contrast_b4_mean",
+            "abs_coefficient": 0.6808
+          },
+          {
+            "feature": "mfcc_19_mean",
+            "abs_coefficient": 0.6586
+          },
+          {
+            "feature": "mfcc_12_mean",
+            "abs_coefficient": 0.6207
+          },
+          {
+            "feature": "rms_std",
+            "abs_coefficient": 0.582
+          },
+          {
+            "feature": "spec_contrast_b5_mean",
+            "abs_coefficient": 0.5726
+          }
+        ]
+      },
+      "Random Forest (Non-linear)": {
+        "accuracy": 0.8133333333333334,
+        "balanced_accuracy": 0.8444444444444444,
+        "f1_score": 0.8108108108108109,
+        "roc_auc": 0.9588888888888889,
+        "eer": 0.10555555555555554,
+        "eer_threshold": 0.6634444444444444,
+        "fit_time_sec": 0.176,
+        "top_10_features": [
+          {
+            "feature": "mfcc_3_mean",
+            "importance": 0.0931
+          },
+          {
+            "feature": "spec_contrast_b3_std",
+            "importance": 0.0848
+          },
+          {
+            "feature": "mfcc_1_mean",
+            "importance": 0.0564
+          },
+          {
+            "feature": "spec_contrast_b1_std",
+            "importance": 0.0504
+          },
+          {
+            "feature": "zcr_mean",
+            "importance": 0.0368
+          },
+          {
+            "feature": "spec_contrast_b0_mean",
+            "importance": 0.0364
+          },
+          {
+            "feature": "mfcc_12_mean",
+            "importance": 0.0295
+          },
+          {
+            "feature": "spec_contrast_b4_std",
+            "importance": 0.0279
+          },
+          {
+            "feature": "mfcc_1_std",
+            "importance": 0.0235
+          },
+          {
+            "feature": "spec_contrast_b3_mean",
+            "importance": 0.0221
+          }
+        ]
+      }
+    }
+  },
+  "normalized_condition": {
+    "condition": "Normalized (-14 LUFS EBU R128)",
+    "total_samples": 270,
+    "train_samples": 195,
+    "test_samples": 75,
+    "train_tracks": 13,
+    "test_tracks": 5,
+    "models": {
+      "Logistic Regression (Linear)": {
+        "accuracy": 0.8133333333333334,
+        "balanced_accuracy": 0.8222222222222222,
+        "f1_score": 0.7878787878787878,
+        "roc_auc": 0.922962962962963,
+        "eer": 0.17222222222222222,
+        "eer_threshold": 0.6518376469612122,
+        "fit_time_sec": 0.014,
+        "top_10_features": [
+          {
+            "feature": "rms_mean",
+            "abs_coefficient": 1.2311
+          },
+          {
+            "feature": "mfcc_3_mean",
+            "abs_coefficient": 1.1979
+          },
+          {
+            "feature": "rms_std",
+            "abs_coefficient": 1.048
+          },
+          {
+            "feature": "spec_contrast_b0_mean",
+            "abs_coefficient": 0.8318
+          },
+          {
+            "feature": "mfcc_6_mean",
+            "abs_coefficient": 0.6732
+          },
+          {
+            "feature": "spec_contrast_b5_mean",
+            "abs_coefficient": 0.6312
+          },
+          {
+            "feature": "delta_mfcc_1_std",
+            "abs_coefficient": 0.6039
+          },
+          {
+            "feature": "spec_contrast_b3_std",
+            "abs_coefficient": 0.5551
+          },
+          {
+            "feature": "zcr_mean",
+            "abs_coefficient": 0.5266
+          },
+          {
+            "feature": "mfcc_20_mean",
+            "abs_coefficient": 0.4873
+          }
+        ]
+      },
+      "Random Forest (Non-linear)": {
+        "accuracy": 0.8533333333333334,
+        "balanced_accuracy": 0.8777777777777778,
+        "f1_score": 0.8450704225352113,
+        "roc_auc": 0.9785185185185186,
+        "eer": 0.09444444444444444,
+        "eer_threshold": 0.6512380952380952,
+        "fit_time_sec": 0.168,
+        "top_10_features": [
+          {
+            "feature": "mfcc_3_mean",
+            "importance": 0.0972
+          },
+          {
+            "feature": "spec_contrast_b3_std",
+            "importance": 0.0753
+          },
+          {
+            "feature": "rms_std",
+            "importance": 0.0701
+          },
+          {
+            "feature": "rms_mean",
+            "importance": 0.0514
+          },
+          {
+            "feature": "spec_contrast_b1_std",
+            "importance": 0.0508
+          },
+          {
+            "feature": "zcr_mean",
+            "importance": 0.0359
+          },
+          {
+            "feature": "spec_contrast_b4_std",
+            "importance": 0.0292
+          },
+          {
+            "feature": "spec_contrast_b0_mean",
+            "importance": 0.0281
+          },
+          {
+            "feature": "mfcc_1_std",
+            "importance": 0.0226
+          },
+          {
+            "feature": "spec_contrast_b4_mean",
+            "importance": 0.0223
+          }
+        ]
+      }
+    }
+  }
+}

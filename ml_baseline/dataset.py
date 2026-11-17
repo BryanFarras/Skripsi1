@@ -28,6 +28,7 @@ if __package__ is None or __package__ == "":
         SLICE_HOP
     )
     from ml_baseline.features import AudioFeatureExtractor
+    from ml_baseline.normalization import normalize_audio_loudness
 else:
     from .config import (
         SUNO_DIR,
@@ -40,6 +41,7 @@ else:
         SLICE_HOP
     )
     from .features import AudioFeatureExtractor
+    from .normalization import normalize_audio_loudness
 
 def discover_audio_files(
     max_bonafide_tracks: int = 75,
@@ -81,21 +83,27 @@ def build_dataset(
     max_bonafide_tracks: int = 75,
     max_spoof_tracks: int = 75,
     max_slices_per_track: int = 25,
-    force_rebuild: bool = False
+    force_rebuild: bool = False,
+    normalize_loudness: bool = True,
+    target_lufs: float = -14.0,
+    output_name: str = "dataset"
 ) -> Dict[str, Any]:
     """
     Extracts features across spoof and bona-fide tracks and persists data files.
+    Optionally standardizes loudness to target_lufs (EBU R128 / ITU-R BS.1770)
+    to mitigate confounding loudness and codec bias.
     """
     DATA_DIR.mkdir(parents=True, exist_ok=True)
-    csv_path = DATA_DIR / "dataset.csv"
-    npz_path = DATA_DIR / "dataset.npz"
-    meta_path = DATA_DIR / "metadata.json"
+    csv_path = DATA_DIR / f"{output_name}.csv"
+    npz_path = DATA_DIR / f"{output_name}.npz"
+    meta_path = DATA_DIR / f"{output_name}_metadata.json"
 
     if not force_rebuild and npz_path.exists() and meta_path.exists():
         print(f"[*] Found existing cached dataset at {npz_path}")
-        return load_dataset()
+        return load_dataset(output_name=output_name)
 
-    print("[*] Discovering tracks for dataset extraction...")
+    print(f"[*] Discovering tracks for dataset extraction ('{output_name}')...")
+    print(f"    - Loudness normalization (EBU R128): {'ENABLED (-14 LUFS)' if normalize_loudness else 'DISABLED (Raw)'}")
     suno_tracks, musdb_tracks = discover_audio_files(
         max_bonafide_tracks=max_bonafide_tracks,
         max_spoof_tracks=max_spoof_tracks
@@ -133,6 +141,8 @@ def build_dataset(
         
         try:
             y, sr = extractor.load_audio_file(track_path)
+            if normalize_loudness:
+                y, _, _ = normalize_audio_loudness(y, sr=sr, target_lufs=target_lufs)
             slices = list(extractor.slice_waveform(y, duration=SLICE_DURATION, hop=SLICE_HOP))
             if max_slices_per_track and len(slices) > max_slices_per_track:
                 # Evenly sample slices across the song
@@ -163,6 +173,8 @@ def build_dataset(
 
         try:
             y, sr = extractor.load_audio_file(track_path)
+            if normalize_loudness:
+                y, _, _ = normalize_audio_loudness(y, sr=sr, target_lufs=target_lufs)
             slices = list(extractor.slice_waveform(y, duration=SLICE_DURATION, hop=SLICE_HOP))
             if max_slices_per_track and len(slices) > max_slices_per_track:
                 indices = np.linspace(0, len(slices) - 1, max_slices_per_track, dtype=int)
@@ -219,6 +231,8 @@ def build_dataset(
         "num_spoof_samples": int(np.sum(y == LABEL_SPOOF)),
         "num_bonafide_samples": int(np.sum(y == LABEL_BONAFIDE)),
         "num_tracks": int(len(set(groups))),
+        "loudness_normalized": bool(normalize_loudness),
+        "target_lufs": float(target_lufs) if normalize_loudness else None,
         "feature_names": feature_names,
         "sample_rate": extractor.sample_rate,
         "slice_duration_sec": SLICE_DURATION,
@@ -237,12 +251,17 @@ def build_dataset(
         "metadata": metadata
     }
 
-def load_dataset() -> Dict[str, Any]:
-    """Loads cached dataset from disk."""
-    npz_path = DATA_DIR / "dataset.npz"
-    meta_path = DATA_DIR / "metadata.json"
+def load_dataset(output_name: str = "dataset") -> Dict[str, Any]:
+    """Loads cached dataset from disk by output_name."""
+    npz_path = DATA_DIR / f"{output_name}.npz"
+    meta_path = DATA_DIR / f"{output_name}_metadata.json"
     if not npz_path.exists():
-        raise FileNotFoundError(f"Dataset not built yet! Please run build_dataset().")
+        # Fallback to legacy metadata.json name if existing
+        legacy_meta = DATA_DIR / "metadata.json"
+        if legacy_meta.exists() and output_name == "dataset":
+            meta_path = legacy_meta
+        else:
+            raise FileNotFoundError(f"Dataset '{output_name}' not found at {npz_path}!")
 
     data = np.load(npz_path, allow_pickle=True)
     with open(meta_path, "r") as f:
@@ -261,6 +280,17 @@ if __name__ == "__main__":
     parser.add_argument("--max-bonafide", type=int, default=12, help="Max bona-fide tracks to sample")
     parser.add_argument("--max-slices", type=int, default=40, help="Max slices per track")
     parser.add_argument("--rebuild", action="store_true", help="Force rebuild dataset")
+    parser.add_argument("--no-norm", action="store_true", help="Disable loudness normalization (extract raw)")
+    parser.add_argument("--output-name", type=str, default="dataset", help="Dataset name prefix")
+    args = parser.parse_args()
+
+    build_dataset(
+        max_bonafide_tracks=args.max_bonafide,
+        max_slices_per_track=args.max_slices,
+        force_rebuild=args.rebuild,
+        normalize_loudness=not args.no_norm,
+        output_name=args.output_name
+    )
     args = parser.parse_args()
 
     build_dataset(

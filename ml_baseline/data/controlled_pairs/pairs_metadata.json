@@ -1,0 +1,86 @@
+{
+  "corpus_description": "Controlled Pairs Corpus: 5 Traditional Indonesian Instrumental Non-Vocal Music Styles",
+  "purpose": "Evaluation of AI synthetic music detection and TreeSHAP acoustic attribution on authentic vs synthetic Indonesian regional instruments, matching acoustic prompts and eliminating recording/vocal confounding variables.",
+  "research_question": "RM 3: Kinerja deteksi dan atribusi TreeSHAP pada korpus pasangan terkendali musik instrumental daerah Indonesia tanpa vokal",
+  "audio_standardization": {
+    "format": "WAV PCM 16-bit",
+    "sample_rate": 22050,
+    "channels": "1 (Mono)",
+    "loudness_standard": "EBU R128 / ITU-R BS.1770-4",
+    "target_integrated_loudness_lufs": -14.0,
+    "max_true_peak_dbfs": -1.0
+  },
+  "pairs": [
+    {
+      "pair_id": "pair_01_gamelan",
+      "pair_name": "Gamelan Jawa/Bali",
+      "region": "Jawa Tengah & Bali, Indonesia",
+      "instrument_family": "Metalo-perkusi perunggu berpenala (Bronze Metallophones & Gongs)",
+      "instruments": ["Bonang", "Saron", "Kendang", "Gong Ageng"],
+      "tuning_system": "Pelog / Slendro",
+      "tempo_bpm": 84,
+      "vocal": false,
+      "suno_prompt": "traditional Javanese gamelan instrumental, authentic bronze metallophone bonang saron gong ageng kendang, slendro pelog tuning, rhythmic acoustic percussion, meditative classical court music, acoustic room acoustics, no vocals, purely instrumental",
+      "human_file": "bonafide_gamelan_jawa.wav",
+      "suno_file": "spoof_gamelan_suno_v35.wav",
+      "key_acoustic_markers": "Peluruhan nada logam harmonik tinggi (>5 kHz), resonansi transien kendang, mikro-dinamika pukulan tabuh fisik."
+    },
+    {
+      "pair_id": "pair_02_rindik",
+      "pair_name": "Rindik Bambu Bali",
+      "region": "Bali, Indonesia",
+      "instrument_family": "Idiofon bilah bambu beresonator tabung (Bamboo Xylophone)",
+      "instruments": ["Rindik Bambu", "Suling Bali"],
+      "tuning_system": "Selisir Bali",
+      "tempo_bpm": 116,
+      "vocal": false,
+      "suno_prompt": "Balinese rindik bamboo instrumental, fast interlocking bamboo xylophone notes kotekan, traditional Balinese acoustic melody, gentle bamboo resonance, tropical acoustic folk music, natural organic room tone, no vocals, purely instrumental",
+      "human_file": "bonafide_rindik_bali.wav",
+      "suno_file": "spoof_rindik_suno_v35.wav",
+      "key_acoustic_markers": "Transien perkusi ketukan bilah bambu cepat, resonansi berongga tabung bambu, variasi dinamika artikulasi tangan."
+    },
+    {
+      "pair_id": "pair_03_sasando",
+      "pair_name": "Sasando Rote",
+      "region": "Pulau Rote, Nusa Tenggara Timur (NTT), Indonesia",
+      "instrument_family": "Kordofon tabung dawai petik beresonator daun lontar (Plucked Tube Zither with Palm Resonator)",
+      "instruments": ["Sasando Gong / Sasando Rote"],
+      "tuning_system": "Diatonik / Pentatonik Rote",
+      "tempo_bpm": 92,
+      "vocal": false,
+      "suno_prompt": "traditional Indonesian sasando plucked string instrumental, acoustic harp with lontar palm leaf resonance, intricate fingerpicking, melodious Indonesian traditional melody, ambient acoustic timbre, natural decay, no singing, no vocals, purely instrumental",
+      "human_file": "bonafide_sasando_rote.wav",
+      "suno_file": "spoof_sasando_suno_v35.wav",
+      "key_acoustic_markers": "Artikulasi petikan dawai nilon/baja, dengung spasial resonator daun lontar alami, harmonik senar berdengung."
+    },
+    {
+      "pair_id": "pair_04_angklung",
+      "pair_name": "Angklung Sunda",
+      "region": "Sunda, Jawa Barat, Indonesia",
+      "instrument_family": "Idiofon tabung bambu goyang (Shaken Tuned Bamboo Tubes)",
+      "instruments": ["Ansambel Angklung Pagelaran"],
+      "tuning_system": "Diatonik / Salendro Sunda",
+      "tempo_bpm": 105,
+      "vocal": false,
+      "suno_prompt": "Sundanese angklung bamboo ensemble instrumental, shaken bamboo tubes rattling acoustic harmony, traditional West Javanese rhythmic melody, cheerful acoustic folk, natural hall acoustics, no vocals, instrumental only",
+      "human_file": "bonafide_angklung_sunda.wav",
+      "suno_file": "spoof_angklung_suno_v35.wav",
+      "key_acoustic_markers": "Karakteristik getaran berderik (rattle) tabung bambu, pergeseran fasa mikro antar-tabung goyang, modulasi amplitudo sinusoidal."
+    },
+    {
+      "pair_id": "pair_05_kolintang",
+      "pair_name": "Kolintang Minahasa",
+      "region": "Minahasa, Sulawesi Utara, Indonesia",
+      "instrument_family": "Idiofon bilah kayu beresonator kotak (Wooden Xylophone Ensemble)",
+      "instruments": ["Kolintang Melodi", "Kolintang Bass", "Kolintang Pengiring"],
+      "tuning_system": "Diatonik Kromatik",
+      "tempo_bpm": 128,
+      "vocal": false,
+      "suno_prompt": "Minahasan kolintang wooden xylophone instrumental, traditional North Sulawesi acoustic wooden percussion ensemble, melodic wooden bars resonance, upbeat polyphonic Indonesian traditional, wooden mallet strike, instrumental only, no vocals",
+      "human_file": "bonafide_kolintang_minahasa.wav",
+      "suno_file": "spoof_kolintang_suno_v35.wav",
+      "key_acoustic_markers": "Kekasaran perkusi ketukan kayu padat (solid wood transients), resonansi kotak kayu penopang, spektrum frekuensi rendah pada bilah bass."
+    }
+  ]
+}
+

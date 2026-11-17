@@ -1,0 +1,2242 @@
+[
+  {
+    "model_name": "v3_DeepResAudioNet",
+    "epoch": 1,
+    "train_loss": 0.593431,
+    "val_loss": 0.574141,
+    "train_acc": 0.688495,
+    "val_acc": 0.735805,
+    "val_balanced_acc": 0.729588,
+    "val_precision": 0.712707,
+    "val_recall": 0.675393,
+    "val_f1": 0.693548,
+    "val_roc_auc": 0.800089,
+    "val_eer": 0.264216,
+    "val_eer_threshold": 0.47578,
+    "learning_rate": 0.0003,
+    "grad_norm": 0.87667,
+    "epoch_time_sec": 0.221,
+    "confusion_matrix": [
+      [
+        377,
+        104
+      ],
+      [
+        124,
+        258
+      ]
+    ]
+  },
+  {
+    "model_name": "v3_DeepResAudioNet",
+    "epoch": 2,
+    "train_loss": 0.470731,
+    "val_loss": 0.489555,
+    "train_acc": 0.828509,
+    "val_acc": 0.789108,
+    "val_balanced_acc": 0.778483,
+    "val_precision": 0.808642,
+    "val_recall": 0.685864,
+    "val_f1": 0.74221,
+    "val_roc_auc": 0.89371,
+    "val_eer": 0.198999,
+    "val_eer_threshold": 0.42181,
+    "learning_rate": 0.00029989,
+    "grad_norm": 0.725808,
+    "epoch_time_sec": 0.2425,
+    "confusion_matrix": [
+      [
+        419,
+        62
+      ],
+      [
+        120,
+        262
+      ]
+    ]
+  },
+  {
+    "model_name": "v3_DeepResAudioNet",
+    "epoch": 3,
+    "train_loss": 0.403768,
+    "val_loss": 0.456595,
+    "train_acc": 0.884226,
+    "val_acc": 0.79606,
+    "val_balanced_acc": 0.789838,
+    "val_precision": 0.789326,
+    "val_recall": 0.735602,
+    "val_f1": 0.761518,
+    "val_roc_auc": 0.901487,
+    "val_eer": 0.19692,
+    "val_eer_threshold": 0.433044,
+    "learning_rate": 0.00029955,
+    "grad_norm": 0.689832,
+    "epoch_time_sec": 0.2146,
+    "confusion_matrix": [
+      [
+        406,
+        75
+      ],
+      [
+        101,
+        281
+      ]
+    ]
+  },
+  {
+    "model_name": "v3_DeepResAudioNet",
+    "epoch": 4,
+    "train_loss": 0.366731,
+    "val_loss": 0.435217,
+    "train_acc": 0.900507,
+    "val_acc": 0.807648,
+    "val_balanced_acc": 0.802119,
+    "val_precision": 0.8,
+    "val_recall": 0.753927,
+    "val_f1": 0.77628,
+    "val_roc_auc": 0.912421,
+    "val_eer": 0.186487,
+    "val_eer_threshold": 0.435634,
+    "learning_rate": 0.00029899,
+    "grad_norm": 0.665978,
+    "epoch_time_sec": 0.227,
+    "confusion_matrix": [
+      [
+        409,
+        72
+      ],
+      [
+        94,
+        288
+      ]
+    ]
+  },
+  {
+    "model_name": "v3_DeepResAudioNet",
+    "epoch": 5,
+    "train_loss": 0.331939,
+    "val_loss": 0.397702,
+    "train_acc": 0.917511,
+    "val_acc": 0.841251,
+    "val_balanced_acc": 0.83873,
+    "val_precision": 0.823219,
+    "val_recall": 0.816754,
+    "val_f1": 0.819974,
+    "val_roc_auc": 0.934392,
+    "val_eer": 0.152839,
+    "val_eer_threshold": 0.451182,
+    "learning_rate": 0.00029821,
+    "grad_norm": 0.652118,
+    "epoch_time_sec": 0.2208,
+    "confusion_matrix": [
+      [
+        414,
+        67
+      ],
+      [
+        70,
+        312
+      ]
+    ]
+  },
+  {
+    "model_name": "v3_DeepResAudioNet",
+    "epoch": 6,
+    "train_loss": 0.31383,
+    "val_loss": 0.396231,
+    "train_acc": 0.921491,
+    "val_acc": 0.83314,
+    "val_balanced_acc": 0.829029,
+    "val_precision": 0.82337,
+    "val_recall": 0.793194,
+    "val_f1": 0.808,
+    "val_roc_auc": 0.932639,
+    "val_eer": 0.156497,
+    "val_eer_threshold": 0.416286,
+    "learning_rate": 0.00029721,
+    "grad_norm": 0.671989,
+    "epoch_time_sec": 0.2199,
+    "confusion_matrix": [
+      [
+        416,
+        65
+      ],
+      [
+        79,
+        303
+      ]
+    ]
+  },
+  {
+    "model_name": "v3_DeepResAudioNet",
+    "epoch": 7,
+    "train_loss": 0.292707,
+    "val_loss": 0.384227,
+    "train_acc": 0.935239,
+    "val_acc": 0.837775,
+    "val_balanced_acc": 0.835881,
+    "val_precision": 0.815104,
+    "val_recall": 0.819372,
+    "val_f1": 0.817232,
+    "val_roc_auc": 0.93671,
+    "val_eer": 0.150222,
+    "val_eer_threshold": 0.447682,
+    "learning_rate": 0.00029599,
+    "grad_norm": 0.706237,
+    "epoch_time_sec": 0.2207,
+    "confusion_matrix": [
+      [
+        410,
+        71
+      ],
+      [
+        69,
+        313
+      ]
+    ]
+  },
+  {
+    "model_name": "v3_DeepResAudioNet",
+    "epoch": 8,
+    "train_loss": 0.276774,
+    "val_loss": 0.389774,
+    "train_acc": 0.939219,
+    "val_acc": 0.84241,
+    "val_balanced_acc": 0.841117,
+    "val_precision": 0.81701,
+    "val_recall": 0.829843,
+    "val_f1": 0.823377,
+    "val_roc_auc": 0.932057,
+    "val_eer": 0.162233,
+    "val_eer_threshold": 0.454722,
+    "learning_rate": 0.00029456,
+    "grad_norm": 0.730032,
+    "epoch_time_sec": 0.2137,
+    "confusion_matrix": [
+      [
+        410,
+        71
+      ],
+      [
+        65,
+        317
+      ]
+    ]
+  },
+  {
+    "model_name": "v3_DeepResAudioNet",
+    "epoch": 9,
+    "train_loss": 0.265958,
+    "val_loss": 0.368168,
+    "train_acc": 0.945369,
+    "val_acc": 0.848204,
+    "val_balanced_acc": 0.844967,
+    "val_precision": 0.836461,
+    "val_recall": 0.816754,
+    "val_f1": 0.82649,
+    "val_roc_auc": 0.944678,
+    "val_eer": 0.144755,
+    "val_eer_threshold": 0.442224,
+    "learning_rate": 0.0002929,
+    "grad_norm": 0.708915,
+    "epoch_time_sec": 0.2456,
+    "confusion_matrix": [
+      [
+        420,
+        61
+      ],
+      [
+        70,
+        312
+      ]
+    ]
+  },
+  {
+    "model_name": "v3_DeepResAudioNet",
+    "epoch": 10,
+    "train_loss": 0.250572,
+    "val_loss": 0.358637,
+    "train_acc": 0.947178,
+    "val_acc": 0.862109,
+    "val_balanced_acc": 0.862291,
+    "val_precision": 0.831234,
+    "val_recall": 0.863874,
+    "val_f1": 0.84724,
+    "val_roc_auc": 0.947688,
+    "val_eer": 0.13667,
+    "val_eer_threshold": 0.507491,
+    "learning_rate": 0.00029104,
+    "grad_norm": 0.732734,
+    "epoch_time_sec": 0.2272,
+    "confusion_matrix": [
+      [
+        414,
+        67
+      ],
+      [
+        52,
+        330
+      ]
+    ]
+  },
+  {
+    "model_name": "v3_DeepResAudioNet",
+    "epoch": 11,
+    "train_loss": 0.245841,
+    "val_loss": 0.37046,
+    "train_acc": 0.951158,
+    "val_acc": 0.849363,
+    "val_balanced_acc": 0.846546,
+    "val_precision": 0.835106,
+    "val_recall": 0.82199,
+    "val_f1": 0.828496,
+    "val_roc_auc": 0.943573,
+    "val_eer": 0.146064,
+    "val_eer_threshold": 0.427112,
+    "learning_rate": 0.00028896,
+    "grad_norm": 0.730252,
+    "epoch_time_sec": 0.2358,
+    "confusion_matrix": [
+      [
+        419,
+        62
+      ],
+      [
+        68,
+        314
+      ]
+    ]
+  },
+  {
+    "model_name": "v3_DeepResAudioNet",
+    "epoch": 12,
+    "train_loss": 0.234209,
+    "val_loss": 0.367892,
+    "train_acc": 0.959841,
+    "val_acc": 0.862109,
+    "val_balanced_acc": 0.85825,
+    "val_precision": 0.858311,
+    "val_recall": 0.824607,
+    "val_f1": 0.841121,
+    "val_roc_auc": 0.946615,
+    "val_eer": 0.137979,
+    "val_eer_threshold": 0.409353,
+    "learning_rate": 0.00028668,
+    "grad_norm": 0.731107,
+    "epoch_time_sec": 0.2452,
+    "confusion_matrix": [
+      [
+        429,
+        52
+      ],
+      [
+        67,
+        315
+      ]
+    ]
+  },
+  {
+    "model_name": "v3_DeepResAudioNet",
+    "epoch": 13,
+    "train_loss": 0.230958,
+    "val_loss": 0.36325,
+    "train_acc": 0.958032,
+    "val_acc": 0.853998,
+    "val_balanced_acc": 0.85232,
+    "val_precision": 0.833333,
+    "val_recall": 0.837696,
+    "val_f1": 0.835509,
+    "val_roc_auc": 0.946468,
+    "val_eer": 0.146064,
+    "val_eer_threshold": 0.450149,
+    "learning_rate": 0.0002842,
+    "grad_norm": 0.760313,
+    "epoch_time_sec": 0.2371,
+    "confusion_matrix": [
+      [
+        417,
+        64
+      ],
+      [
+        62,
+        320
+      ]
+    ]
+  },
+  {
+    "model_name": "v3_DeepResAudioNet",
+    "epoch": 14,
+    "train_loss": 0.217665,
+    "val_loss": 0.354219,
+    "train_acc": 0.966715,
+    "val_acc": 0.866744,
+    "val_balanced_acc": 0.866179,
+    "val_precision": 0.841432,
+    "val_recall": 0.861257,
+    "val_f1": 0.851229,
+    "val_roc_auc": 0.950561,
+    "val_eer": 0.133551,
+    "val_eer_threshold": 0.497451,
+    "learning_rate": 0.00028151,
+    "grad_norm": 0.717076,
+    "epoch_time_sec": 0.2158,
+    "confusion_matrix": [
+      [
+        419,
+        62
+      ],
+      [
+        53,
+        329
+      ]
+    ]
+  },
+  {
+    "model_name": "v3_DeepResAudioNet",
+    "epoch": 15,
+    "train_loss": 0.219134,
+    "val_loss": 0.371379,
+    "train_acc": 0.963097,
+    "val_acc": 0.855156,
+    "val_balanced_acc": 0.855515,
+    "val_precision": 0.822055,
+    "val_recall": 0.858639,
+    "val_f1": 0.839949,
+    "val_roc_auc": 0.944749,
+    "val_eer": 0.140327,
+    "val_eer_threshold": 0.512974,
+    "learning_rate": 0.00027863,
+    "grad_norm": 0.731711,
+    "epoch_time_sec": 0.2288,
+    "confusion_matrix": [
+      [
+        410,
+        71
+      ],
+      [
+        54,
+        328
+      ]
+    ]
+  },
+  {
+    "model_name": "v3_DeepResAudioNet",
+    "epoch": 16,
+    "train_loss": 0.216032,
+    "val_loss": 0.343953,
+    "train_acc": 0.965991,
+    "val_acc": 0.872538,
+    "val_balanced_acc": 0.870838,
+    "val_precision": 0.856021,
+    "val_recall": 0.856021,
+    "val_f1": 0.856021,
+    "val_roc_auc": 0.956227,
+    "val_eer": 0.126237,
+    "val_eer_threshold": 0.444903,
+    "learning_rate": 0.00027556,
+    "grad_norm": 0.701665,
+    "epoch_time_sec": 0.2118,
+    "confusion_matrix": [
+      [
+        426,
+        55
+      ],
+      [
+        55,
+        327
+      ]
+    ]
+  },
+  {
+    "model_name": "v3_DeepResAudioNet",
+    "epoch": 17,
+    "train_loss": 0.202619,
+    "val_loss": 0.342158,
+    "train_acc": 0.969971,
+    "val_acc": 0.881808,
+    "val_balanced_acc": 0.878346,
+    "val_precision": 0.880435,
+    "val_recall": 0.848168,
+    "val_f1": 0.864,
+    "val_roc_auc": 0.957266,
+    "val_eer": 0.119461,
+    "val_eer_threshold": 0.388469,
+    "learning_rate": 0.00027231,
+    "grad_norm": 0.764143,
+    "epoch_time_sec": 0.2296,
+    "confusion_matrix": [
+      [
+        437,
+        44
+      ],
+      [
+        58,
+        324
+      ]
+    ]
+  },
+  {
+    "model_name": "v3_DeepResAudioNet",
+    "epoch": 18,
+    "train_loss": 0.203809,
+    "val_loss": 0.346669,
+    "train_acc": 0.973951,
+    "val_acc": 0.882966,
+    "val_balanced_acc": 0.88154,
+    "val_precision": 0.866841,
+    "val_recall": 0.86911,
+    "val_f1": 0.867974,
+    "val_roc_auc": 0.955563,
+    "val_eer": 0.122849,
+    "val_eer_threshold": 0.462638,
+    "learning_rate": 0.00026887,
+    "grad_norm": 0.700469,
+    "epoch_time_sec": 0.2257,
+    "confusion_matrix": [
+      [
+        430,
+        51
+      ],
+      [
+        50,
+        332
+      ]
+    ]
+  },
+  {
+    "model_name": "v3_DeepResAudioNet",
+    "epoch": 19,
+    "train_loss": 0.198566,
+    "val_loss": 0.348257,
+    "train_acc": 0.975036,
+    "val_acc": 0.873696,
+    "val_balanced_acc": 0.871069,
+    "val_precision": 0.864,
+    "val_recall": 0.848168,
+    "val_f1": 0.856011,
+    "val_roc_auc": 0.956063,
+    "val_eer": 0.121809,
+    "val_eer_threshold": 0.410907,
+    "learning_rate": 0.00026526,
+    "grad_norm": 0.687571,
+    "epoch_time_sec": 0.232,
+    "confusion_matrix": [
+      [
+        430,
+        51
+      ],
+      [
+        58,
+        324
+      ]
+    ]
+  },
+  {
+    "model_name": "v3_DeepResAudioNet",
+    "epoch": 20,
+    "train_loss": 0.197047,
+    "val_loss": 0.368459,
+    "train_acc": 0.973227,
+    "val_acc": 0.864426,
+    "val_balanced_acc": 0.865447,
+    "val_precision": 0.828784,
+    "val_recall": 0.874346,
+    "val_f1": 0.850955,
+    "val_roc_auc": 0.948885,
+    "val_eer": 0.134591,
+    "val_eer_threshold": 0.529658,
+    "learning_rate": 0.00026148,
+    "grad_norm": 0.682558,
+    "epoch_time_sec": 0.2203,
+    "confusion_matrix": [
+      [
+        412,
+        69
+      ],
+      [
+        48,
+        334
+      ]
+    ]
+  },
+  {
+    "model_name": "v3_DeepResAudioNet",
+    "epoch": 21,
+    "train_loss": 0.186339,
+    "val_loss": 0.353669,
+    "train_acc": 0.981187,
+    "val_acc": 0.871379,
+    "val_balanced_acc": 0.867643,
+    "val_precision": 0.86921,
+    "val_recall": 0.835079,
+    "val_f1": 0.851802,
+    "val_roc_auc": 0.956477,
+    "val_eer": 0.125967,
+    "val_eer_threshold": 0.349413,
+    "learning_rate": 0.00025753,
+    "grad_norm": 0.662337,
+    "epoch_time_sec": 0.2169,
+    "confusion_matrix": [
+      [
+        433,
+        48
+      ],
+      [
+        63,
+        319
+      ]
+    ]
+  },
+  {
+    "model_name": "v3_DeepResAudioNet",
+    "epoch": 22,
+    "train_loss": 0.1991,
+    "val_loss": 0.344839,
+    "train_acc": 0.968524,
+    "val_acc": 0.876014,
+    "val_balanced_acc": 0.87665,
+    "val_precision": 0.844612,
+    "val_recall": 0.882199,
+    "val_f1": 0.862996,
+    "val_roc_auc": 0.95774,
+    "val_eer": 0.123888,
+    "val_eer_threshold": 0.5209,
+    "learning_rate": 0.00025343,
+    "grad_norm": 0.784805,
+    "epoch_time_sec": 0.2341,
+    "confusion_matrix": [
+      [
+        419,
+        62
+      ],
+      [
+        45,
+        337
+      ]
+    ]
+  },
+  {
+    "model_name": "v3_DeepResAudioNet",
+    "epoch": 23,
+    "train_loss": 0.182965,
+    "val_loss": 0.350029,
+    "train_acc": 0.982634,
+    "val_acc": 0.884125,
+    "val_balanced_acc": 0.882311,
+    "val_precision": 0.871053,
+    "val_recall": 0.866492,
+    "val_f1": 0.868766,
+    "val_roc_auc": 0.956858,
+    "val_eer": 0.125197,
+    "val_eer_threshold": 0.436211,
+    "learning_rate": 0.00024917,
+    "grad_norm": 0.644252,
+    "epoch_time_sec": 0.2199,
+    "confusion_matrix": [
+      [
+        432,
+        49
+      ],
+      [
+        51,
+        331
+      ]
+    ]
+  },
+  {
+    "model_name": "v3_DeepResAudioNet",
+    "epoch": 24,
+    "train_loss": 0.186864,
+    "val_loss": 0.376937,
+    "train_acc": 0.980101,
+    "val_acc": 0.863268,
+    "val_balanced_acc": 0.859559,
+    "val_precision": 0.858696,
+    "val_recall": 0.827225,
+    "val_f1": 0.842667,
+    "val_roc_auc": 0.952335,
+    "val_eer": 0.133282,
+    "val_eer_threshold": 0.368822,
+    "learning_rate": 0.00024477,
+    "grad_norm": 0.750599,
+    "epoch_time_sec": 0.2527,
+    "confusion_matrix": [
+      [
+        429,
+        52
+      ],
+      [
+        66,
+        316
+      ]
+    ]
+  },
+  {
+    "model_name": "v3_DeepResAudioNet",
+    "epoch": 25,
+    "train_loss": 0.187106,
+    "val_loss": 0.358173,
+    "train_acc": 0.980825,
+    "val_acc": 0.874855,
+    "val_balanced_acc": 0.874264,
+    "val_precision": 0.851282,
+    "val_recall": 0.86911,
+    "val_f1": 0.860104,
+    "val_roc_auc": 0.955835,
+    "val_eer": 0.122849,
+    "val_eer_threshold": 0.471541,
+    "learning_rate": 0.00024023,
+    "grad_norm": 0.755103,
+    "epoch_time_sec": 0.2222,
+    "confusion_matrix": [
+      [
+        423,
+        58
+      ],
+      [
+        50,
+        332
+      ]
+    ]
+  },
+  {
+    "model_name": "v3_DeepResAudioNet",
+    "epoch": 26,
+    "train_loss": 0.185489,
+    "val_loss": 0.364062,
+    "train_acc": 0.979016,
+    "val_acc": 0.87022,
+    "val_balanced_acc": 0.870106,
+    "val_precision": 0.84264,
+    "val_recall": 0.86911,
+    "val_f1": 0.85567,
+    "val_roc_auc": 0.953984,
+    "val_eer": 0.128585,
+    "val_eer_threshold": 0.492734,
+    "learning_rate": 0.00023556,
+    "grad_norm": 0.677101,
+    "epoch_time_sec": 0.2319,
+    "confusion_matrix": [
+      [
+        419,
+        62
+      ],
+      [
+        50,
+        332
+      ]
+    ]
+  },
+  {
+    "model_name": "v3_DeepResAudioNet",
+    "epoch": 27,
+    "train_loss": 0.183262,
+    "val_loss": 0.374166,
+    "train_acc": 0.982272,
+    "val_acc": 0.878331,
+    "val_balanced_acc": 0.882501,
+    "val_precision": 0.825882,
+    "val_recall": 0.918848,
+    "val_f1": 0.869888,
+    "val_roc_auc": 0.953658,
+    "val_eer": 0.123888,
+    "val_eer_threshold": 0.670113,
+    "learning_rate": 0.00023076,
+    "grad_norm": 0.772041,
+    "epoch_time_sec": 0.2255,
+    "confusion_matrix": [
+      [
+        407,
+        74
+      ],
+      [
+        31,
+        351
+      ]
+    ]
+  },
+  {
+    "model_name": "v3_DeepResAudioNet",
+    "epoch": 28,
+    "train_loss": 0.176609,
+    "val_loss": 0.365934,
+    "train_acc": 0.983357,
+    "val_acc": 0.867903,
+    "val_balanced_acc": 0.867219,
+    "val_precision": 0.84359,
+    "val_recall": 0.861257,
+    "val_f1": 0.852332,
+    "val_roc_auc": 0.954534,
+    "val_eer": 0.130934,
+    "val_eer_threshold": 0.478335,
+    "learning_rate": 0.00022585,
+    "grad_norm": 0.660062,
+    "epoch_time_sec": 0.2198,
+    "confusion_matrix": [
+      [
+        420,
+        61
+      ],
+      [
+        53,
+        329
+      ]
+    ]
+  },
+  {
+    "model_name": "v3_DeepResAudioNet",
+    "epoch": 29,
+    "train_loss": 0.17673,
+    "val_loss": 0.359253,
+    "train_acc": 0.984443,
+    "val_acc": 0.886443,
+    "val_balanced_acc": 0.889508,
+    "val_precision": 0.841346,
+    "val_recall": 0.91623,
+    "val_f1": 0.877193,
+    "val_roc_auc": 0.957571,
+    "val_eer": 0.122849,
+    "val_eer_threshold": 0.611425,
+    "learning_rate": 0.00022083,
+    "grad_norm": 0.665692,
+    "epoch_time_sec": 0.2356,
+    "confusion_matrix": [
+      [
+        415,
+        66
+      ],
+      [
+        32,
+        350
+      ]
+    ]
+  },
+  {
+    "model_name": "v3_DeepResAudioNet",
+    "epoch": 30,
+    "train_loss": 0.174576,
+    "val_loss": 0.376775,
+    "train_acc": 0.98589,
+    "val_acc": 0.872538,
+    "val_balanced_acc": 0.872724,
+    "val_precision": 0.843434,
+    "val_recall": 0.874346,
+    "val_f1": 0.858612,
+    "val_roc_auc": 0.952515,
+    "val_eer": 0.126237,
+    "val_eer_threshold": 0.506027,
+    "learning_rate": 0.00021571,
+    "grad_norm": 0.6706,
+    "epoch_time_sec": 0.2319,
+    "confusion_matrix": [
+      [
+        419,
+        62
+      ],
+      [
+        48,
+        334
+      ]
+    ]
+  },
+  {
+    "model_name": "v3_DeepResAudioNet",
+    "epoch": 31,
+    "train_loss": 0.175697,
+    "val_loss": 0.380611,
+    "train_acc": 0.987337,
+    "val_acc": 0.871379,
+    "val_balanced_acc": 0.871954,
+    "val_precision": 0.839599,
+    "val_recall": 0.876963,
+    "val_f1": 0.857875,
+    "val_roc_auc": 0.952248,
+    "val_eer": 0.128585,
+    "val_eer_threshold": 0.520841,
+    "learning_rate": 0.00021049,
+    "grad_norm": 0.642437,
+    "epoch_time_sec": 0.2141,
+    "confusion_matrix": [
+      [
+        417,
+        64
+      ],
+      [
+        47,
+        335
+      ]
+    ]
+  },
+  {
+    "model_name": "v3_DeepResAudioNet",
+    "epoch": 32,
+    "train_loss": 0.169913,
+    "val_loss": 0.392177,
+    "train_acc": 0.989146,
+    "val_acc": 0.864426,
+    "val_balanced_acc": 0.864639,
+    "val_precision": 0.833753,
+    "val_recall": 0.866492,
+    "val_f1": 0.849807,
+    "val_roc_auc": 0.947775,
+    "val_eer": 0.133282,
+    "val_eer_threshold": 0.506502,
+    "learning_rate": 0.00020519,
+    "grad_norm": 0.600385,
+    "epoch_time_sec": 0.2308,
+    "confusion_matrix": [
+      [
+        415,
+        66
+      ],
+      [
+        51,
+        331
+      ]
+    ]
+  },
+  {
+    "model_name": "v3_DeepResAudioNet",
+    "epoch": 33,
+    "train_loss": 0.173015,
+    "val_loss": 0.397039,
+    "train_acc": 0.984443,
+    "val_acc": 0.87022,
+    "val_balanced_acc": 0.871453,
+    "val_precision": 0.834158,
+    "val_recall": 0.882199,
+    "val_f1": 0.857506,
+    "val_roc_auc": 0.948433,
+    "val_eer": 0.128585,
+    "val_eer_threshold": 0.558611,
+    "learning_rate": 0.00019981,
+    "grad_norm": 0.657698,
+    "epoch_time_sec": 0.2248,
+    "confusion_matrix": [
+      [
+        414,
+        67
+      ],
+      [
+        45,
+        337
+      ]
+    ]
+  },
+  {
+    "model_name": "v3_DeepResAudioNet",
+    "epoch": 34,
+    "train_loss": 0.175742,
+    "val_loss": 0.368476,
+    "train_acc": 0.984443,
+    "val_acc": 0.873696,
+    "val_balanced_acc": 0.871339,
+    "val_precision": 0.862069,
+    "val_recall": 0.850785,
+    "val_f1": 0.85639,
+    "val_roc_auc": 0.955372,
+    "val_eer": 0.125197,
+    "val_eer_threshold": 0.387888,
+    "learning_rate": 0.00019436,
+    "grad_norm": 0.774059,
+    "epoch_time_sec": 0.2318,
+    "confusion_matrix": [
+      [
+        429,
+        52
+      ],
+      [
+        57,
+        325
+      ]
+    ]
+  },
+  {
+    "model_name": "v3_DeepResAudioNet",
+    "epoch": 35,
+    "train_loss": 0.167886,
+    "val_loss": 0.365013,
+    "train_acc": 0.988423,
+    "val_acc": 0.876014,
+    "val_balanced_acc": 0.875573,
+    "val_precision": 0.851662,
+    "val_recall": 0.871728,
+    "val_f1": 0.861578,
+    "val_roc_auc": 0.955835,
+    "val_eer": 0.122849,
+    "val_eer_threshold": 0.486957,
+    "learning_rate": 0.00018885,
+    "grad_norm": 0.602673,
+    "epoch_time_sec": 0.2445,
+    "confusion_matrix": [
+      [
+        423,
+        58
+      ],
+      [
+        49,
+        333
+      ]
+    ]
+  },
+  {
+    "model_name": "v3_DeepResAudioNet",
+    "epoch": 36,
+    "train_loss": 0.169118,
+    "val_loss": 0.374523,
+    "train_acc": 0.988061,
+    "val_acc": 0.873696,
+    "val_balanced_acc": 0.874033,
+    "val_precision": 0.843829,
+    "val_recall": 0.876963,
+    "val_f1": 0.860077,
+    "val_roc_auc": 0.954823,
+    "val_eer": 0.126237,
+    "val_eer_threshold": 0.51529,
+    "learning_rate": 0.00018329,
+    "grad_norm": 0.637835,
+    "epoch_time_sec": 0.227,
+    "confusion_matrix": [
+      [
+        419,
+        62
+      ],
+      [
+        47,
+        335
+      ]
+    ]
+  },
+  {
+    "model_name": "v3_DeepResAudioNet",
+    "epoch": 37,
+    "train_loss": 0.161763,
+    "val_loss": 0.381781,
+    "train_acc": 0.993126,
+    "val_acc": 0.867903,
+    "val_balanced_acc": 0.868296,
+    "val_precision": 0.836683,
+    "val_recall": 0.871728,
+    "val_f1": 0.853846,
+    "val_roc_auc": 0.951933,
+    "val_eer": 0.128585,
+    "val_eer_threshold": 0.527014,
+    "learning_rate": 0.00017768,
+    "grad_norm": 0.506107,
+    "epoch_time_sec": 0.2214,
+    "confusion_matrix": [
+      [
+        416,
+        65
+      ],
+      [
+        49,
+        333
+      ]
+    ]
+  },
+  {
+    "model_name": "v3_DeepResAudioNet",
+    "epoch": 38,
+    "train_loss": 0.165969,
+    "val_loss": 0.378263,
+    "train_acc": 0.990232,
+    "val_acc": 0.877173,
+    "val_balanced_acc": 0.876343,
+    "val_precision": 0.85567,
+    "val_recall": 0.86911,
+    "val_f1": 0.862338,
+    "val_roc_auc": 0.953554,
+    "val_eer": 0.125197,
+    "val_eer_threshold": 0.46292,
+    "learning_rate": 0.00017204,
+    "grad_norm": 0.543196,
+    "epoch_time_sec": 0.2257,
+    "confusion_matrix": [
+      [
+        425,
+        56
+      ],
+      [
+        50,
+        332
+      ]
+    ]
+  },
+  {
+    "model_name": "v3_DeepResAudioNet",
+    "epoch": 39,
+    "train_loss": 0.171139,
+    "val_loss": 0.375505,
+    "train_acc": 0.98589,
+    "val_acc": 0.877173,
+    "val_balanced_acc": 0.878498,
+    "val_precision": 0.841584,
+    "val_recall": 0.890052,
+    "val_f1": 0.86514,
+    "val_roc_auc": 0.955731,
+    "val_eer": 0.122849,
+    "val_eer_threshold": 0.592009,
+    "learning_rate": 0.00016638,
+    "grad_norm": 0.651853,
+    "epoch_time_sec": 0.2284,
+    "confusion_matrix": [
+      [
+        417,
+        64
+      ],
+      [
+        42,
+        340
+      ]
+    ]
+  },
+  {
+    "model_name": "v3_DeepResAudioNet",
+    "epoch": 40,
+    "train_loss": 0.165221,
+    "val_loss": 0.36779,
+    "train_acc": 0.990955,
+    "val_acc": 0.881808,
+    "val_balanced_acc": 0.880501,
+    "val_precision": 0.864583,
+    "val_recall": 0.86911,
+    "val_f1": 0.866841,
+    "val_roc_auc": 0.955867,
+    "val_eer": 0.127276,
+    "val_eer_threshold": 0.425812,
+    "learning_rate": 0.00016069,
+    "grad_norm": 0.629691,
+    "epoch_time_sec": 0.2275,
+    "confusion_matrix": [
+      [
+        429,
+        52
+      ],
+      [
+        50,
+        332
+      ]
+    ]
+  },
+  {
+    "model_name": "v3_DeepResAudioNet",
+    "epoch": 41,
+    "train_loss": 0.164599,
+    "val_loss": 0.367183,
+    "train_acc": 0.990232,
+    "val_acc": 0.87949,
+    "val_balanced_acc": 0.87923,
+    "val_precision": 0.854592,
+    "val_recall": 0.876963,
+    "val_f1": 0.865633,
+    "val_roc_auc": 0.95658,
+    "val_eer": 0.119461,
+    "val_eer_threshold": 0.478267,
+    "learning_rate": 0.000155,
+    "grad_norm": 0.572322,
+    "epoch_time_sec": 0.2309,
+    "confusion_matrix": [
+      [
+        424,
+        57
+      ],
+      [
+        47,
+        335
+      ]
+    ]
+  },
+  {
+    "model_name": "v3_DeepResAudioNet",
+    "epoch": 42,
+    "train_loss": 0.162885,
+    "val_loss": 0.36288,
+    "train_acc": 0.989508,
+    "val_acc": 0.880649,
+    "val_balanced_acc": 0.882964,
+    "val_precision": 0.839416,
+    "val_recall": 0.903141,
+    "val_f1": 0.870113,
+    "val_roc_auc": 0.959732,
+    "val_eer": 0.113455,
+    "val_eer_threshold": 0.600425,
+    "learning_rate": 0.00014931,
+    "grad_norm": 0.577043,
+    "epoch_time_sec": 0.2365,
+    "confusion_matrix": [
+      [
+        415,
+        66
+      ],
+      [
+        37,
+        345
+      ]
+    ]
+  },
+  {
+    "model_name": "v3_DeepResAudioNet",
+    "epoch": 43,
+    "train_loss": 0.166428,
+    "val_loss": 0.36158,
+    "train_acc": 0.987699,
+    "val_acc": 0.886443,
+    "val_balanced_acc": 0.885467,
+    "val_precision": 0.867876,
+    "val_recall": 0.876963,
+    "val_f1": 0.872396,
+    "val_roc_auc": 0.95818,
+    "val_eer": 0.118152,
+    "val_eer_threshold": 0.432218,
+    "learning_rate": 0.00014362,
+    "grad_norm": 0.585297,
+    "epoch_time_sec": 0.2532,
+    "confusion_matrix": [
+      [
+        430,
+        51
+      ],
+      [
+        47,
+        335
+      ]
+    ]
+  },
+  {
+    "model_name": "v3_DeepResAudioNet",
+    "epoch": 44,
+    "train_loss": 0.165953,
+    "val_loss": 0.34738,
+    "train_acc": 0.988784,
+    "val_acc": 0.887601,
+    "val_balanced_acc": 0.887315,
+    "val_precision": 0.86445,
+    "val_recall": 0.884817,
+    "val_f1": 0.874515,
+    "val_roc_auc": 0.962317,
+    "val_eer": 0.112416,
+    "val_eer_threshold": 0.490166,
+    "learning_rate": 0.00013796,
+    "grad_norm": 0.648124,
+    "epoch_time_sec": 0.2275,
+    "confusion_matrix": [
+      [
+        428,
+        53
+      ],
+      [
+        44,
+        338
+      ]
+    ]
+  },
+  {
+    "model_name": "v3_DeepResAudioNet",
+    "epoch": 45,
+    "train_loss": 0.162098,
+    "val_loss": 0.373299,
+    "train_acc": 0.991679,
+    "val_acc": 0.876014,
+    "val_balanced_acc": 0.87692,
+    "val_precision": 0.842893,
+    "val_recall": 0.884817,
+    "val_f1": 0.863346,
+    "val_roc_auc": 0.955323,
+    "val_eer": 0.121809,
+    "val_eer_threshold": 0.531185,
+    "learning_rate": 0.00013232,
+    "grad_norm": 0.546475,
+    "epoch_time_sec": 0.2199,
+    "confusion_matrix": [
+      [
+        418,
+        63
+      ],
+      [
+        44,
+        338
+      ]
+    ]
+  },
+  {
+    "model_name": "v3_DeepResAudioNet",
+    "epoch": 46,
+    "train_loss": 0.164622,
+    "val_loss": 0.374183,
+    "train_acc": 0.988784,
+    "val_acc": 0.882966,
+    "val_balanced_acc": 0.885581,
+    "val_precision": 0.840194,
+    "val_recall": 0.908377,
+    "val_f1": 0.872956,
+    "val_roc_auc": 0.95793,
+    "val_eer": 0.119461,
+    "val_eer_threshold": 0.649484,
+    "learning_rate": 0.00012671,
+    "grad_norm": 0.665075,
+    "epoch_time_sec": 0.2495,
+    "confusion_matrix": [
+      [
+        415,
+        66
+      ],
+      [
+        35,
+        347
+      ]
+    ]
+  },
+  {
+    "model_name": "v3_DeepResAudioNet",
+    "epoch": 47,
+    "train_loss": 0.160315,
+    "val_loss": 0.367085,
+    "train_acc": 0.992041,
+    "val_acc": 0.885284,
+    "val_balanced_acc": 0.886583,
+    "val_precision": 0.851117,
+    "val_recall": 0.897906,
+    "val_f1": 0.873885,
+    "val_roc_auc": 0.958589,
+    "val_eer": 0.114495,
+    "val_eer_threshold": 0.563746,
+    "learning_rate": 0.00012115,
+    "grad_norm": 0.514426,
+    "epoch_time_sec": 0.2294,
+    "confusion_matrix": [
+      [
+        421,
+        60
+      ],
+      [
+        39,
+        343
+      ]
+    ]
+  },
+  {
+    "model_name": "v3_DeepResAudioNet",
+    "epoch": 48,
+    "train_loss": 0.161325,
+    "val_loss": 0.369736,
+    "train_acc": 0.993126,
+    "val_acc": 0.87949,
+    "val_balanced_acc": 0.87923,
+    "val_precision": 0.854592,
+    "val_recall": 0.876963,
+    "val_f1": 0.865633,
+    "val_roc_auc": 0.957506,
+    "val_eer": 0.122849,
+    "val_eer_threshold": 0.49655,
+    "learning_rate": 0.00011564,
+    "grad_norm": 0.654116,
+    "epoch_time_sec": 0.2602,
+    "confusion_matrix": [
+      [
+        424,
+        57
+      ],
+      [
+        47,
+        335
+      ]
+    ]
+  },
+  {
+    "model_name": "v3_DeepResAudioNet",
+    "epoch": 49,
+    "train_loss": 0.16285,
+    "val_loss": 0.380195,
+    "train_acc": 0.991679,
+    "val_acc": 0.880649,
+    "val_balanced_acc": 0.882425,
+    "val_precision": 0.842752,
+    "val_recall": 0.897906,
+    "val_f1": 0.869455,
+    "val_roc_auc": 0.956259,
+    "val_eer": 0.126237,
+    "val_eer_threshold": 0.583671,
+    "learning_rate": 0.00011019,
+    "grad_norm": 0.52988,
+    "epoch_time_sec": 0.2498,
+    "confusion_matrix": [
+      [
+        417,
+        64
+      ],
+      [
+        39,
+        343
+      ]
+    ]
+  },
+  {
+    "model_name": "v3_DeepResAudioNet",
+    "epoch": 50,
+    "train_loss": 0.16325,
+    "val_loss": 0.386179,
+    "train_acc": 0.990955,
+    "val_acc": 0.867903,
+    "val_balanced_acc": 0.86668,
+    "val_precision": 0.84715,
+    "val_recall": 0.856021,
+    "val_f1": 0.851562,
+    "val_roc_auc": 0.953261,
+    "val_eer": 0.125197,
+    "val_eer_threshold": 0.472324,
+    "learning_rate": 0.00010481,
+    "grad_norm": 0.581974,
+    "epoch_time_sec": 0.2569,
+    "confusion_matrix": [
+      [
+        422,
+        59
+      ],
+      [
+        55,
+        327
+      ]
+    ]
+  },
+  {
+    "model_name": "v3_DeepResAudioNet",
+    "epoch": 51,
+    "train_loss": 0.16315,
+    "val_loss": 0.369141,
+    "train_acc": 0.988784,
+    "val_acc": 0.882966,
+    "val_balanced_acc": 0.883157,
+    "val_precision": 0.855696,
+    "val_recall": 0.884817,
+    "val_f1": 0.870013,
+    "val_roc_auc": 0.957005,
+    "val_eer": 0.118152,
+    "val_eer_threshold": 0.519111,
+    "learning_rate": 9.951e-05,
+    "grad_norm": 0.598964,
+    "epoch_time_sec": 0.2585,
+    "confusion_matrix": [
+      [
+        424,
+        57
+      ],
+      [
+        44,
+        338
+      ]
+    ]
+  },
+  {
+    "model_name": "v3_DeepResAudioNet",
+    "epoch": 52,
+    "train_loss": 0.165614,
+    "val_loss": 0.38164,
+    "train_acc": 0.986975,
+    "val_acc": 0.876014,
+    "val_balanced_acc": 0.879344,
+    "val_precision": 0.828162,
+    "val_recall": 0.908377,
+    "val_f1": 0.866417,
+    "val_roc_auc": 0.955508,
+    "val_eer": 0.1205,
+    "val_eer_threshold": 0.673039,
+    "learning_rate": 9.429e-05,
+    "grad_norm": 0.670164,
+    "epoch_time_sec": 0.2168,
+    "confusion_matrix": [
+      [
+        409,
+        72
+      ],
+      [
+        35,
+        347
+      ]
+    ]
+  },
+  {
+    "model_name": "v3_DeepResAudioNet",
+    "epoch": 53,
+    "train_loss": 0.162637,
+    "val_loss": 0.365327,
+    "train_acc": 0.992041,
+    "val_acc": 0.87949,
+    "val_balanced_acc": 0.8795,
+    "val_precision": 0.852792,
+    "val_recall": 0.879581,
+    "val_f1": 0.865979,
+    "val_roc_auc": 0.957473,
+    "val_eer": 0.122579,
+    "val_eer_threshold": 0.494867,
+    "learning_rate": 8.917e-05,
+    "grad_norm": 0.555581,
+    "epoch_time_sec": 0.2365,
+    "confusion_matrix": [
+      [
+        423,
+        58
+      ],
+      [
+        46,
+        336
+      ]
+    ]
+  },
+  {
+    "model_name": "v3_DeepResAudioNet",
+    "epoch": 54,
+    "train_loss": 0.157717,
+    "val_loss": 0.372187,
+    "train_acc": 0.99602,
+    "val_acc": 0.877173,
+    "val_balanced_acc": 0.877959,
+    "val_precision": 0.845,
+    "val_recall": 0.884817,
+    "val_f1": 0.86445,
+    "val_roc_auc": 0.95744,
+    "val_eer": 0.119461,
+    "val_eer_threshold": 0.567475,
+    "learning_rate": 8.415e-05,
+    "grad_norm": 0.49096,
+    "epoch_time_sec": 0.2455,
+    "confusion_matrix": [
+      [
+        419,
+        62
+      ],
+      [
+        44,
+        338
+      ]
+    ]
+  },
+  {
+    "model_name": "v3_DeepResAudioNet",
+    "epoch": 55,
+    "train_loss": 0.159408,
+    "val_loss": 0.374391,
+    "train_acc": 0.993849,
+    "val_acc": 0.87949,
+    "val_balanced_acc": 0.878691,
+    "val_precision": 0.858247,
+    "val_recall": 0.871728,
+    "val_f1": 0.864935,
+    "val_roc_auc": 0.956238,
+    "val_eer": 0.118152,
+    "val_eer_threshold": 0.46704,
+    "learning_rate": 7.924e-05,
+    "grad_norm": 0.552911,
+    "epoch_time_sec": 0.2396,
+    "confusion_matrix": [
+      [
+        426,
+        55
+      ],
+      [
+        49,
+        333
+      ]
+    ]
+  },
+  {
+    "model_name": "v3_DeepResAudioNet",
+    "epoch": 56,
+    "train_loss": 0.164205,
+    "val_loss": 0.373649,
+    "train_acc": 0.989146,
+    "val_acc": 0.891078,
+    "val_balanced_acc": 0.895552,
+    "val_precision": 0.838028,
+    "val_recall": 0.934555,
+    "val_f1": 0.883663,
+    "val_roc_auc": 0.959449,
+    "val_eer": 0.112416,
+    "val_eer_threshold": 0.678232,
+    "learning_rate": 7.444e-05,
+    "grad_norm": 0.686262,
+    "epoch_time_sec": 0.2281,
+    "confusion_matrix": [
+      [
+        412,
+        69
+      ],
+      [
+        25,
+        357
+      ]
+    ]
+  },
+  {
+    "model_name": "v3_DeepResAudioNet",
+    "epoch": 57,
+    "train_loss": 0.1571,
+    "val_loss": 0.353837,
+    "train_acc": 0.993488,
+    "val_acc": 0.882966,
+    "val_balanced_acc": 0.881271,
+    "val_precision": 0.868766,
+    "val_recall": 0.866492,
+    "val_f1": 0.867628,
+    "val_roc_auc": 0.961087,
+    "val_eer": 0.118691,
+    "val_eer_threshold": 0.439735,
+    "learning_rate": 6.977e-05,
+    "grad_norm": 0.546292,
+    "epoch_time_sec": 0.2198,
+    "confusion_matrix": [
+      [
+        431,
+        50
+      ],
+      [
+        51,
+        331
+      ]
+    ]
+  },
+  {
+    "model_name": "v3_DeepResAudioNet",
+    "epoch": 58,
+    "train_loss": 0.167659,
+    "val_loss": 0.36049,
+    "train_acc": 0.988061,
+    "val_acc": 0.886443,
+    "val_balanced_acc": 0.887084,
+    "val_precision": 0.856784,
+    "val_recall": 0.89267,
+    "val_f1": 0.874359,
+    "val_roc_auc": 0.959465,
+    "val_eer": 0.117113,
+    "val_eer_threshold": 0.551483,
+    "learning_rate": 6.523e-05,
+    "grad_norm": 0.603489,
+    "epoch_time_sec": 0.2318,
+    "confusion_matrix": [
+      [
+        424,
+        57
+      ],
+      [
+        41,
+        341
+      ]
+    ]
+  },
+  {
+    "model_name": "v3_DeepResAudioNet",
+    "epoch": 59,
+    "train_loss": 0.158924,
+    "val_loss": 0.362076,
+    "train_acc": 0.993126,
+    "val_acc": 0.881808,
+    "val_balanced_acc": 0.881579,
+    "val_precision": 0.857143,
+    "val_recall": 0.879581,
+    "val_f1": 0.868217,
+    "val_roc_auc": 0.959187,
+    "val_eer": 0.113186,
+    "val_eer_threshold": 0.468811,
+    "learning_rate": 6.083e-05,
+    "grad_norm": 0.467578,
+    "epoch_time_sec": 0.2453,
+    "confusion_matrix": [
+      [
+        425,
+        56
+      ],
+      [
+        46,
+        336
+      ]
+    ]
+  },
+  {
+    "model_name": "v3_DeepResAudioNet",
+    "epoch": 60,
+    "train_loss": 0.158376,
+    "val_loss": 0.369756,
+    "train_acc": 0.992402,
+    "val_acc": 0.882966,
+    "val_balanced_acc": 0.882349,
+    "val_precision": 0.861183,
+    "val_recall": 0.876963,
+    "val_f1": 0.869001,
+    "val_roc_auc": 0.957974,
+    "val_eer": 0.114764,
+    "val_eer_threshold": 0.475466,
+    "learning_rate": 5.657e-05,
+    "grad_norm": 0.493827,
+    "epoch_time_sec": 0.243,
+    "confusion_matrix": [
+      [
+        427,
+        54
+      ],
+      [
+        47,
+        335
+      ]
+    ]
+  },
+  {
+    "model_name": "v3_DeepResAudioNet",
+    "epoch": 61,
+    "train_loss": 0.160818,
+    "val_loss": 0.361838,
+    "train_acc": 0.990232,
+    "val_acc": 0.882966,
+    "val_balanced_acc": 0.88154,
+    "val_precision": 0.866841,
+    "val_recall": 0.86911,
+    "val_f1": 0.867974,
+    "val_roc_auc": 0.95977,
+    "val_eer": 0.114764,
+    "val_eer_threshold": 0.438074,
+    "learning_rate": 5.247e-05,
+    "grad_norm": 0.554807,
+    "epoch_time_sec": 0.2215,
+    "confusion_matrix": [
+      [
+        430,
+        51
+      ],
+      [
+        50,
+        332
+      ]
+    ]
+  },
+  {
+    "model_name": "v3_DeepResAudioNet",
+    "epoch": 62,
+    "train_loss": 0.159002,
+    "val_loss": 0.367788,
+    "train_acc": 0.992402,
+    "val_acc": 0.886443,
+    "val_balanced_acc": 0.886814,
+    "val_precision": 0.858586,
+    "val_recall": 0.890052,
+    "val_f1": 0.874036,
+    "val_roc_auc": 0.958039,
+    "val_eer": 0.118421,
+    "val_eer_threshold": 0.531335,
+    "learning_rate": 4.852e-05,
+    "grad_norm": 0.520605,
+    "epoch_time_sec": 0.2308,
+    "confusion_matrix": [
+      [
+        425,
+        56
+      ],
+      [
+        42,
+        340
+      ]
+    ]
+  },
+  {
+    "model_name": "v3_DeepResAudioNet",
+    "epoch": 63,
+    "train_loss": 0.156367,
+    "val_loss": 0.354337,
+    "train_acc": 0.993126,
+    "val_acc": 0.885284,
+    "val_balanced_acc": 0.885236,
+    "val_precision": 0.860051,
+    "val_recall": 0.884817,
+    "val_f1": 0.872258,
+    "val_roc_auc": 0.961647,
+    "val_eer": 0.114764,
+    "val_eer_threshold": 0.506267,
+    "learning_rate": 4.474e-05,
+    "grad_norm": 0.450976,
+    "epoch_time_sec": 0.2207,
+    "confusion_matrix": [
+      [
+        426,
+        55
+      ],
+      [
+        44,
+        338
+      ]
+    ]
+  },
+  {
+    "model_name": "v3_DeepResAudioNet",
+    "epoch": 64,
+    "train_loss": 0.159432,
+    "val_loss": 0.356415,
+    "train_acc": 0.993126,
+    "val_acc": 0.887601,
+    "val_balanced_acc": 0.885698,
+    "val_precision": 0.875989,
+    "val_recall": 0.86911,
+    "val_f1": 0.872536,
+    "val_roc_auc": 0.961294,
+    "val_eer": 0.111376,
+    "val_eer_threshold": 0.406357,
+    "learning_rate": 4.113e-05,
+    "grad_norm": 0.559103,
+    "epoch_time_sec": 0.2717,
+    "confusion_matrix": [
+      [
+        434,
+        47
+      ],
+      [
+        50,
+        332
+      ]
+    ]
+  },
+  {
+    "model_name": "v3_DeepResAudioNet",
+    "epoch": 65,
+    "train_loss": 0.158406,
+    "val_loss": 0.367362,
+    "train_acc": 0.990593,
+    "val_acc": 0.884125,
+    "val_balanced_acc": 0.882849,
+    "val_precision": 0.867188,
+    "val_recall": 0.871728,
+    "val_f1": 0.869452,
+    "val_roc_auc": 0.958447,
+    "val_eer": 0.111376,
+    "val_eer_threshold": 0.456387,
+    "learning_rate": 3.769e-05,
+    "grad_norm": 0.5645,
+    "epoch_time_sec": 0.2529,
+    "confusion_matrix": [
+      [
+        430,
+        51
+      ],
+      [
+        49,
+        333
+      ]
+    ]
+  },
+  {
+    "model_name": "v3_DeepResAudioNet",
+    "epoch": 66,
+    "train_loss": 0.157763,
+    "val_loss": 0.366341,
+    "train_acc": 0.992041,
+    "val_acc": 0.887601,
+    "val_balanced_acc": 0.889739,
+    "val_precision": 0.848411,
+    "val_recall": 0.908377,
+    "val_f1": 0.87737,
+    "val_roc_auc": 0.960782,
+    "val_eer": 0.115804,
+    "val_eer_threshold": 0.634278,
+    "learning_rate": 3.444e-05,
+    "grad_norm": 0.470016,
+    "epoch_time_sec": 0.2594,
+    "confusion_matrix": [
+      [
+        419,
+        62
+      ],
+      [
+        35,
+        347
+      ]
+    ]
+  },
+  {
+    "model_name": "v3_DeepResAudioNet",
+    "epoch": 67,
+    "train_loss": 0.158017,
+    "val_loss": 0.363739,
+    "train_acc": 0.990593,
+    "val_acc": 0.891078,
+    "val_balanced_acc": 0.892589,
+    "val_precision": 0.856436,
+    "val_recall": 0.905759,
+    "val_f1": 0.880407,
+    "val_roc_auc": 0.9594,
+    "val_eer": 0.114764,
+    "val_eer_threshold": 0.591957,
+    "learning_rate": 3.137e-05,
+    "grad_norm": 0.536243,
+    "epoch_time_sec": 0.2408,
+    "confusion_matrix": [
+      [
+        423,
+        58
+      ],
+      [
+        36,
+        346
+      ]
+    ]
+  },
+  {
+    "model_name": "v3_DeepResAudioNet",
+    "epoch": 68,
+    "train_loss": 0.159516,
+    "val_loss": 0.366034,
+    "train_acc": 0.991679,
+    "val_acc": 0.886443,
+    "val_balanced_acc": 0.888431,
+    "val_precision": 0.848039,
+    "val_recall": 0.905759,
+    "val_f1": 0.875949,
+    "val_roc_auc": 0.960445,
+    "val_eer": 0.113455,
+    "val_eer_threshold": 0.632858,
+    "learning_rate": 2.849e-05,
+    "grad_norm": 0.513789,
+    "epoch_time_sec": 0.2407,
+    "confusion_matrix": [
+      [
+        419,
+        62
+      ],
+      [
+        36,
+        346
+      ]
+    ]
+  },
+  {
+    "model_name": "v3_DeepResAudioNet",
+    "epoch": 69,
+    "train_loss": 0.159883,
+    "val_loss": 0.376395,
+    "train_acc": 0.992041,
+    "val_acc": 0.884125,
+    "val_balanced_acc": 0.887699,
+    "val_precision": 0.835714,
+    "val_recall": 0.918848,
+    "val_f1": 0.875312,
+    "val_roc_auc": 0.959313,
+    "val_eer": 0.117382,
+    "val_eer_threshold": 0.704098,
+    "learning_rate": 2.58e-05,
+    "grad_norm": 0.545149,
+    "epoch_time_sec": 0.2215,
+    "confusion_matrix": [
+      [
+        412,
+        69
+      ],
+      [
+        31,
+        351
+      ]
+    ]
+  },
+  {
+    "model_name": "v3_DeepResAudioNet",
+    "epoch": 70,
+    "train_loss": 0.155009,
+    "val_loss": 0.377218,
+    "train_acc": 0.995297,
+    "val_acc": 0.884125,
+    "val_balanced_acc": 0.883119,
+    "val_precision": 0.865285,
+    "val_recall": 0.874346,
+    "val_f1": 0.869792,
+    "val_roc_auc": 0.956613,
+    "val_eer": 0.117113,
+    "val_eer_threshold": 0.465188,
+    "learning_rate": 2.332e-05,
+    "grad_norm": 0.538566,
+    "epoch_time_sec": 0.2391,
+    "confusion_matrix": [
+      [
+        429,
+        52
+      ],
+      [
+        48,
+        334
+      ]
+    ]
+  },
+  {
+    "model_name": "v3_DeepResAudioNet",
+    "epoch": 71,
+    "train_loss": 0.158682,
+    "val_loss": 0.37092,
+    "train_acc": 0.991317,
+    "val_acc": 0.884125,
+    "val_balanced_acc": 0.884196,
+    "val_precision": 0.857868,
+    "val_recall": 0.884817,
+    "val_f1": 0.871134,
+    "val_roc_auc": 0.957097,
+    "val_eer": 0.117113,
+    "val_eer_threshold": 0.510187,
+    "learning_rate": 2.104e-05,
+    "grad_norm": 0.490178,
+    "epoch_time_sec": 0.2467,
+    "confusion_matrix": [
+      [
+        425,
+        56
+      ],
+      [
+        44,
+        338
+      ]
+    ]
+  },
+  {
+    "model_name": "v3_DeepResAudioNet",
+    "epoch": 72,
+    "train_loss": 0.154897,
+    "val_loss": 0.37209,
+    "train_acc": 0.996744,
+    "val_acc": 0.887601,
+    "val_balanced_acc": 0.887045,
+    "val_precision": 0.866324,
+    "val_recall": 0.882199,
+    "val_f1": 0.874189,
+    "val_roc_auc": 0.9575,
+    "val_eer": 0.114764,
+    "val_eer_threshold": 0.489624,
+    "learning_rate": 1.896e-05,
+    "grad_norm": 0.517215,
+    "epoch_time_sec": 0.2135,
+    "confusion_matrix": [
+      [
+        429,
+        52
+      ],
+      [
+        45,
+        337
+      ]
+    ]
+  },
+  {
+    "model_name": "v3_DeepResAudioNet",
+    "epoch": 73,
+    "train_loss": 0.158526,
+    "val_loss": 0.380659,
+    "train_acc": 0.993488,
+    "val_acc": 0.882966,
+    "val_balanced_acc": 0.885043,
+    "val_precision": 0.843521,
+    "val_recall": 0.903141,
+    "val_f1": 0.872314,
+    "val_roc_auc": 0.955356,
+    "val_eer": 0.118152,
+    "val_eer_threshold": 0.557513,
+    "learning_rate": 1.71e-05,
+    "grad_norm": 0.515458,
+    "epoch_time_sec": 0.4422,
+    "confusion_matrix": [
+      [
+        417,
+        64
+      ],
+      [
+        37,
+        345
+      ]
+    ]
+  },
+  {
+    "model_name": "v3_DeepResAudioNet",
+    "epoch": 74,
+    "train_loss": 0.153695,
+    "val_loss": 0.376634,
+    "train_acc": 0.995297,
+    "val_acc": 0.882966,
+    "val_balanced_acc": 0.883696,
+    "val_precision": 0.85213,
+    "val_recall": 0.890052,
+    "val_f1": 0.870679,
+    "val_roc_auc": 0.956118,
+    "val_eer": 0.119461,
+    "val_eer_threshold": 0.55486,
+    "learning_rate": 1.544e-05,
+    "grad_norm": 0.447651,
+    "epoch_time_sec": 0.2726,
+    "confusion_matrix": [
+      [
+        422,
+        59
+      ],
+      [
+        42,
+        340
+      ]
+    ]
+  },
+  {
+    "model_name": "v3_DeepResAudioNet",
+    "epoch": 75,
+    "train_loss": 0.159138,
+    "val_loss": 0.376444,
+    "train_acc": 0.993126,
+    "val_acc": 0.885284,
+    "val_balanced_acc": 0.886852,
+    "val_precision": 0.849383,
+    "val_recall": 0.900524,
+    "val_f1": 0.874206,
+    "val_roc_auc": 0.956461,
+    "val_eer": 0.115804,
+    "val_eer_threshold": 0.562674,
+    "learning_rate": 1.401e-05,
+    "grad_norm": 0.489334,
+    "epoch_time_sec": 0.2299,
+    "confusion_matrix": [
+      [
+        420,
+        61
+      ],
+      [
+        38,
+        344
+      ]
+    ]
+  },
+  {
+    "model_name": "v3_DeepResAudioNet",
+    "epoch": 76,
+    "train_loss": 0.160489,
+    "val_loss": 0.37514,
+    "train_acc": 0.990955,
+    "val_acc": 0.885284,
+    "val_balanced_acc": 0.886044,
+    "val_precision": 0.854637,
+    "val_recall": 0.89267,
+    "val_f1": 0.873239,
+    "val_roc_auc": 0.956515,
+    "val_eer": 0.112146,
+    "val_eer_threshold": 0.52658,
+    "learning_rate": 1.279e-05,
+    "grad_norm": 0.649962,
+    "epoch_time_sec": 0.2377,
+    "confusion_matrix": [
+      [
+        423,
+        58
+      ],
+      [
+        41,
+        341
+      ]
+    ]
+  },
+  {
+    "model_name": "v3_DeepResAudioNet",
+    "epoch": 77,
+    "train_loss": 0.15597,
+    "val_loss": 0.378136,
+    "train_acc": 0.993488,
+    "val_acc": 0.874855,
+    "val_balanced_acc": 0.87157,
+    "val_precision": 0.87027,
+    "val_recall": 0.842932,
+    "val_f1": 0.856383,
+    "val_roc_auc": 0.956455,
+    "val_eer": 0.114764,
+    "val_eer_threshold": 0.337764,
+    "learning_rate": 1.179e-05,
+    "grad_norm": 0.525921,
+    "epoch_time_sec": 0.2356,
+    "confusion_matrix": [
+      [
+        433,
+        48
+      ],
+      [
+        60,
+        322
+      ]
+    ]
+  },
+  {
+    "model_name": "v3_DeepResAudioNet",
+    "epoch": 78,
+    "train_loss": 0.158544,
+    "val_loss": 0.375576,
+    "train_acc": 0.993488,
+    "val_acc": 0.886443,
+    "val_balanced_acc": 0.887353,
+    "val_precision": 0.855,
+    "val_recall": 0.895288,
+    "val_f1": 0.87468,
+    "val_roc_auc": 0.956706,
+    "val_eer": 0.113455,
+    "val_eer_threshold": 0.560754,
+    "learning_rate": 1.101e-05,
+    "grad_norm": 0.542185,
+    "epoch_time_sec": 0.2621,
+    "confusion_matrix": [
+      [
+        423,
+        58
+      ],
+      [
+        40,
+        342
+      ]
+    ]
+  },
+  {
+    "model_name": "v3_DeepResAudioNet",
+    "epoch": 79,
+    "train_loss": 0.159614,
+    "val_loss": 0.372375,
+    "train_acc": 0.992041,
+    "val_acc": 0.884125,
+    "val_balanced_acc": 0.884466,
+    "val_precision": 0.856061,
+    "val_recall": 0.887435,
+    "val_f1": 0.871465,
+    "val_roc_auc": 0.956874,
+    "val_eer": 0.118152,
+    "val_eer_threshold": 0.512324,
+    "learning_rate": 1.045e-05,
+    "grad_norm": 0.615118,
+    "epoch_time_sec": 0.235,
+    "confusion_matrix": [
+      [
+        424,
+        57
+      ],
+      [
+        43,
+        339
+      ]
+    ]
+  },
+  {
+    "model_name": "v3_DeepResAudioNet",
+    "epoch": 80,
+    "train_loss": 0.152981,
+    "val_loss": 0.370525,
+    "train_acc": 0.996382,
+    "val_acc": 0.885284,
+    "val_balanced_acc": 0.883619,
+    "val_precision": 0.871391,
+    "val_recall": 0.86911,
+    "val_f1": 0.870249,
+    "val_roc_auc": 0.956771,
+    "val_eer": 0.114764,
+    "val_eer_threshold": 0.423361,
+    "learning_rate": 1.011e-05,
+    "grad_norm": 0.374798,
+    "epoch_time_sec": 0.235,
+    "confusion_matrix": [
+      [
+        432,
+        49
+      ],
+      [
+        50,
+        332
+      ]
+    ]
+  }
+]
