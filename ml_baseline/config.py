@@ -1,6 +1,8 @@
 """
 Baseline AI Audio Classifier Configuration
 Defines dataset locations, audio parameters, feature extraction specs, and model paths.
+Configured for 100% Pure Open-Source AI Music Generation Models & Bona-Fide Reference.
+(Suno AI is strictly excluded and deprecated per thesis supervisor directive).
 """
 
 import os
@@ -11,11 +13,23 @@ ML_BASELINE_DIR = Path(__file__).resolve().parent
 APP_ROOT = ML_BASELINE_DIR.parent
 WORKSPACE_ROOT = APP_ROOT.parent.parent
 
-# Datasets Paths
+# Datasets Paths - 100% Open-Source AI Music Generation & Bona-fide
 DATASETS_DIR = WORKSPACE_ROOT / "Datasets"
-SUNO_DIR = DATASETS_DIR / "suno" / "original"
-SUNO_SPLITS_DIR = DATASETS_DIR / "suno" / "splits"
+BONAFIDE_DIR = DATASETS_DIR / "bonafide_30"
 MUSDB18_DIR = DATASETS_DIR / "musdb18" / "train"
+
+# Target 4 Open-Source Foundation Generators (Suno completely replaced by ACE-Step)
+ACESTEP_DIR = DATASETS_DIR / "acestep"
+HEARTMULA_DIR = DATASETS_DIR / "heartmula"
+DIFFRHYTHM_DIR = DATASETS_DIR / "diffrhythm"
+MUSE_DIR = DATASETS_DIR / "muse"
+
+OPEN_SOURCE_GENERATOR_DIRS = {
+    "acestep": ACESTEP_DIR,
+    "heartmula": HEARTMULA_DIR,
+    "diffrhythm": DIFFRHYTHM_DIR,
+    "muse": MUSE_DIR,
+}
 
 # Virtual Environment & Tools
 VENV_PYTHON = WORKSPACE_ROOT / ".venv" / "Scripts" / "python.exe"
